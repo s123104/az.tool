@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Draw</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        #results {
+            margin-top: 20px;
+        }
+
+        #results ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #results li {
+            margin-bottom: 5px;
+        }
+
+        #allThreeMatch {
+            color: green;
+        }
+
+        #drawButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Lucky Draw</h2>
+    <button id="drawButton" onclick="drawWinners()">Draw 10 Winners</button>
+    <div id="results">
+        <h3>Users who meet all three criteria:</h3>
+        <ul id="allThreeMatch"></ul>
+    </div>
+
+    <script>
+        // Commented users
+        const commented_users = ["Hussnai09706267", "darmianto5", "FRifai5", "GigQp", "GNam90", "Mandz93", "pebrian002_", "Nanaemot", "Nuntapol_G", "AdieSanjaya15", "Athrampollu", "Sran557", "sheryleth0", "duythien0912", "A8Lu9i", "langtusg0308", "mohammadku58250", "narji20084"];
+        
+        // Liked users
+        const liked_users = ["joinfantech", "GigQp", "Daans", "Calvalry0x", "KawaiFarm", "Laville3883", "CryInsider", "A8Lu9i", "oxo_all", "duythien0912", "langtusg0308", "dongbi9x", "Krazykxkid2590", "GNam90", "Nuntapol_G", "sheryleth0", "Hussnai09706267", "Adyrayy1", "CemCemcengiz55", "bet889bnb", "lifeofblaq", "anhminh280788", "FanTechPost", "Sran557", "EVREN98908721", "Biji255", "pebrian002_", "Heyrids16_", "Bhatharris4", "viscount771", "Mandz93", "mottomo_uts", "Athrampollu", "Enzi166", "locblue202", "Baki11016185", "irfankas135", "sdmn99999", "AdieSanjaya15", "TDragon2706", "MahmutVatan2", "VnChinhVn", "tinh_quoc49128", "mohammadku58250", "narji20084", "haikal_0212"];
+        
+        // Forwarded users
+        const forwarded_users = ["Calvalry0x", "duythien0912", "A8Lu9i", "dongbi9x", "Huong67641181", "GNam90", "Krazykxkid2590", "sheryleth0", "Nuntapol_G", "Adyrayy1", "bet889bnb", "CemCemcengiz55", "Hussnai09706267", "Sran557", "sdmn99999", "VnChinhVn", "AdieSanjaya15", "Biji255", "pebrian002_", "mottomo_uts", "locblue202", "Mandz93", "Baki11016185", "Athrampollu", "Enzi166", "viscount771", "TDragon2706", "MahmutVatan2", "mohammadku58250", "narji20084", "VnChinhVn", "tinh_quoc49128", "haikal_0212"];
+
+        // Users who meet all three criteria
+        const allThreeMatch = commented_users.filter(user => liked_users.includes(user) && forwarded_users.includes(user));
+
+        // Display results on the webpage
+        function displayResults(winners) {
+            const allThreeMatchList = document.getElementById('allThreeMatch');
+            allThreeMatchList.innerHTML = ""; // Clear previous results
+
+            winners.forEach(user => {
+                const listItem = document.createElement('li');
+                listItem.textContent = user;
+                allThreeMatchList.appendChild(listItem);
+            });
+        }
+
+        // Randomly select 10 winners
+        function drawWinners() {
+            const winners = [];
+            const numWinners = 10; // Number of winners to draw
+
+            // Check if there are enough users meeting the criteria
+            if (allThreeMatch.length < numWinners) {
+                alert("Sorry, there are not enough users meeting the criteria for the draw.");
+                return;
+            }
+
+            while (winners.length < numWinners) {
+                const randomIndex = Math.floor(Math.random() * allThreeMatch.length);
+                const winner = allThreeMatch[randomIndex];
+
+                // Avoid selecting the same user more than once
+                if (!winners.includes(winner)) {
+                    winners.push(winner);
+                }
+            }
+
+            // Display the draw results
+            displayResults(winners);
+        }
+    </script>
+</body>
+</html>
