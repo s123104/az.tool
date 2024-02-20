@@ -70,85 +70,42 @@
                 return item !== '';
             });
 
-            var snapshotValue = selectedSnapshot;
-
-            // 根據選擇的快照進行不同的處理
-            switch (selectedSnapshot) {
-                case '12thWL':
-                    snapshotValue = ['12thWL_1', '12thWL_2'];
-                    break;
-                case '13thWL':
-                    snapshotValue = ['13thWL_1', '13thWL_2'];
-                    break;
-                default:
-                    snapshotValue = selectedSnapshot;
-                    break;
-            }
-
             var xhr = new XMLHttpRequest();
-            if (Array.isArray(snapshotValue)) {
-                var jsonDataArray = [];
-                var requestsCompleted = 0;
+            xhr.open("GET", selectedSnapshot + ".json", true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var jsonData = JSON.parse(xhr.responseText);
+                    var results = [];
 
-                // 對每個快照進行請求
-                snapshotValue.forEach(function(snapshot) {
-                    var request = new XMLHttpRequest();
-                    request.open("GET", snapshot + ".json", true);
-                    request.onreadystatechange = function() {
-                        if (request.readyState === 4 && request.status === 200) {
-                            var jsonData = JSON.parse(request.responseText);
-                            jsonDataArray.push.apply(jsonDataArray, jsonData);
-                            requestsCompleted++;
+                    inputArray.forEach(function (address) {
+                        var found = false;
+                        var stakedAmount = "";
+                        var solanaAddress = "";
+                        var evmAddress = "";
 
-                            // 當所有請求完成後處理數據
-                            if (requestsCompleted === snapshotValue.length) {
-                                handleData(jsonDataArray);
+                        for (var i = 0; i < jsonData.length; i++) {
+                            var solana = jsonData[i].solana.toLowerCase();
+                            var evm = jsonData[i].evm.toLowerCase();
+
+                            if (solana === address || evm === address) {
+                                stakedAmount = parseFloat(jsonData[i].stakedAmount) / 1000000; // Convert to Pyth
+                                solanaAddress = jsonData[i].solana;
+                                evmAddress = jsonData[i].evm;
+                                results.push("Snapshot: " + selectedSnapshot + "<br>Solana Address: " + solanaAddress + "<br>EVM Address: " + evmAddress + "<br>Staked Amount: " + stakedAmount.toFixed(6) + " $PYTH");
+                                found = true;
+                                break;
                             }
                         }
-                    };
-                    request.send();
-                });
-            } else {
-                xhr.open("GET", snapshotValue + ".json", true);
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        var jsonData = JSON.parse(xhr.responseText);
-                        handleData(jsonData);
-                    }
-                };
-                xhr.send();
-            }
 
-            function handleData(jsonData) {
-                var results = [];
-
-                inputArray.forEach(function (address) {
-                    var found = false;
-                    var stakedAmount = "";
-                    var solanaAddress = "";
-                    var evmAddress = "";
-
-                    for (var i = 0; i < jsonData.length; i++) {
-                        var solana = jsonData[i].solana.toLowerCase();
-                        var evm = jsonData[i].evm.toLowerCase();
-
-                        if (solana === address || evm === address) {
-                            stakedAmount = parseFloat(jsonData[i].stakedAmount) / 1000000; // Convert to Pyth
-                            solanaAddress = jsonData[i].solana;
-                            evmAddress = jsonData[i].evm;
-                            results.push("Snapshot: " + selectedSnapshot + "<br>Solana Address: " + solanaAddress + "<br>EVM Address: " + evmAddress + "<br>Staked Amount: " + stakedAmount.toFixed(6) + " $PYTH");
-                            found = true;
-                            break;
+                        if (!found) {
+							results.push("Snapshot: " + selectedSnapshot + "<br>Address: " + address + "<br>Staked Amount: Address not found.");
                         }
-                    }
+                    });
 
-                    if (!found) {
-                        results.push("Snapshot: " + selectedSnapshot + "<br>Address: " + address + "<br>Staked Amount: Address not found.");
-                    }
-                });
-
-                document.getElementById("result").innerHTML = results.join("<br><br>");
-            }
+                    document.getElementById("result").innerHTML = results.join("<br><br>");
+                }
+            };
+            xhr.send();
         }
     </script>
 </head>
@@ -157,8 +114,10 @@
         <h1>Staked Amount Query</h1>
         <select id="snapshot">
             <option value="7thWL">7th Snapshot</option>
-            <option value="12thWL">12th Snapshot</option>
-            <option value="13thWL">13th Snapshot</option>
+            <option value="12thWL_1">12th_1 Snapshot</option>
+            <option value="12thWL_2">12th_2 Snapshot</option>
+            <option value="13thWL_1">13th_1 Snapshot</option>
+            <option value="13thWL_2">13th_2 Snapshot</option>
             <option value="16thWL">16th Snapshot</option>
         </select>
         <br><br>
