@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staked Amount Query</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -59,6 +60,15 @@
             font-size: 18px;
             text-align: left;
         }
+
+        #loading {
+            display: none;
+            margin-top: 20px;
+        }
+
+        #loading .fa-spin {
+            font-size: 50px;
+        }
     </style>
     <script>
         function searchStakedAmount() {
@@ -70,10 +80,16 @@
                 return item !== '';
             });
 
+            // 顯示正在讀取的動畫
+            document.getElementById("loading").style.display = "block";
+
             var xhr = new XMLHttpRequest();
             xhr.open("GET", selectedSnapshot + ".json", true);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
+                    // 隱藏正在讀取的動畫
+                    document.getElementById("loading").style.display = "none";
+
                     var jsonData = JSON.parse(xhr.responseText);
                     var results = [];
 
@@ -98,7 +114,7 @@
                         }
 
                         if (!found) {
-							results.push("Snapshot: " + selectedSnapshot + "<br>Address: " + address + "<br>Staked Amount: Address not found.");
+                            results.push("Snapshot: " + selectedSnapshot + "<br>Address: " + address + "<br>Staked Amount: Address not found.");
                         }
                     });
 
@@ -123,6 +139,10 @@
         <br><br>
         <textarea id="inputData" placeholder="Enter Solana or EVM Address(es) separated by new lines" rows="5"></textarea>
         <button onclick="searchStakedAmount()">Search</button>
+        <div id="loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading...</p>
+        </div>
         <div id="result"></div>
     </div>
 </body>
