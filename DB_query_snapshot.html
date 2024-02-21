@@ -186,13 +186,13 @@
                             
                             // 驗證 stakedAmount 是否大於 500
                             if (stakedAmount > 500) {
-                                validationResults.push("Address: " + address + " - Valid: <span class='valid'>$DB Airdrop Eligible</span>");
+                                validationResults.push("Address: " + address + " - Valid: <span class='valid'>$DB Airdrop Eligible</span><br>");
                             } else {
                                 // 判斷是否有 EVM 地址，如果只有 Solana 地址則為 Not Eligible
                                 if (evmAddress === "") {
-                                    validationResults.push("Address: " + address + " - <span style='color:red'>Not Eligible for $DB Airdrop (No EVM Address)</span>");
+                                    validationResults.push("Address: " + address + " - <span style='color:red'>Not Eligible for $DB Airdrop (No EVM Address)</span><br>");
                                 } else {
-                                    validationResults.push("Address: " + address + " - <span style='color:red'>Not Eligible for $DB Airdrop</span>");
+                                    validationResults.push("Address: " + address + " - <span style='color:red'>Not Eligible for $DB Airdrop</span><br>");
                                 }
                             }
                             found = true;
@@ -203,7 +203,7 @@
                     if (!found) {
                         results.push("Snapshot: " + selectedSnapshot + "<br>Address: " + address + "<br>Staked Amount: Address not found.");
                         // 對於找不到的地址，無法進行驗證
-                        validationResults.push("Address: " + address + " - Cannot Validate");
+                        validationResults.push("Address: " + address + " - Cannot Validate<br>");
                     }
                 });
 
