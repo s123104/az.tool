@@ -69,6 +69,19 @@
         #loading .fa-spin {
             font-size: 50px;
         }
+
+        #validation {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        #validation .valid {
+            color: green;
+        }
+
+        #validation .invalid {
+            color: red;
+        }
     </style>
     <script>
         function searchStakedAmount() {
@@ -92,6 +105,7 @@
 
                     var jsonData = JSON.parse(xhr.responseText);
                     var results = [];
+                    var validationResults = [];
 
                     inputArray.forEach(function (address) {
                         var found = false;
@@ -108,6 +122,14 @@
                                 solanaAddress = jsonData[i].solana;
                                 evmAddress = jsonData[i].evm;
                                 results.push("Snapshot: " + selectedSnapshot + "<br>Solana Address: " + solanaAddress + "<br>EVM Address: " + evmAddress + "<br>Staked Amount: " + stakedAmount.toFixed(6) + " $PYTH");
+                                
+                                // 驗證 stakedAmount 是否大於 500
+                                if (stakedAmount > 500) {
+                                    validationResults.push("Address: " + address + " - Valid: <span class='valid'>$DB Airdrop Eligible</span>");
+                                } else {
+                                    validationResults.push("Address: " + address + " - Valid: <span class='invalid'>Not Eligible for $DB Airdrop</span>");
+                                }
+
                                 found = true;
                                 break;
                             }
@@ -115,10 +137,14 @@
 
                         if (!found) {
                             results.push("Snapshot: " + selectedSnapshot + "<br>Address: " + address + "<br>Staked Amount: Address not found.");
+
+                            // 對於找不到的地址，無法進行驗證
+                            validationResults.push("Address: " + address + " - Cannot Validate");
                         }
                     });
 
                     document.getElementById("result").innerHTML = results.join("<br><br>");
+                    document.getElementById("validation").innerHTML = validationResults.join("<br>");
                 }
             };
             xhr.send();
@@ -144,6 +170,7 @@
             <p>Loading...</p>
         </div>
         <div id="result"></div>
+        <div id="validation"></div>
     </div>
 </body>
 </html>
