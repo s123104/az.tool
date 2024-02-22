@@ -88,141 +88,145 @@
         }
     </style>
     <script>
-       function searchStakedAmount() {
-        var selectedSnapshot = document.getElementById("snapshot").value;
-        var input = document.getElementById("inputData").value.toLowerCase();
-        var inputArray = input.split('\n').map(function(item) {
-            return item.trim();
-        }).filter(function(item) {
-            return item !== '';
-        });
-
-        // 顯示正在讀取的動畫
-        document.getElementById("loading").style.display = "block";
-
-        var xhr = new XMLHttpRequest();
-        var fileName = "";
-
-        if (selectedSnapshot.includes("12thWL")) {
-            // 如果選擇了12thWL，則同時查詢12thWL_1.json, 12thWL_2.json
-            var fileName1 = "12thWL_1.json";
-            var fileName2 = "12thWL_2.json";
-
-            var xhr1 = new XMLHttpRequest();
-            var xhr2 = new XMLHttpRequest();
-
-            // 處理第一個快照的查詢
-            xhr1.open("GET", fileName1, true);
-            xhr1.onreadystatechange = function () {
-                if (xhr1.readyState === 4 && xhr1.status === 200) {
-                    handleSnapshotResult(xhr1.responseText);
-                }
-            };
-            xhr1.send();
-
-            // 處理第二個快照的查詢
-            xhr2.open("GET", fileName2, true);
-            xhr2.onreadystatechange = function () {
-                if (xhr2.readyState === 4 && xhr2.status === 200) {
-                    handleSnapshotResult(xhr2.responseText);
-                }
-            };
-            xhr2.send();
-        } else if (selectedSnapshot.includes("_")) {
-            // 如果快照包含下劃線，則使用選擇的快照名稱作為檔案名
-            fileName = selectedSnapshot + ".json";
-
-            // 處理查詢
-            xhr.open("GET", fileName, true);
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    handleSnapshotResult(xhr.responseText);
-                } else if (xhr.status === 404) {
-                    handleSnapshotResultNotFound();
-                }
-            };
-            xhr.send();
-        } else {
-            // 如果快照不包含下劃線，則將檔案名設置為selectedSnapshot
-            fileName = selectedSnapshot + "_1.json";
-
-            // 處理查詢
-            xhr.open("GET", fileName, true);
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    handleSnapshotResult(xhr.responseText);
-                } else if (xhr.status === 404) {
-                    handleSnapshotResultNotFound();
-                }
-            };
-            xhr.send();
-        }
-
-        // 處理快照結果的函數
-        function handleSnapshotResult(responseText) {
-            // 隱藏正在讀取的動畫
-            document.getElementById("loading").style.display = "none";
-            document.getElementById("result").style.display = "block";
-
-            var jsonData = JSON.parse(responseText);
-            var results = [];
-            var validationResults = [];
-
-            inputArray.forEach(function (address) {
-                var found = false;
-                var stakedAmount = "";
-                var solanaAddress = "";
-                var evmAddress = "";
-
-                for (var i = 0; i < jsonData.length; i++) {
-                    var solana = jsonData[i].solana.toLowerCase();
-                    var evm = jsonData[i].evm.toLowerCase();
-
-                    if (solana === address || evm === address) {
-                        stakedAmount = parseFloat(jsonData[i].stakedAmount) / 1000000; // Convert to Pyth
-                        solanaAddress = jsonData[i].solana;
-                        evmAddress = jsonData[i].evm;
-                        results.push("Snapshot: " + selectedSnapshot + "<br>Solana Address: " + solanaAddress + "<br>EVM Address: " + evmAddress + "<br>Staked Amount: " + stakedAmount.toFixed(6) + " $PYTH");
-                        
-                        // 驗證 stakedAmount 是否大於 500
-                        if (stakedAmount > 500) {
-                            validationResults.push("Address: " + address + " - Valid: <span class='valid'>$DB Airdrop Eligible</span><br>");
-                        } else {
-                            // 判斷是否有 EVM 地址，如果只有 Solana 地址則為 Not Eligible
-                            if (evmAddress === "") {
-                                validationResults.push("Address: " + address + " - <span style='color:red'>Not Eligible for $DB Airdrop (No EVM Address)</span><br>");
-                            } else {
-                                validationResults.push("Address: " + address + " - <span style='color:red'>Not Eligible for $DB Airdrop</span><br>");
-                            }
-                        }
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    results.push("Snapshot: " + selectedSnapshot + "<br>Address: " + address + "<br>Staked Amount: Address not found.");
-                    // 對於找不到的地址，無法進行驗證
-                    validationResults.push("Address: " + address + " - Cannot Validate<br>");
-                }
+        function searchStakedAmount() {
+            var selectedSnapshot = document.getElementById("snapshot").value;
+            var input = document.getElementById("inputData").value.toLowerCase();
+            var inputArray = input.split('\n').map(function(item) {
+                return item.trim();
+            }).filter(function(item) {
+                return item !== '';
             });
 
-            document.getElementById("result").innerHTML = results.join("<br><br>");
-            document.getElementById("validation").innerHTML = validationResults.join("<br>");
+            // 顯示正在讀取的動畫
+            document.getElementById("loading").style.display = "block";
 
-            if (validationResults.some(result => result.includes("Not Eligible for $DB Airdrop"))) {
-                document.getElementById("validation").innerHTML += "<br><br><span style='color: blue;'>The following conditions may indicate that the address is not eligible for the snapshot:</span><br>- Unable to find the snapshot<br>- EVM address is not bound<br>- Staked amount is not greater than 500";
+            var xhr = new XMLHttpRequest();
+            var fileName = "";
+
+            if (selectedSnapshot.includes("12thWL")) {
+                // 如果選擇了12thWL，則同時查詢12thWL_1.json, 12thWL_2.json
+                var fileName1 = "12thWL_1.json";
+                var fileName2 = "12thWL_2.json";
+
+                var xhr1 = new XMLHttpRequest();
+                var xhr2 = new XMLHttpRequest();
+
+                // 處理第一個快照的查詢
+                xhr1.open("GET", fileName1, true);
+                xhr1.onreadystatechange = function () {
+                    if (xhr1.readyState === 4 && xhr1.status === 200) {
+                        handleSnapshotResult(xhr1.responseText);
+                    }
+                };
+                xhr1.send();
+
+                // 處理第二個快照的查詢
+                xhr2.open("GET", fileName2, true);
+                xhr2.onreadystatechange = function () {
+                    if (xhr2.readyState === 4 && xhr2.status === 200) {
+                        handleSnapshotResult(xhr2.responseText);
+                    }
+                };
+                xhr2.send();
+            } else if (selectedSnapshot.includes("_")) {
+                // 如果快照包含下劃線，則使用選擇的快照名稱作為檔案名
+                fileName = selectedSnapshot + ".json";
+
+                // 處理查詢
+                xhr.open("GET", fileName, true);
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        handleSnapshotResult(xhr.responseText);
+                    } else if (xhr.status === 404) {
+                        handleSnapshotResultNotFound();
+                    }
+                };
+                xhr.send();
+            } else {
+                // 如果快照不包含下劃線，則將檔案名設置為selectedSnapshot
+                fileName = selectedSnapshot + "_1.json";
+
+                // 處理查詢
+                xhr.open("GET", fileName, true);
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        handleSnapshotResult(xhr.responseText);
+                    } else if (xhr.status === 404) {
+                        handleSnapshotResultNotFound();
+                    }
+                };
+                xhr.send();
+            }
+
+            // 處理快照結果的函數
+            function handleSnapshotResult(responseText) {
+                // 隱藏正在讀取的動畫
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("result").style.display = "block";
+
+                var jsonData = JSON.parse(responseText);
+                var results = [];
+                var validationResults = [];
+
+                inputArray.forEach(function (address) {
+                    var found = false;
+                    var stakedAmount = "";
+                    var solanaAddress = "";
+                    var evmAddress = "";
+
+                    for (var i = 0; i < jsonData.length; i++) {
+                        var solana = jsonData[i].solana.toLowerCase();
+                        var evm = jsonData[i].evm.toLowerCase();
+
+                        if (solana === address || evm === address) {
+                            stakedAmount = parseFloat(jsonData[i].stakedAmount) / 1000000; // Convert to Pyth
+                            solanaAddress = jsonData[i].solana;
+                            evmAddress = jsonData[i].evm;
+                            results.push("Snapshot: " + selectedSnapshot + "<br>Solana Address: " + solanaAddress + "<br>EVM Address: " + evmAddress + "<br>Staked Amount: " + stakedAmount.toFixed(6) + " $PYTH");
+                            
+                            // 驗證 stakedAmount 是否大於 500
+                            if (stakedAmount > 500) {
+                                validationResults.push("Address: " + address + " - Valid: <span class='valid'>$DB Airdrop Eligible</span><br>");
+                            } else {
+                                // 判斷是否有 EVM 地址，如果只有 Solana 地址則為 Not Eligible
+                                if (evmAddress === "") {
+                                    validationResults.push("Address: " + address + "<br>- <span style='color:red'>Not Eligible for $DB Airdrop (No EVM Address)</span><br>");
+                                    // 提示用戶至PYTH官方質押網站綁定
+                                    validationResults.push("Please bind your EVM address at the PYTH official staking <br>website: <a href='https://staking.pyth.network/profile' target='_blank'>https://staking.pyth.network/profile</a><br>Pyth Twitter official: <a href='https://twitter.com/PythNetwork' target='_blank'>https://twitter.com/PythNetwork</a><br>");
+                                } else if (stakedAmount < 500) {
+                                    validationResults.push("Address: " + address + "<br>- <span style='color:red'>Not Eligible for $DB Airdrop (Staked Amount < 500 PYTH)</span><br>");
+                                    // 提示用戶質押超過500 PYTH
+                                    validationResults.push("Please pledge more than 500 PYTH on PYTH official website <br>Website: <a href='https://staking.pyth.network/' target='_blank'>https://staking.pyth.network/</a><br>Pyth Twitter official: <a href='https://twitter.com/PythNetwork' target='_blank'>https://twitter.com/PythNetwork</a><br>");
+                                } else {
+                                    validationResults.push("Address: " + address + "<br>- <span style='color:red'>Not Eligible for $DB Airdrop</span><br>");
+                                }
+                            }
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found) {
+                        results.push("Snapshot: " + selectedSnapshot + "<br>Address: " + address + "<br>Staked Amount: Address not found.");
+                        // 對於找不到的地址，無法進行驗證
+                        validationResults.push("Address: " + address + " - Cannot Validate<br>");
+                    }
+                });
+
+                document.getElementById("result").innerHTML = results.join("<br><br>");
+                document.getElementById("validation").innerHTML = validationResults.join("<br>");
+
+                if (validationResults.some(result => result.includes("Not Eligible for $DB Airdrop"))) {
+                    document.getElementById("validation").innerHTML += "<br><br><span style='color: blue;'>The following conditions may indicate that the address is not eligible for the snapshot:</span><br>- Unable to find the snapshot<br>- EVM address is not bound<br>- Staked amount is not greater than 500";
+                }
+            }
+            // 處理找不到快照的函數
+            function handleSnapshotResultNotFound() {
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("result").style.display = "block";
+                document.getElementById("result").innerHTML = "Snapshot not found or unavailable. Please contact the official discord for assistance: <a href='https://discord.gg/bKxuFx4W6a'>https://discord.gg/bKxuFx4W6a</a>";
             }
         }
-
-        // 處理找不到快照的函數
-        function handleSnapshotResultNotFound() {
-            document.getElementById("loading").style.display = "none";
-            document.getElementById("result").style.display = "block";
-            document.getElementById("result").innerHTML = "Snapshot not found or unavailable. Please contact the official discord for assistance: <a href='https://discord.gg/bKxuFx4W6a'>https://discord.gg/bKxuFx4W6a</a>";
-        }
-    }
-
     </script>
 </head>
 <body>
