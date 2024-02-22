@@ -193,7 +193,11 @@
                                     validationResults.push("Address: " + address + "<br>- <span style='color:red'>Not Eligible for $DB Airdrop (No EVM Address)</span><br>");
                                     // 提示用戶至PYTH官方質押網站綁定
                                     validationResults.push("Please bind your EVM address at the PYTH official staking <br>website: <a href='https://staking.pyth.network/profile' target='_blank'>https://staking.pyth.network/profile</a><br>Pyth Twitter official: <a href='https://twitter.com/PythNetwork' target='_blank'>https://twitter.com/PythNetwork</a><br>");
-                                } else if (stakedAmount < 500) {
+                                }else {
+                                    validationResults.push("Address: " + address + "<br>- <span style='color:red'>Not Eligible for $DB Airdrop</span><br>");
+                                }
+                                
+                                if (stakedAmount < 500) {
                                     validationResults.push("Address: " + address + "<br>- <span style='color:red'>Not Eligible for $DB Airdrop (Staked Amount < 500 PYTH)</span><br>");
                                     // 提示用戶質押超過500 PYTH
                                     validationResults.push("Please pledge more than 500 PYTH on PYTH official website <br>Website: <a href='https://staking.pyth.network/' target='_blank'>https://staking.pyth.network/</a><br>Pyth Twitter official: <a href='https://twitter.com/PythNetwork' target='_blank'>https://twitter.com/PythNetwork</a><br>");
