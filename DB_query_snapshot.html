@@ -86,6 +86,12 @@
         #validation .invalid {
             color: red;
         }
+        /* 響應式區隔線 */
+        .divider {
+            width: 100%;
+            border-top: 1px solid #ccc; /* 區隔線的顏色和樣式 */
+            margin: 10px 0; /* 設置區隔線的上下間距 */
+        }
     </style>
     <script>
         function searchStakedAmount() {
@@ -188,23 +194,26 @@
                             if (stakedAmount > 500) {
                                 validationResults.push("Address: " + address + " - Valid: <span class='valid'>$DB Airdrop Eligible</span><br>");
                             } else {
+                                validationResults.push("Address: " + address + "<br>");
+                                   
                                 // 判斷是否有 EVM 地址，如果只有 Solana 地址則為 Not Eligible
                                 if (evmAddress === "") {
-                                    validationResults.push("Address: " + address + "<br>- <span style='color:red'>Not Eligible for $DB Airdrop (No EVM Address)</span><br>");
+                                    validationResults.push("- <span style='color:red'>Not Eligible for $DB Airdrop (No EVM Address)</span><br>");
                                     // 提示用戶至PYTH官方質押網站綁定
                                     validationResults.push("Please bind your EVM address at the PYTH official staking <br>website: <a href='https://staking.pyth.network/profile' target='_blank'>https://staking.pyth.network/profile</a><br>Pyth Twitter official: <a href='https://twitter.com/PythNetwork' target='_blank'>https://twitter.com/PythNetwork</a><br>");
                                 }else {
-                                    validationResults.push("Address: " + address + "<br>- <span style='color:red'>Not Eligible for $DB Airdrop</span><br>");
+                                    validationResults.push("- <span style='color:red'>Not Eligible for $DB Airdrop</span><br>");
                                 }
                                 
                                 if (stakedAmount < 500) {
-                                    validationResults.push("Address: " + address + "<br>- <span style='color:red'>Not Eligible for $DB Airdrop (Staked Amount < 500 PYTH)</span><br>");
+                                    validationResults.push("- <span style='color:red'>Not Eligible for $DB Airdrop (Staked Amount < 500 PYTH)</span><br>");
                                     // 提示用戶質押超過500 PYTH
                                     validationResults.push("Please pledge more than 500 PYTH on PYTH official website <br>Website: <a href='https://staking.pyth.network/' target='_blank'>https://staking.pyth.network/</a><br>Pyth Twitter official: <a href='https://twitter.com/PythNetwork' target='_blank'>https://twitter.com/PythNetwork</a><br>");
                                 } else {
-                                    validationResults.push("Address: " + address + "<br>- <span style='color:red'>Not Eligible for $DB Airdrop</span><br>");
+                                    validationResults.push("- <span style='color:red'>Not Eligible for $DB Airdrop</span><br>");
                                 }
                             }
+                            validationResults.push("<div class='divider'></div>");
                             found = true;
                             break;
                         }
@@ -241,6 +250,7 @@
             <option value="12thWL">12th Snapshot</option>
             <option value="13thWL">13th Snapshot</option>
             <option value="16thWL">16th Snapshot</option>
+            <option value="21thWL">21th Snapshot</option>
         </select>
         <br><br>
         <textarea id="inputData" placeholder="Enter Solana or EVM Address(es) separated by new lines" rows="5"></textarea>
