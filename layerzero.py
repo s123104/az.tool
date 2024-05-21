@@ -89,6 +89,29 @@ scrollbar.pack(side="right", fill="y")
 
 address_text.config(yscrollcommand=scrollbar.set)
 
+# 創建右鍵菜單
+
+
+def make_right_click_menu(widget):
+    menu = tk.Menu(widget, tearoff=0)
+    menu.add_command(
+        label="剪切", command=lambda: widget.event_generate("<<Cut>>"))
+    menu.add_command(
+        label="複製", command=lambda: widget.event_generate("<<Copy>>"))
+    menu.add_command(
+        label="貼上", command=lambda: widget.event_generate("<<Paste>>"))
+    return menu
+
+# 綁定右鍵菜單
+
+
+def show_right_click_menu(event):
+    right_click_menu.tk_popup(event.x_root, event.y_root)
+
+
+right_click_menu = make_right_click_menu(address_text)
+address_text.bind("<Button-3>", show_right_click_menu)
+
 # 創建查詢按鈕
 query_button = tk.Button(root, text="查詢", command=query_addresses)
 query_button.pack(pady=10)
