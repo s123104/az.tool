@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>輪盤抽籤程式</title>
   <style>
+    
     body {
       font-family: Arial, sans-serif;
       text-align: center;
@@ -113,6 +114,26 @@
         opacity: 0.5;
       }
     }
+
+    @media only screen and (max-width: 600px) {
+    #wheel-wrapper {
+      width: 90%; /* 調整輪盤容器寬度為螢幕的90% */
+      height: auto; /* 讓高度自適應內容 */
+    }
+
+    #wheel {
+      width: 100%;
+      height: 100%;
+    }
+
+    .slice text {
+      font-size: 10px; /* 調整文字大小以適應小屏幕 */
+    }
+
+    #participants {
+      width: 90%; /* 調整參與者文本框寬度為螢幕的90% */
+    }
+  }
   </style>
 </head>
 
