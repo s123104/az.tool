@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>輪盤抽籤程式</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    #participants {
+      width: 80%;
+      height: 150px;
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+
+    #winner {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ff0000;
+      margin-top: 20px;
+    }
+
+    #wheel-wrapper {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      margin: 20px auto;
+      /* 增加輪盤與按鈕間的距離 */
+    }
+
+    #wheel {
+      width: 100%;
+      height: 100%;
+      transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      border-radius: 50%;
+      background-color: #fff;
+    }
+
+    #pointer {
+      position: absolute;
+      top: -10px;
+      /* 調整指針位置 */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-top: 30px solid #FF5722;
+      /* 調整指針形狀 */
+      z-index: 10;
+    }
+
+    #spinButton {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin-top: 20px;
+      margin-bottom: 30px;
+      /* 添加下間隙 */
+      cursor: pointer;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      transition: background-color 0.3s;
+    }
+
+    #spinButton:hover {
+      background-color: #45a049;
+    }
+
+    .slice {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      clip-path: polygon(50% 50%, 0 0, 0 100%);
+      transform-origin: 50% 50%;
+    }
+
+    .slice text {
+      fill: white;
+      font-size: 14px;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    @keyframes flash {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <textarea id="participants" placeholder="請輸入參與者，每行一個"></textarea><br>
+    <button id="spinButton" onclick="startSpinning()">開始抽籤</button>
+    <div id="wheel-wrapper">
+      <svg id="wheel" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+        <g id="slices">
+          <!-- Slices will be dynamically生成 -->
+        </g>
+      </svg>
+      <div id="pointer"></div>
+    </div>
+    <div id="winner"></div>
+  </div>
+
+  <audio id="spinSound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
+
+  <script>
+    var rotationCount = 0;
+
+    function startSpinning() {
+      var participants = document.getElementById("participants").value.split(/\r?\n/);
+      participants = participants.filter(participant => participant.trim() !== '');
+
+      if (participants.length === 0) {
+        alert("請至少輸入一個參與者！");
+        return;
+      }
+
+      generateSlices(participants);
+
+      var winnerIndex = Math.floor(Math.random() * participants.length);
+      var winner = participants[winnerIndex];
+
+      var wheel = document.getElementById("wheel");
+      var spinButton = document.getElementById("spinButton");
+
+      spinButton.disabled = true; // 禁用按鈕
+
+      rotationCount += 3; // 每次點擊旋轉三圈
+      var rotation = 360 * rotationCount + (winnerIndex * (360 / participants.length)) - 90; // 確保指針落在區塊中間
+      wheel.style.transform = "rotate(" + rotation + "deg)";
+
+      var spinSound = document.getElementById("spinSound");
+      spinSound.play();
+
+      setTimeout(function() {
+        displayWinner(winner);
+        spinButton.disabled = false; // 啟用按鈕
+      }, 4000);
+    }
+
+    function generateSlices(participants) {
+      var slices = document.getElementById('slices');
+      slices.innerHTML = '';
+      var colors = ['#FFC107', '#03A9F4', '#4CAF50', '#FF5722', '#9C27B0', '#E91E63', '#009688', '#FF9800', '#673AB7', '#2196F3', '#FF5722', '#8BC34A'];
+      var anglePerSlice = 360 / participants.length;
+
+      participants.forEach((participant, index) => {
+        var slice = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        var startAngle = index * anglePerSlice - anglePerSlice / 2; // 讓色塊稍微偏移
+        var endAngle = startAngle + anglePerSlice;
+        var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+        var startX = 200 + 190 * Math.cos(Math.PI * startAngle / 180); // 調整起點和終點
+        var startY = 200 - 190 * Math.sin(Math.PI * startAngle / 180);
+        var endX = 200 + 190 * Math.cos(Math.PI * endAngle / 180);
+        var endY = 200 - 190 * Math.sin(Math.PI * endAngle / 180);
+
+        var pathData = `M 200 200 L ${startX} ${startY} A 190 190 0 ${largeArcFlag} 1 ${endX} ${endY} Z`;
+        slice.setAttribute("d", pathData);
+        slice.setAttribute("fill", colors[index % colors.length]);
+
+        var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        var textAngle = startAngle + anglePerSlice / 2;
+        var textX = 200 + 140 * Math.cos(Math.PI * textAngle / 180);
+        var textY = 200 - 140 * Math.sin(Math.PI * textAngle / 180);
+        text.setAttribute("x", textX);
+        text.setAttribute("y", textY);
+        text.setAttribute("transform", `rotate(${textAngle - 90}, ${textX}, ${textY})`);
+        text.textContent = participant;
+
+        slices.appendChild(slice);
+        slices.appendChild(text);
+      });
+    }
+
+    function displayWinner(winner) {
+      var winnerDisplay = document.getElementById("winner");
+      winnerDisplay.textContent = "中獎者：" + winner;
+      winnerDisplay.style.animation = "flash 1s infinite";
+    }
+  </script>
+</body>
+
+</html>
