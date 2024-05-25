@@ -200,7 +200,7 @@
     }
 
     .modal .close-btn {
-      background-color: #4CAF50;
+      background-color: #7cd71b;
       color: white;
       padding: 10px 20px;
       border: none;
@@ -211,11 +211,11 @@
     }
 
     .modal .close-btn:hover {
-      background-color: #45a049;
+      background-color: #66ca4b;
     }
 
     .modal .retry-btn {
-      background-color: #ADD8E6;
+      background-color: #4cd2ff;
       color: white;
       padding: 10px 20px;
       border: none;
@@ -227,7 +227,7 @@
     }
 
     .modal .retry-btn:hover {
-      background-color: #87CEEB;
+      background-color: #14bcff;
     }
 
     /* 煙花動畫樣式 */
@@ -281,24 +281,26 @@
     }
 
     #winnerList {
-      margin-top: 20px;
+      margin-top: 40px;
       text-align: center;
+      list-style-type: none;
+      font-size: 18px;
+      color: #333;
+      background-color: white;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      padding:0px 100px 0px 100px;
     }
 
     #winnerList ul {
       list-style-type: none;
       padding: 0;
       font-size: 18px;
-      color: #333;
-      background-color: white;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      border-radius: 10px;
-      padding: 10px;
     }
 
     #winnerList ul li {
       padding: 5px 0;
-      color: #ff0000;
+      color: #000000;
     }
   </style>
 </head>
@@ -306,7 +308,7 @@
 <body>
   <div class="container">
     <textarea id="participants" placeholder="請輸入參與者，每行一個"></textarea><br>
-    <button id="spinButton" onclick="startSpinning()">開始抽籤</button>
+    <button id="spinButton" onclick="startSpinning()">開始抽獎</button>
     <div id="wheel-wrapper">
       <svg id="wheel" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
         <g id="slices"></g>
@@ -324,8 +326,8 @@
       <label for="removeWinner">移除中獎者</label>
       <input type="checkbox" id="removeWinner">
     </div>
-    <button class="retry-btn" onclick="retry()">再抽一次</button>
     <button class="close-btn" onclick="closeModal()">關閉</button>
+    <button class="retry-btn" onclick="retry()">再抽一次</button>
   </div>
 
   <div class="firework" id="firework"></div>
