@@ -300,7 +300,7 @@
 
     #winnerList ul li {
       padding: 5px 0;
-      color: #000000;
+      color: #da0f0f;
     }
   </style>
 </head>
@@ -366,7 +366,7 @@
       var winner = participants[winnerIndex];
 
       var sliceAngle = 360 / participants.length;
-      var randomAngle = Math.floor(Math.random() * 360) + 360 * 3; // Spin at least 3 full turns
+      var randomAngle = Math.floor(Math.random() * 360) + 360 * 10; // Spin at least 10 full turns
       rotation += randomAngle;
       rotation = rotation - (rotation % 360) + (winnerIndex * sliceAngle);
 
