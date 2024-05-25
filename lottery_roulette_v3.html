@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>輪盤抽籤程式</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    #participants {
+      width: 80%;
+      height: 150px;
+      margin-bottom: 20px;
+      font-size: 16px;
+      padding: 10px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+    }
+
+    #winner {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ff0000;
+      margin-top: 20px;
+      animation: flash 1s infinite;
+    }
+
+    #wheel-wrapper {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      margin: 20px auto;
+    }
+
+    #wheel {
+      width: 100%;
+      height: 100%;
+      transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      border-radius: 50%;
+      background-color: #fff;
+      border: 10px solid #fff;
+    }
+
+    #pointer {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-top: 30px solid #FF5722;
+      z-index: 10;
+    }
+
+    #spinButton {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin-top: 20px;
+      margin-bottom: 30px;
+      cursor: pointer;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      transition: background-color 0.3s;
+    }
+
+    #spinButton:hover {
+      background-color: #45a049;
+    }
+
+    .slice {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      clip-path: polygon(50% 50%, 0 0, 0 100%);
+      transform-origin: 50% 50%;
+    }
+
+    .slice text {
+      fill: white;
+      font-size: 14px;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    @keyframes flash {
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    @media only screen and (max-width: 600px) {
+      #wheel-wrapper {
+        width: 90%;
+        height: auto;
+      }
+
+      #wheel {
+        width: 100%;
+        height: 100%;
+      }
+
+      .slice text {
+        font-size: 10px;
+      }
+
+      #participants {
+        width: 90%;
+      }
+    }
+
+    /* 彈跳窗樣式 */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      max-width: 400px;
+      background-color: white;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .modal h2 {
+      margin: 0;
+      padding: 10px;
+      font-size: 24px;
+      color: #4CAF50;
+    }
+
+    .modal p {
+      font-size: 18px;
+      color: #333;
+      animation: glow 1s infinite;
+    }
+
+    @keyframes glow {
+      0% {
+        text-shadow: 0 0 5px red;
+      }
+
+      50% {
+        text-shadow: 0 0 20px red;
+      }
+
+      100% {
+        text-shadow: 0 0 5px red;
+      }
+    }
+
+    .modal .confetti-emoji {
+      font-size: 40px;
+      animation: scale 1s infinite;
+    }
+
+    @keyframes scale {
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.5);
+      }
+    }
+
+    .modal .close-btn {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s;
+    }
+
+    .modal .close-btn:hover {
+      background-color: #45a049;
+    }
+
+    .modal .retry-btn {
+      background-color: #ADD8E6;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+      margin-right: 10px;
+      transition: background-color 0.3s;
+    }
+
+    .modal .retry-btn:hover {
+      background-color: #87CEEB;
+    }
+
+    /* 煙花動畫樣式 */
+    .firework {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 99;
+    }
+
+    .firework div {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background-color: #FF5722;
+      animation: firework-animation 1s linear infinite;
+    }
+
+    @keyframes firework-animation {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+      100% {
+        transform
+        : translate(calc(var(--dx) * 1px), calc(var(--dy) * 1px)) scale(0);
+      }
+    }
+
+    /* 拉炮動畫 */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 20px;
+      background-color: #FFC107;
+      top: 50%;
+      left: 50%;
+      animation: confetti-fall 1.5s linear;
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translate(-50%, -50%) rotate(0);
+      }
+      100% {
+        transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) rotate(360deg);
+      }
+    }
+
+    #winnerList {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    #winnerList ul {
+      list-style-type: none;
+      padding: 0;
+      font-size: 18px;
+      color: #333;
+      background-color: white;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    #winnerList ul li {
+      padding: 5px 0;
+      color: #ff0000;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <textarea id="participants" placeholder="請輸入參與者，每行一個"></textarea><br>
+    <button id="spinButton" onclick="startSpinning()">開始抽籤</button>
+    <div id="wheel-wrapper">
+      <svg id="wheel" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+        <g id="slices"></g>
+      </svg>
+      <div id="pointer"></div>
+    </div>
+    <div id="winner"></div>
+  </div>
+
+  <div class="modal" id="winnerModal">
+    <h2>恭喜中獎！</h2>
+    <div class="confetti-emoji">🎉</div>
+    <p id="winnerName"></p>
+    <div>
+      <label for="removeWinner">移除中獎者</label>
+      <input type="checkbox" id="removeWinner">
+    </div>
+    <button class="retry-btn" onclick="retry()">再抽一次</button>
+    <button class="close-btn" onclick="closeModal()">關閉</button>
+  </div>
+
+  <div class="firework" id="firework"></div>
+  <div class="confettiContainer" id="confettiContainer"></div>
+
+  <audio id="spinSound">
+    <source src="spin-sound.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="winSound">
+    <source src="win-sound.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="fireworkSound">
+    <source src="firework-sound.mp3" type="audio/mpeg">
+  </audio>
+
+  <div id="winnerList">
+    <h3>歷史中獎清單</h3>
+    <ul id="historyList"></ul>
+  </div>
+
+  <script>
+    var rotation = 0;
+    var historyList = [];
+
+    function startSpinning() {
+      var participants = document.getElementById("participants").value.split(/\r?\n/).filter(name => name.trim() !== '');
+      if (participants.length === 0) {
+        alert("請輸入至少一個參與者。");
+        return;
+      }
+
+      var spinButton = document.getElementById("spinButton");
+      spinButton.disabled = true;
+
+      var winnerIndex = Math.floor(Math.random() * participants.length);
+      var winner = participants[winnerIndex];
+
+      var sliceAngle = 360 / participants.length;
+      var randomAngle = Math.floor(Math.random() * 360) + 360 * 3; // Spin at least 3 full turns
+      rotation += randomAngle;
+      rotation = rotation - (rotation % 360) + (winnerIndex * sliceAngle);
+
+      document.getElementById("wheel").style.transform = `rotate(${rotation}deg)`;
+
+      var spinSound = document.getElementById("spinSound");
+      spinSound.play();
+
+      setTimeout(function () {
+        displayWinner(winner);
+        spinButton.disabled = false;
+      }, 4000);
+    }
+
+    function generateSlices(participants) {
+      var slices = document.getElementById('slices');
+      slices.innerHTML = '';
+      var colors = ['#FFC107', '#03A9F4', '#4CAF50', '#FF5722', '#9C27B0', '#E91E63', '#009688', '#FF9800', '#673AB7', '#2196F3', '#FF5722', '#8BC34A'];
+      var anglePerSlice = 360 / participants.length;
+
+      participants.forEach((participant, index) => {
+        var slice = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        var startAngle = index * anglePerSlice - anglePerSlice / 2;
+        var endAngle = startAngle + anglePerSlice;
+        var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+        var startX = 200 + 190 * Math.cos(Math.PI * startAngle / 180);
+        var startY = 200 - 190 * Math.sin(Math.PI * startAngle / 180);
+        var endX = 200 + 190 * Math.cos(Math.PI * endAngle / 180);
+        var endY = 200 - 190 * Math.sin(Math.PI * endAngle / 180);
+
+        var pathData = `M 200 200 L ${startX} ${startY} A 190 190 0 ${largeArcFlag} 1 ${endX} ${endY} Z`;
+        slice.setAttribute("d", pathData);
+        slice.setAttribute("fill", colors[index % colors.length]);
+
+        var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        var textAngle = startAngle + anglePerSlice / 2;
+        var textX = 200 + 140 * Math.cos(Math.PI * textAngle / 180);
+        var textY = 200 - 140 * Math.sin(Math.PI * textAngle / 180);
+        text.setAttribute("x", textX);
+        text.setAttribute("y", textY);
+        text.setAttribute("transform", `rotate(${textAngle + 90}, ${textX}, ${textY})`);
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("dominant-baseline", "middle");
+        text.setAttribute("fill", "#fff");
+        text.textContent = participant;
+
+        slices.appendChild(slice);
+        slices.appendChild(text);
+      });
+    }
+
+    function displayWinner(winner) {
+      var winnerModal = document.getElementById("winnerModal");
+      var winnerName = document.getElementById("winnerName");
+      winnerName.textContent = winner;
+
+      var winSound = document.getElementById("winSound");
+      var fireworkSound = document.getElementById("fireworkSound");
+
+      winnerModal.style.display = "block";
+      winSound.play();
+
+      // 煙花效果
+      var firework = document.getElementById("firework");
+      for (let i = 0; i < 50; i++) {
+        let spark = document.createElement("div");
+        spark.style.setProperty("--dx", Math.random() * 600 - 300);
+        spark.style.setProperty("--dy", Math.random() * 600 - 300);
+        firework.appendChild(spark);
+      }
+
+      fireworkSound.play();
+
+      // 拉炮效果
+      var confettiContainer = document.getElementById("confettiContainer");
+      for (let i = 0; i < 100; i++) {
+        let confetti = document.createElement("div");
+        confetti.className = 'confetti';
+        confetti.style.setProperty("--x", `${Math.random() * 200 - 100}vw`);
+        confetti.style.setProperty("--y", `${Math.random() * 200 - 100}vh`);
+        confettiContainer.appendChild(confetti);
+      }
+
+      setTimeout(function () {
+        firework.innerHTML = '';
+        confettiContainer.innerHTML = '';
+      }, 1000);
+
+      // 更新歷史中獎清單
+      var historyListElement = document.getElementById("historyList");
+      var listItem = document.createElement("li");
+      listItem.textContent = winner;
+      historyListElement.appendChild(listItem);
+    }
+
+    function closeModal() {
+      var winnerModal = document.getElementById("winnerModal");
+      winnerModal.style.display = "none";
+    }
+
+    function retry() {
+      var removeWinnerCheckbox = document.getElementById("removeWinner");
+      var participants = document.getElementById("participants").value.split(/\r?\n/).filter(name => name.trim() !== '');
+
+      if (removeWinnerCheckbox.checked) {
+        var winner = document.getElementById("winnerName").textContent;
+        participants = participants.filter(participant => participant !== winner);
+        document.getElementById("participants").value = participants.join('\n');
+      }
+
+      closeModal();
+      generateSlices(participants);
+      startSpinning();
+    }
+
+    window.onload = function () {
+      document.getElementById("participants").addEventListener("input", function () {
+        var participants = this.value.split(/\r?\n/).filter(name => name.trim() !== '');
+        generateSlices(participants);
+      });
+    }
+  </script>
+</body>
+
+</html>
