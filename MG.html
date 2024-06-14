@@ -186,12 +186,12 @@
             
             let codeText = document.createElement("span");
             codeText.textContent = `${index + 1}. ${code}`;
-            codeText.onclick = () => copyToClipboard(codeText.textContent.split('. ')[1]);
+            codeText.onclick = () => copyToClipboard(code, codeText);
             
             let copyBtn = document.createElement("button");
             copyBtn.className = "copy-btn";
             copyBtn.textContent = "複製";
-            copyBtn.onclick = () => copyToClipboard(code);
+            copyBtn.onclick = () => copyToClipboard(code, copyBtn);
             
             item.appendChild(codeText);
             item.appendChild(copyBtn);
@@ -219,11 +219,15 @@
         });
     }
 
-    function copyToClipboard(text) {
+    function copyToClipboard(text, element) {
         navigator.clipboard.writeText(text).then(() => {
-            alert("已複製到剪貼簿: " + text);
+            element.textContent = "已複製";
+            element.style.backgroundColor = "#28a745";
+            element.style.color = "white";
         }, () => {
-            alert("複製失敗");
+            element.textContent = "複製失敗";
+            element.style.backgroundColor = "#dc3545";
+            element.style.color = "white";
         });
     }
 </script>
