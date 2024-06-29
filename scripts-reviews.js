@@ -46,6 +46,11 @@ async function fetchReviews() {
 
         console.log('Place API響應數據:', placeData);
 
+        if (placeData.status !== 'OK') {
+            alert(`找不到公司名稱: ${placeData.status}`);
+            return;
+        }
+
         if (!placeData.candidates || placeData.candidates.length === 0) {
             alert('找不到公司名稱');
             return;
@@ -58,6 +63,11 @@ async function fetchReviews() {
         const reviewData = await reviewResponse.json();
 
         console.log('Review API響應數據:', reviewData);
+
+        if (reviewData.status !== 'OK') {
+            alert(`無法獲取評論: ${reviewData.status}`);
+            return;
+        }
 
         if (!reviewData.result || !reviewData.result.reviews) {
             alert('無法獲取評論');
