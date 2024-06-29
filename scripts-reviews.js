@@ -42,6 +42,9 @@ async function fetchReviews() {
         console.log(`正在查找公司: ${companyName}`);
 
         const placeResponse = await fetch(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(companyName)}&inputtype=textquery&fields=place_id&key=${apiKey}`);
+        if (!placeResponse.ok) {
+            throw new Error(`Place API響應錯誤: ${placeResponse.statusText}`);
+        }
         const placeData = await placeResponse.json();
 
         console.log('Place API響應數據:', placeData);
@@ -60,6 +63,9 @@ async function fetchReviews() {
         console.log(`找到的Place ID: ${placeId}`);
 
         const reviewResponse = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews&key=${apiKey}`);
+        if (!reviewResponse.ok) {
+            throw new Error(`Review API響應錯誤: ${reviewResponse.statusText}`);
+        }
         const reviewData = await reviewResponse.json();
 
         console.log('Review API響應數據:', reviewData);
