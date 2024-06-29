@@ -41,7 +41,7 @@ async function fetchReviews() {
         console.log(`使用的API密鑰: ${apiKey}`);
         console.log(`正在查找公司: ${companyName}`);
 
-        const placeResponse = await fetch(`https://my-proxy-server.herokuapp.com/api/findplace?input=${encodeURIComponent(companyName)}&inputtype=textquery&fields=place_id&key=${apiKey}`);
+        const placeResponse = await fetch(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(companyName)}&inputtype=textquery&fields=place_id&key=${apiKey}`);
         if (!placeResponse.ok) {
             throw new Error(`Place API響應錯誤: ${placeResponse.statusText}`);
         }
@@ -62,7 +62,7 @@ async function fetchReviews() {
         const placeId = placeData.candidates[0].place_id;
         console.log(`找到的Place ID: ${placeId}`);
 
-        const reviewResponse = await fetch(`https://my-proxy-server.herokuapp.com/api/placedetails?place_id=${placeId}&fields=reviews&key=${apiKey}`);
+        const reviewResponse = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews&key=${apiKey}`);
         if (!reviewResponse.ok) {
             throw new Error(`Review API響應錯誤: ${reviewResponse.statusText}`);
         }
