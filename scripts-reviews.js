@@ -38,8 +38,13 @@ async function fetchReviews() {
     }
 
     try {
+        console.log(`使用的API密鑰: ${apiKey}`);
+        console.log(`正在查找公司: ${companyName}`);
+
         const placeResponse = await fetch(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(companyName)}&inputtype=textquery&fields=place_id&key=${apiKey}`);
         const placeData = await placeResponse.json();
+
+        console.log('Place API響應數據:', placeData);
 
         if (!placeData.candidates || placeData.candidates.length === 0) {
             alert('找不到公司名稱');
@@ -47,9 +52,17 @@ async function fetchReviews() {
         }
 
         const placeId = placeData.candidates[0].place_id;
+        console.log(`找到的Place ID: ${placeId}`);
 
         const reviewResponse = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews&key=${apiKey}`);
         const reviewData = await reviewResponse.json();
+
+        console.log('Review API響應數據:', reviewData);
+
+        if (!reviewData.result || !reviewData.result.reviews) {
+            alert('無法獲取評論');
+            return;
+        }
 
         const reviews = reviewData.result.reviews;
         const fiveStarReviews = reviews.filter(review => review.rating === 5).slice(0, 10);
@@ -57,6 +70,7 @@ async function fetchReviews() {
 
         displayReviews(fiveStarReviews, oneStarReviews);
     } catch (error) {
+        console.error('請求失敗:', error);
         alert('請求失敗');
     }
 }
