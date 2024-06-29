@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公司評論查詢</title>
+    <link rel="stylesheet" href="styles-reviews.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="scripts-reviews.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>公司評論查詢</h1>
+        <input type="text" id="apiKey" placeholder="輸入Google API密鑰">
+        <button onclick="saveApiKey()">保存API密鑰</button>
+        <input type="text" id="companyName" placeholder="輸入公司名稱">
+        <button onclick="fetchReviews()">查詢評論</button>
+        <div id="reviews">
+            <h2>5星評論</h2>
+            <ul id="fiveStarReviews"></ul>
+            <h2>1星評論</h2>
+            <ul id="oneStarReviews"></ul>
+        </div>
+    </div>
+</body>
+</html>
