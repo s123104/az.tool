@@ -9,38 +9,54 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
-        textarea, button {
-            width: 90%;
-            margin: 10px 0;
-            padding: 10px;
-            font-size: 16px;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
+            justify-content: flex-start;
+            min-height: 100vh;
         }
         .container {
             background-color: white;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 80%;
+            width: 90%;
+            max-width: 1000px;
+            box-sizing: border-box;
+        }
+        textarea, button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        button:active {
+            transform: scale(0.95);
         }
         p {
             word-wrap: break-word;
+        }
+        .hidden {
+            display: none;
+        }
+        #outputText {
+            height: 200px; /* 增加解密內容框的高度 */
+            resize: vertical; /* 允許使用者調整大小 */
         }
     </style>
 </head>
@@ -49,7 +65,11 @@
         <textarea id="inputText" rows="10" placeholder="在此輸入文字..."></textarea>
         <button onclick="processText()">壓縮並加密</button>
         <p>編碼網址: <a id="encodedUrl" href="" target="_blank"></a></p>
-        <textarea id="outputText" rows="10" placeholder="解密後的文字將顯示在此..."></textarea>
+        <button onclick="copyUrl()">複製網址</button>
+        <div id="outputContainer" class="hidden">
+            <p>解密內容:</p>
+            <textarea id="outputText" placeholder="解密內容將顯示在此..." style="resize: vertical;"></textarea>
+        </div>
     </div>
     <script>
         async function processText() {
@@ -78,7 +98,8 @@
         }
 
         async function decodeText(encodedUrl) {
-            const [keyBase64, ivBase64, encBase64] = encodedUrl.substring(1).split('.');
+            const urlHash = encodedUrl || window.location.hash;
+            const [keyBase64, ivBase64, encBase64] = urlHash.substring(1).split('.');
 
             const key = new Uint8Array(atob(keyBase64).split('').map(char => char.charCodeAt(0)));
             const iv = new Uint8Array(atob(ivBase64).split('').map(char => char.charCodeAt(0)));
@@ -95,11 +116,19 @@
 
             const decompressed = pako.ungzip(new Uint8Array(decrypted), { to: 'string' });
             document.getElementById('outputText').value = decompressed;
+            document.getElementById('outputContainer').classList.remove('hidden');
+        }
+
+        function copyUrl() {
+            const url = document.getElementById('encodedUrl').textContent;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('網址已複製！');
+            });
         }
 
         window.onload = function() {
             if (window.location.hash) {
-                decodeText(window.location.hash);
+                decodeText();
             }
         };
 
@@ -123,12 +152,16 @@
             return decompressed;
         }
 
-        if (window.location.pathname === "/api/decode" && window.location.hash) {
-            const encodedUrl = window.location.hash;
-            apiResponse(encodedUrl).then(response => {
-                document.body.innerHTML = `<pre>${response}</pre>`;
-            });
+        async function handleApiRequest() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('encodedUrl')) {
+                const encodedUrl = urlParams.get('encodedUrl');
+                const decodedContent = await apiResponse(encodedUrl);
+                document.body.innerHTML = `<pre>${decodedContent}</pre>`;
+            }
         }
+
+        handleApiRequest();
     </script>
 </body>
 </html>
