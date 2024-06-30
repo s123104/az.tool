@@ -1,11 +1,29 @@
+
 function saveApiKey() {
     const apiKey = document.getElementById('apiKey').value;
     if (!apiKey) {
-        alert('請輸入API密鑰');
+        console.error('請輸入API密鑰');
         return;
     }
     document.cookie = `googleApiKey=${apiKey}; path=/`;
-    alert('API密鑰已保存');
+    console.log('API密鑰已保存');
+    document.getElementById('apiSection').style.display = 'none';
+}
+
+function saveApiKeyModal() {
+    const apiKey = document.getElementById('apiKeyModal').value;
+    if (!apiKey) {
+        console.error('請輸入API密鑰');
+        return;
+    }
+    document.cookie = `googleApiKey=${apiKey}; path=/`;
+    console.log('API密鑰已保存');
+    document.getElementById('apiSectionModal').style.display = 'none';
+}
+
+function showApiKeyInput() {
+    document.getElementById('apiSectionModal').style.display = 'block';
+    document.getElementById('changeApiKeyButtonModal').style.display = 'none';
 }
 
 function getApiKeyFromCookie() {
@@ -38,26 +56,34 @@ function updateHistoryList() {
     historyList.innerHTML = '';
     let history = JSON.parse(localStorage.getItem('history')) || [];
     history.forEach(name => {
-        const li = document.createElement('li');
-        li.textContent = name;
-        li.onclick = () => {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.textContent = name;
+        td.onclick = () => {
             document.getElementById('companyName').value = name;
             fetchReviews();
+            toggleUtilityModal();
         };
-        historyList.appendChild(li);
+        tr.appendChild(td);
+        historyList.appendChild(tr);
     });
+}
+
+function toggleUtilityModal() {
+    const modal = document.getElementById('utilityModal');
+    modal.style.display = modal.style.display === "block" ? "none" : "block";
 }
 
 async function fetchReviews() {
     const apiKey = getApiKeyFromCookie();
     if (!apiKey) {
-        alert('請先輸入並保存API密鑰');
+        console.error('請先輸入並保存API密鑰');
         return;
     }
 
     const companyName = document.getElementById('companyName').value;
     if (!companyName) {
-        alert('請輸入公司名稱');
+        console.error('請輸入公司名稱');
         return;
     }
 
@@ -76,12 +102,12 @@ async function fetchReviews() {
         console.log('Place API響應數據:', placeData);
 
         if (placeData.status !== 'OK') {
-            alert(`找不到公司名稱: ${placeData.status}`);
+            console.error(`找不到公司名稱: ${placeData.status}`);
             return;
         }
 
         if (!placeData.candidates || placeData.candidates.length === 0) {
-            alert('找不到公司名稱');
+            console.error('找不到公司名稱');
             return;
         }
 
@@ -97,61 +123,128 @@ async function fetchReviews() {
         console.log('Review API響應數據:', reviewData);
 
         if (reviewData.status !== 'OK') {
-            alert(`無法獲取評論: ${reviewData.status}`);
+            console.error(`無法獲取評論: ${reviewData.status}`);
             return;
         }
 
         if (!reviewData.result || !reviewData.result.reviews) {
-            alert('無法獲取評論');
+            console.error('無法獲取評論');
             return;
         }
 
         const reviews = reviewData.result.reviews;
         const photos = reviewData.result.photos;
 
-        const fiveStarReviews = reviews.filter(review => review.rating === 5).slice(0, 10);
-        const oneStarReviews = reviews.filter(review => review.rating === 1).slice(0, 10);
+        const goodReviews = reviews.filter(review => review.rating >= 4).slice(0, 20);
+        const badReviews = reviews.filter(review => review.rating <= 3).slice(0, 20);
 
-        displayReviews(fiveStarReviews, oneStarReviews);
-        displayPhotos(photos.slice(0, 5), apiKey);
+        displayReviews(goodReviews, 'goodReviews', 'good-review', '查無好評');
+        displayReviews(badReviews, 'badReviews', 'bad-review', '查無差評');
+        displayPhotos(photos.slice(0, 6), apiKey);
+        await fetchPttLinks(companyName);
+
+        document.getElementById('companyTitle').textContent = companyName;
     } catch (error) {
         console.error('請求失敗:', error);
-        alert('請求失敗');
     }
 }
 
-function displayReviews(fiveStarReviews, oneStarReviews) {
-    const fiveStarList = document.getElementById('fiveStarReviews');
-    const oneStarList = document.getElementById('oneStarReviews');
+function displayReviews(reviews, elementId, className, emptyMessage) {
+    const reviewList = document.getElementById(elementId);
+    if (!reviewList) {
+        console.error(`元素未找到: ${elementId}`);
+        return;
+    }
+    reviewList.innerHTML = '';
 
-    fiveStarList.innerHTML = '';
-    oneStarList.innerHTML = '';
-
-    fiveStarReviews.forEach(review => {
+    if (reviews.length === 0) {
         const li = document.createElement('li');
-        li.className = 'five-star';
-        li.innerHTML = `<i class="fas fa-thumbs-up"></i><img src="https://via.placeholder.com/40" alt="avatar">${review.text}`;
-        fiveStarList.appendChild(li);
+        li.textContent = emptyMessage;
+        reviewList.appendChild(li);
+        return;
+    }
+
+    reviews.forEach((review, index) => {
+        const li = document.createElement('li');
+        li.className = className;
+        li.innerHTML = `${className === 'good-review' ? '<i class="fas fa-thumbs-up"></i>' : '<i class="fas fa-thumbs-down"></i>'}${review.rating} 星 - ${review.text}`;
+        if (index >= 5) {
+            li.style.display = 'none';
+        }
+        reviewList.appendChild(li);
     });
 
-    oneStarReviews.forEach(review => {
-        const li = document.createElement('li');
-        li.className = 'one-star';
-        li.innerHTML = `<i class="fas fa-thumbs-down"></i><img src="https://via.placeholder.com/40" alt="avatar">${review.text}`;
-        oneStarList.appendChild(li);
-    });
+    if (reviews.length > 5) {
+        const showMore = document.createElement('button');
+        showMore.className = 'show-more';
+        showMore.textContent = '顯示更多';
+        showMore.onclick = () => {
+            reviewList.querySelectorAll('li').forEach((li, index) => {
+                if (index >= 5) {
+                    li.style.display = 'flex';
+                }
+            });
+            showMore.style.display = 'none';
+        };
+        reviewList.appendChild(showMore);
+    }
 }
 
 function displayPhotos(photos, apiKey) {
     const photoList = document.getElementById('photoList');
+    if (!photoList) {
+        console.error('元素未找到: photoList');
+        return;
+    }
     photoList.innerHTML = '';
 
     photos.forEach(photo => {
         const img = document.createElement('img');
-        const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=${apiKey}`;
+        const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${photo.photo_reference}&key=${apiKey}`;
         img.src = photoUrl;
         photoList.appendChild(img);
     });
+}
+
+async function fetchPttLinks(companyName) {
+    try {
+        const response = await fetch(`https://www.ptt.cc/bbs/search?q=${encodeURIComponent(companyName)}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'text/html',
+            }
+        });
+        if (!response.ok) {
+            throw new Error(`PTT API響應錯誤: ${response.statusText}`);
+        }
+        const data = await response.text();
+        console.log('PTT 搜索結果:', data);
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data, 'text/html');
+        const links = Array.from(doc.querySelectorAll('.title a')).slice(0, 5);
+
+        const pttLinks = document.getElementById('pttLinks');
+        if (!pttLinks) {
+            console.error('元素未找到: pttLinks');
+            return;
+        }
+        pttLinks.innerHTML = '';
+
+        if (links.length === 0) {
+            document.getElementById('pttTitle').style.display = 'none';
+            return;
+        }
+
+        links.forEach(link => {
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="https://www.ptt.cc${link.getAttribute('href')}" target="_blank">${link.textContent}</a>`;
+            pttLinks.appendChild(li);
+        });
+    } catch (error) {
+        console.error('PTT連結請求失敗:', error);
+        document.getElementById('pttTitle').style.display = 'none';
+    }
 }
 
 // 自動填充API密鑰輸入框和更新歷史搜索列表（如果已經存在於cookie和本地存儲中）
@@ -159,6 +252,7 @@ window.onload = function() {
     const apiKey = getApiKeyFromCookie();
     if (apiKey) {
         document.getElementById('apiKey').value = apiKey;
+        document.getElementById('apiSection').style.display = 'none';
     }
     updateHistoryList();
-};
+    };

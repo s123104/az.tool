@@ -1,56 +1,89 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     margin: 0;
+    padding: 0;
 }
 
 .container {
-    background: #fff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    width: 400px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-h1 {
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header h1 {
     color: #333;
 }
 
-input, button {
+.header input, .header button {
     width: calc(100% - 22px);
+    max-width: 400px;
     padding: 10px;
-    margin: 10px 0;
+    margin: 5px 0;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 
-button {
-    background-color: #28a745;
+.header button {
+    background-color: rgba(0, 123, 255, 0.5);
     color: white;
     border: none;
     cursor: pointer;
 }
 
-button:hover {
-    background-color: #218838;
+.header button:hover {
+    background-color: rgba(0, 123, 255, 0.7);
 }
 
-#history, #reviews, #photos {
-    margin-top: 20px;
+.utility-button {
+    background-color: rgba(0, 123, 255, 0.5);
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.utility-button:hover {
+    background-color: rgba(0, 123, 255, 0.7);
+}
+
+.content {
+    text-align: center;
+}
+
+.review-panel {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.review-section {
+    width: 45%;
     text-align: left;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
-ul {
+.review-section ul {
     list-style-type: none;
     padding: 0;
 }
 
-li {
+.review-section li {
     display: flex;
     align-items: center;
     background: #f9f9f9;
@@ -58,32 +91,149 @@ li {
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-li i {
+.review-section li .icon {
     margin-right: 10px;
     font-size: 20px;
 }
 
-.five-star {
+.review-section .good-review {
     color: green;
 }
 
-.one-star {
+.review-section .bad-review {
     color: red;
 }
 
-li img {
-    margin-right: 10px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+.show-more {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background-color: rgba(0, 123, 255, 0.5);
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.show-more:hover {
+    background-color: rgba(0, 123, 255, 0.7);
+}
+
+#ptt {
+    margin-top: 20px;
+    text-align: left;
+}
+
+#ptt ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#ptt li {
+    background: #f9f9f9;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#photoList {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin-top: 20px;
 }
 
 #photoList img {
-    margin: 5px;
-    width: 100px;
-    height: 100px;
+    margin: 10px;
+    width: calc(33.333% - 20px);
+    max-width: 200px;
+    height: auto;
     object-fit: cover;
     border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media screen and (max-width: 768px) {
+    .review-panel {
+        flex-direction: column;
+    }
+
+    .review-section {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    #photoList img {
+        width: calc(50% - 20px);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    #photoList img {
+        width: calc(100% - 20px);
+    }
+}
+
+/* Modal styling */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 10px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#historyListTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#historyListTable th, #historyListTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+#historyListTable th {
+    background-color: #f2f2f2;
+}
+
+#historyListTable tr:hover {
+    background-color: #f1f1f1;
 }
