@@ -68,7 +68,7 @@
         <button onclick="copyUrl()">複製網址</button>
         <div id="outputContainer" class="hidden">
             <p>解密內容:</p>
-            <textarea id="outputText" placeholder="解密內容將顯示在此..." style="resize: vertical;"></textarea>
+            <div id="outputText" style="white-space: pre-wrap;"></div>
         </div>
     </div>
     <script>
@@ -115,7 +115,8 @@
             );
 
             const decompressed = pako.ungzip(new Uint8Array(decrypted), { to: 'string' });
-            document.getElementById('outputText').value = decompressed;
+            const linkedContent = decompressed.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+            document.getElementById('outputText').innerHTML = linkedContent.replace(/\n/g, "<br>");
             document.getElementById('outputContainer').classList.remove('hidden');
         }
 
@@ -157,7 +158,8 @@
             if (urlParams.has('encodedUrl')) {
                 const encodedUrl = urlParams.get('encodedUrl');
                 const decodedContent = await apiResponse(encodedUrl);
-                document.body.innerHTML = `<pre>${decodedContent}</pre>`;
+                const linkedContent = decodedContent.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+                document.body.innerHTML = `<pre>${linkedContent}</pre>`;
             }
         }
 
