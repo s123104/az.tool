@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>公司評論查詢</title>
     <link rel="stylesheet" href="styles-reviews.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <script src="scripts-reviews.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js" crossorigin="anonymous"></script>
+    <script defer src="scripts-reviews.js"></script>
 </head>
 <body>
     <div class="container">
@@ -15,11 +15,19 @@
         <button onclick="saveApiKey()">保存API密鑰</button>
         <input type="text" id="companyName" placeholder="輸入公司名稱">
         <button onclick="fetchReviews()">查詢評論</button>
+        <div id="history">
+            <h2>歷史搜索</h2>
+            <ul id="historyList"></ul>
+        </div>
         <div id="reviews">
             <h2>5星評論</h2>
             <ul id="fiveStarReviews"></ul>
             <h2>1星評論</h2>
             <ul id="oneStarReviews"></ul>
+        </div>
+        <div id="photos">
+            <h2>公司照片</h2>
+            <div id="photoList"></div>
         </div>
     </div>
 </body>
