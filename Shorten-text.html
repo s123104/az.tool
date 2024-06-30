@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文字壓縮與加密</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.11/pako.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        textarea, button {
+            width: 90%;
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+        }
+        p {
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <textarea id="inputText" rows="10" placeholder="在此輸入文字..."></textarea>
+        <button onclick="processText()">壓縮並加密</button>
+        <p>編碼網址: <a id="encodedUrl" href="" target="_blank"></a></p>
+        <textarea id="outputText" rows="10" placeholder="解密後的文字將顯示在此..."></textarea>
+    </div>
+    <script>
+        async function processText() {
+            const text = document.getElementById('inputText').value;
+            const compressed = pako.gzip(text);
+            const key = window.crypto.getRandomValues(new Uint8Array(16));
+            const iv = window.crypto.getRandomValues(new Uint8Array(16));
+            const algorithm = { name: 'AES-CBC', iv: iv };
+
+            const cryptoKey = await window.crypto.subtle.importKey(
+                'raw', key, algorithm, false, ['encrypt', 'decrypt']
+            );
+
+            const encrypted = await window.crypto.subtle.encrypt(
+                algorithm, cryptoKey, compressed
+            );
+
+            const encBase64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
+            const ivBase64 = btoa(String.fromCharCode(...iv));
+            const keyBase64 = btoa(String.fromCharCode(...key));
+
+            const encodedUrl = `#${keyBase64}.${ivBase64}.${encBase64}`;
+            const fullUrl = `${window.location.origin}${window.location.pathname}${encodedUrl}`;
+            document.getElementById('encodedUrl').textContent = fullUrl;
+            document.getElementById('encodedUrl').href = fullUrl;
+        }
+
+        async function decodeText(encodedUrl) {
+            const [keyBase64, ivBase64, encBase64] = encodedUrl.substring(1).split('.');
+
+            const key = new Uint8Array(atob(keyBase64).split('').map(char => char.charCodeAt(0)));
+            const iv = new Uint8Array(atob(ivBase64).split('').map(char => char.charCodeAt(0)));
+            const encrypted = new Uint8Array(atob(encBase64).split('').map(char => char.charCodeAt(0)));
+
+            const algorithm = { name: 'AES-CBC', iv: iv };
+            const cryptoKey = await window.crypto.subtle.importKey(
+                'raw', key, algorithm, false, ['decrypt']
+            );
+
+            const decrypted = await window.crypto.subtle.decrypt(
+                algorithm, cryptoKey, encrypted
+            );
+
+            const decompressed = pako.ungzip(new Uint8Array(decrypted), { to: 'string' });
+            document.getElementById('outputText').value = decompressed;
+        }
+
+        window.onload = function() {
+            if (window.location.hash) {
+                decodeText(window.location.hash);
+            }
+        };
+
+        async function apiResponse(encodedUrl) {
+            const [keyBase64, ivBase64, encBase64] = encodedUrl.substring(1).split('.');
+
+            const key = new Uint8Array(atob(keyBase64).split('').map(char => char.charCodeAt(0)));
+            const iv = new Uint8Array(atob(ivBase64).split('').map(char => char.charCodeAt(0)));
+            const encrypted = new Uint8Array(atob(encBase64).split('').map(char => char.charCodeAt(0)));
+
+            const algorithm = { name: 'AES-CBC', iv: iv };
+            const cryptoKey = await window.crypto.subtle.importKey(
+                'raw', key, algorithm, false, ['decrypt']
+            );
+
+            const decrypted = await window.crypto.subtle.decrypt(
+                algorithm, cryptoKey, encrypted
+            );
+
+            const decompressed = pako.ungzip(new Uint8Array(decrypted), { to: 'string' });
+            return decompressed;
+        }
+
+        if (window.location.pathname === "/api/decode" && window.location.hash) {
+            const encodedUrl = window.location.hash;
+            apiResponse(encodedUrl).then(response => {
+                document.body.innerHTML = `<pre>${response}</pre>`;
+            });
+        }
+    </script>
+</body>
+</html>
