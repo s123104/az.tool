@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="img/impressed.png" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1A2B 猜數字遊戲</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #ece9e6, #ffffff);
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f9f9f9;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            position: relative;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #333;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            background: #333;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #555;
+        }
+
+        #result {
+            font-size: 18px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .history {
+            margin-top: 20px;
+            text-align: left;
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .history h3 {
+            text-align: center;
+            color: #333;
+        }
+
+        .character {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            text-align: center;
+        }
+
+        .character img {
+            width: 80px;
+            height: auto;
+            animation: bounce 2s infinite;
+        }
+
+        #character-speech {
+            background: #fff;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            margin-top: 10px;
+        }
+
+        #character-speech::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px;
+            border-style: solid;
+            border-color: #fff transparent transparent transparent;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>1A2B 猜數字遊戲</h1>
+        <div class="input-section">
+            <input type="text" id="guess" maxlength="4" placeholder="輸入4位數字">
+            <button onclick="makeGuess()">猜</button>
+        </div>
+        <div id="result"></div>
+        <div class="history">
+            <h3>歷史記錄</h3>
+            <div id="history"></div>
+        </div>
+        <div class="character">
+            <img src="img/impressed.png" alt="Character">
+            <p id="character-speech">歡迎來玩 1A2B 猜數字遊戲！</p>
+        </div>
+    </div>
+
+    <script>
+        function generateNumber() {
+            let digits = [];
+            while (digits.length < 4) {
+                let digit = Math.floor(Math.random() * 10);
+                if (digits.indexOf(digit) === -1 && (digits.length > 0 || digit !== 0)) {
+                    digits.push(digit);
+                }
+            }
+            return digits.join('');
+        }
+
+        function isValidInput(input) {
+            return /^\d{4}$/.test(input) && new Set(input).size === 4 && input[0] !== '0';
+        }
+
+        function calculateAB(guess, answer) {
+            let a = 0, b = 0;
+            for (let i = 0; i < 4; i++) {
+                if (guess[i] === answer[i]) {
+                    a++;
+                } else if (answer.includes(guess[i])) {
+                    b++;
+                }
+            }
+            return `${a}A${b}B`;
+        }
+
+        function updateHistory(guess, result) {
+            let history = JSON.parse(sessionStorage.getItem('history')) || [];
+            history.push({ guess, result });
+            sessionStorage.setItem('history', JSON.stringify(history));
+            displayHistory();
+        }
+
+        function displayHistory() {
+            let history = JSON.parse(sessionStorage.getItem('history')) || [];
+            let historyDiv = document.getElementById('history');
+            historyDiv.innerHTML = history.map(entry => `猜測: ${entry.guess}, 結果: ${entry.result}`).join('<br>');
+        }
+
+        function makeGuess() {
+            let guessInput = document.getElementById('guess').value;
+            if (!isValidInput(guessInput)) {
+                document.getElementById('result').innerText = '請輸入有效的4位數字，且每個數字不重複，首位不能為0';
+                updateCharacterSpeech('請輸入有效的4位數字，且每個數字不重複，首位不能為0');
+                return;
+            }
+
+            let answer = sessionStorage.getItem('answer');
+            if (!answer) {
+                answer = generateNumber();
+                sessionStorage.setItem('answer', answer);
+            }
+
+            let result = calculateAB(guessInput, answer);
+            document.getElementById('result').innerText = result;
+            updateHistory(guessInput, result);
+            updateCharacterSpeech(result === '4A0B' ? '恭喜你猜中了！' : `結果是：${result}`);
+        }
+
+        function updateCharacterSpeech(text) {
+            document.getElementById('character-speech').innerText = text;
+        }
+
+        function initGame() {
+            if (!sessionStorage.getItem('history')) {
+                sessionStorage.setItem('history', JSON.stringify([]));
+            }
+            displayHistory();
+            updateCharacterSpeech('歡迎來玩 1A2B 猜數字遊戲！');
+        }
+
+        initGame();
+    </script>
+</body>
+</html>
