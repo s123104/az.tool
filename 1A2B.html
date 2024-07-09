@@ -31,6 +31,9 @@
         .input-section {
             margin-bottom: 20px;
             position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         input[type="text"] {
@@ -40,6 +43,7 @@
             font-size: 16px;
             width: 200px;
             transition: all 0.3s ease;
+            margin-right: 10px;
         }
 
         input[type="text"]:focus {
@@ -79,9 +83,10 @@
             color: #333;
         }
 
-        .character {
-            position: relative;
-            text-align: center;
+        .character-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             margin-top: 20px;
         }
 
@@ -96,20 +101,28 @@
             border-radius: 10px;
             padding: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            position: relative;
-            margin-top: 10px;
+            margin-left: 10px;
             display: inline-block;
+            white-space: nowrap;
+            position: relative;
         }
 
         #character-speech::after {
             content: '';
             position: absolute;
             bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 10px;
             border-width: 10px;
             border-style: solid;
             border-color: #fff transparent transparent transparent;
+        }
+
+        .a-color {
+            color: green;
+        }
+
+        .b-color {
+            color: blue;
         }
 
         @keyframes bounce {
@@ -144,8 +157,14 @@
                 width: 100%;
             }
 
-            .character {
-                margin-top: 30px;
+            .character-group {
+                margin-top: 50px;
+                flex-direction: column;
+            }
+
+            #character-speech {
+                margin-left: 0;
+                margin-top: 10px;
             }
         }
     </style>
@@ -158,13 +177,16 @@
             <button onclick="makeGuess()">猜</button>
         </div>
         <div id="result"></div>
+        <div class="character-group">
+            <div class="character">
+                <img src="img/impressed.png" alt="Character">
+            </div>
+            <p id="character-speech">歡迎來玩 1A2B 猜數字遊戲！</p>
+        </div>
         <div class="history">
             <h3>歷史記錄</h3>
             <div id="history"></div>
-        </div>
-        <div class="character">
-            <img src="img/impressed.png" alt="Character">
-            <p id="character-speech">歡迎來玩 1A2B 猜數字遊戲！</p>
+            <button id="more-history" style="display:none;" onclick="showMoreHistory()">查看更多</button>
         </div>
     </div>
 
@@ -193,12 +215,18 @@
                     b++;
                 }
             }
-            return `${a}A${b}B`;
+            return `<span class="a-color">${a}A</span><span class="b-color">${b}B</span>`;
         }
 
         function updateHistory(guess, result) {
             let history = JSON.parse(sessionStorage.getItem('history')) || [];
             history.push({ guess, result });
+            if (history.length > 10) {
+                document.getElementById('more-history').style.display = 'block';
+                history = history.slice(-10);
+            } else {
+                document.getElementById('more-history').style.display = 'none';
+            }
             sessionStorage.setItem('history', JSON.stringify(history));
             displayHistory();
         }
@@ -207,6 +235,13 @@
             let history = JSON.parse(sessionStorage.getItem('history')) || [];
             let historyDiv = document.getElementById('history');
             historyDiv.innerHTML = history.map(entry => `猜測: ${entry.guess}, 結果: ${entry.result}`).join('<br>');
+        }
+
+        function showMoreHistory() {
+            let fullHistory = JSON.parse(sessionStorage.getItem('history')) || [];
+            let historyDiv = document.getElementById('history');
+            historyDiv.innerHTML = fullHistory.map(entry => `猜測: ${entry.guess}, 結果: ${entry.result}`).join('<br>');
+            document.getElementById('more-history').style.display = 'none';
         }
 
         function makeGuess() {
@@ -224,13 +259,13 @@
             }
 
             let result = calculateAB(guessInput, answer);
-            document.getElementById('result').innerText = result;
+            document.getElementById('result').innerHTML = `結果: ${result}`;
             updateHistory(guessInput, result);
-            updateCharacterSpeech(result === '4A0B' ? '恭喜你猜中了！' : `結果是：${result}`);
+            updateCharacterSpeech(result.includes('4A') ? '恭喜你猜中了！' : `結果是：${result}`);
         }
 
         function updateCharacterSpeech(text) {
-            document.getElementById('character-speech').innerText = text;
+            document.getElementById('character-speech').innerHTML = text;
         }
 
         function initGame() {
