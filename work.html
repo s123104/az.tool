@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快速產生公司資訊 | Quick Company Info Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #ecf0f1;
+            --text-color: #34495e;
+            --card-background: #ffffff;
+            --border-color: #bdc3c7;
+            --hover-color: #2980b9;
+        }
+
+        .dark-mode {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #2c3e50;
+            --text-color: #ecf0f1;
+            --card-background: #34495e;
+            --border-color: #7f8c8d;
+            --hover-color: #2980b9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-top: 2rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-top: 2rem;
+            color: var(--secondary-color);
+        }
+
+        .card {
+            background-color: var(--card-background);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 0.75rem 2.5rem 0.75rem 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: var(--card-background);
+            color: var(--text-color);
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .input-group:hover .input-icon {
+            opacity: 1;
+        }
+
+        .range-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 10px;
+            border-radius: 5px;
+            background: var(--secondary-color);
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .range-slider:hover {
+            opacity: 1;
+        }
+
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .range-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .range-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .range-slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .notice {
+            background-color: rgba(46, 204, 113, 0.1);
+            border-left: 4px solid var(--secondary-color);
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .notice h2 {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+            text-align: left;
+        }
+
+        .site-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .site-list li {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: rgba(52, 152, 219, 0.1);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .site-list li:hover {
+            background-color: rgba(52, 152, 219, 0.2);
+            transform: translateX(5px);
+        }
+
+        .toggle-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            margin-left: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn:hover {
+            transform: scale(1.1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="toggle-container">
+            <button id="languageToggle" class="toggle-btn">
+                <img src="https://cdn-icons-png.flaticon.com/512/484/484582.png" alt="Language" width="24" height="24">
+            </button>
+            <button id="themeToggle" class="toggle-btn">
+                <img src="https://cdn-icons-png.flaticon.com/512/1829/1829191.png" alt="Theme" width="24" height="24">
+            </button>
+        </div>
+        <h1 class="fade-in" id="title">快速產生公司資訊</h1>
+        <div class="card fade-in">
+            <form class="search-form">
+                <div class="input-group">
+                    <label for="companyName" id="companyNameLabel">公司名稱</label>
+                    <input type="text" id="companyName" name="companyName" required>
+                    <img class="input-icon" src="https://cdn-icons-png.flaticon.com/512/1253/1253356.png" alt="Company">
+                </div>
+                <div class="input-group">
+                    <label for="location" id="locationLabel">地區 (選填)</label>
+                    <input type="text" id="location" name="location">
+                    <img class="input-icon" src="https://cdn-icons-png.flaticon.com/512/484/484167.png" alt="Location">
+                </div>
+                <div class="input-group">
+                    <label for="jobContent" id="jobContentLabel">工作內容 (選填)</label>
+                    <input type="text" id="jobContent" name="jobContent">
+                    <img class="input-icon" src="https://cdn-icons-png.flaticon.com/512/2910/2910791.png" alt="Job">
+                </div>
+                <div class="input-group">
+                    <label for="yearsRange" id="yearsRangeLabel">搜尋年數: <span id="yearDisplay"></span></label>
+                    <input type="range" id="yearsRange" name="yearsRange" min="1" max="20" value="6" class="range-slider">
+                </div>
+                <button type="button" class="btn" onclick="searchCompany()" id="searchButton">搜尋</button>
+            </form>
+        </div>
+        <div class="notice fade-in">
+            <h2 id="noticeTitle">注意事項</h2>
+            <p id="noticeContent">請確保您的瀏覽器允許彈出式視窗。本工具將在多個網站上搜索公司相關資訊。</p>
+        </div>
+        <div class="card site-list fade-in">
+            <h2 id="siteListTitle">搜尋網站列表</h2>
+            <ul id="siteList">
+                <li>104 人力銀行 (104.com.tw)</li>
+                <li>小雞上工 (chickpt.com.tw)</li>
+                <li>1111 人力銀行 (1111.com.tw)</li>
+                <li>Dcard (dcard.tw)</li>
+                <li>PTT (ptt.cc)</li>
+                <li>Qollie 天眼通 (qollie.com)</li>
+                <li>面試趣 (interview.tw)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function autocomplete(input, suggestions) {
+            let currentFocus;
+            input.addEventListener("input", function() {
+                let a, b, i, val = this.value;
+                closeAllLists();
+                if (!val) { return false;}
+                currentFocus = -1;
+                a = document.createElement("DIV");
+                a.setAttribute("id", this.id + "autocomplete-list");
+                a.setAttribute("class", "autocomplete-items");
+                this.parentNode.appendChild(a);
+                for (I = 0; I < suggestions.length; I++) {
+                    if (suggestions[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                        b = document.createElement("DIV");
+                        b.innerHTML = "<strong>" + suggestions[i].substr(0, val.length) + "</strong>";
+                        b.innerHTML += suggestions[i].substr(val.length);
+                        b.innerHTML += "<input type='hidden' value='" + suggestions[i] + "'>";
+                        b.addEventListener("click", function(e) {
+                            input.value = this.getElementsByTagName("input")[0].value;
+                            closeAllLists();
+                        });
+                        a.appendChild(b);
+                    }
+                }
+            });
+            input.addEventListener("keydown", function(e) {
+                let x = document.getElementById(this.id + "autocomplete-list");
+                if (x) x = x.getElementsByTagName("div");
+                if (e.keyCode == 40) {
+                    currentFocus++;
+                    addActive(x);
+                } else if (e.keyCode == 38) {
+                    currentFocus--;
+                    addActive(x);
+                } else if (e.keyCode == 13) {
+                    e.preventDefault();
+                    if (currentFocus > -1) {if (x) x[currentFocus].click();
+    }
+}
+});
+function addActive(x) {
+    if (!x) return false;
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    x[currentFocus].classList.add("autocomplete-active");
+}
+function removeActive(x) {
+    for (let i = 0; i < x.length; i++) {
+        x[i].classList.remove("autocomplete-active");
+    }
+}
+function closeAllLists(elmnt) {
+    let x = document.getElementsByClassName("autocomplete-items");
+    for (let i = 0; i < x.length; i++) {
+        if (elmnt != x[i] && elmnt != input) {
+            x[i].parentNode.removeChild(x[i]);
+        }
+    }
+}
+document.addEventListener("click", function (e) {
+    closeAllLists(e.target);
+});
+}
+
+function updateTimeRange() {
+const yearsRange = document.getElementById('yearsRange').value;
+const currentDate = new Date();
+const currentYear = currentDate.getFullYear();
+const pastYear = currentYear - yearsRange;
+document.getElementById('yearDisplay').innerText = `${pastYear} - ${currentYear}`;
+}
+
+function searchCompany() {
+const companyName = document.getElementById('companyName').value;
+const location = document.getElementById('location').value;
+const jobContent = document.getElementById('jobContent').value;
+const yearsRange = document.getElementById('yearsRange').value;
+const currentDate = new Date();
+const currentYear = currentDate.getFullYear();
+const pastYear = currentYear - yearsRange;
+
+if (!companyName) {
+    alert(currentLanguage === 'zh' ? "請輸入公司名稱" : "Please enter a company name");
+    return;
+}
+
+let additionalConditions = "";
+if (location) {
+    additionalConditions += ` OR ${location}`;
+}
+if (jobContent) {
+    additionalConditions += ` OR ${jobContent}`;
+}
+
+const searchQuery = `"${companyName}" (工作 OR 求職 OR 面試 OR 福利 OR 待遇 OR 友善 OR 學習 OR 成長 OR 彈性 OR 加班 OR 薪資 OR 福利 OR 管理 OR 環境 OR 挑戰 OR 經驗 OR 訓練 OR 評論${additionalConditions}) before:${currentYear}-12-31 after:${pastYear}-01-01`;
+
+const searchSites = [
+    "https://www.google.com/search?q=",
+    "https://www.google.com/search?q=",
+    "https://www.google.com/search?q=",
+    "https://www.google.com/search?q=",
+    "https://www.google.com/search?q=",
+    "https://www.google.com/search?q=",
+    "https://www.google.com/search?q="
+];
+
+const searchDomains = [
+    "site:104.com.tw",
+    "site:chickpt.com.tw",
+    "site:1111.com.tw",
+    "site:dcard.tw",
+    "site:ptt.cc",
+    "site:qollie.com",
+    "site:interview.tw"
+];
+
+searchSites.forEach((site, index) => {
+    const searchUrl = `${site}${encodeURIComponent(searchQuery + " " + searchDomains[index])}`;
+    window.open(searchUrl, '_blank');
+});
+}
+
+const themeToggle = document.getElementById('themeToggle');
+const languageToggle = document.getElementById('languageToggle');
+const body = document.body;
+
+themeToggle.addEventListener('click', () => {
+body.classList.toggle('dark-mode');
+themeToggle.innerHTML = body.classList.contains('dark-mode') ? 
+    '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>' : 
+    '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+});
+
+let currentLanguage = 'zh';
+languageToggle.addEventListener('click', () => {
+currentLanguage = currentLanguage === 'zh' ? 'en' : 'zh';
+updateLanguage();
+});
+
+function updateLanguage() {
+const translations = {
+    title: { zh: '快速產生公司資訊', en: 'Quick Company Info Generator' },
+    companyNameLabel: { zh: '公司名稱', en: 'Company Name' },
+    locationLabel: { zh: '地區 (選填)', en: 'Location (Optional)' },
+    jobContentLabel: { zh: '工作內容 (選填)', en: 'Job Content (Optional)' },
+    yearsRangeLabel: { zh: '搜尋時間範圍: ', en: 'Search Time Range: ' },
+    searchButton: { zh: '搜尋', en: 'Search' },
+    noticeTitle: { zh: '注意事項', en: 'Notice' },
+    noticeContent: { zh: '請確保您的瀏覽器允許彈出式視窗。', en: 'Please ensure your browser allows pop-up windows.' },
+    siteListTitle: { zh: '搜尋網站列表', en: 'Search Site List' },
+};
+
+Object.keys(translations).forEach(key => {
+    const element = document.getElementById(key);
+    if (element) {
+        if (key === 'yearsRangeLabel') {
+            element.childNodes[0].nodeValue = translations[key][currentLanguage];
+        } else {
+            element.innerText = translations[key][currentLanguage];
+        }
+    }
+});
+
+// Update placeholder text
+document.getElementById('companyName').placeholder = currentLanguage === 'zh' ? '輸入公司名稱' : 'Enter company name';
+document.getElementById('location').placeholder = currentLanguage === 'zh' ? '輸入地區 (選填)' : 'Enter location (optional)';
+document.getElementById('jobContent').placeholder = currentLanguage === 'zh' ? '輸入工作內容 (選填)' : 'Enter job content (optional)';
+
+// Update site list
+const siteList = document.getElementById('siteList');
+const sites = [
+    '104 人力銀行 (104.com.tw)',
+    '小雞上工 (chickpt.com.tw)',
+    '1111 人力銀行 (1111.com.tw)',
+    'Dcard (dcard.tw)',
+    'PTT (ptt.cc)',
+    'Qollie 天眼通 (qollie.com)',
+    '面試趣 (interview.tw)'
+];
+siteList.innerHTML = sites.map(site => `<li>${site}</li>`).join('');
+}
+
+// 初始化自動完成
+const companies = [
+"台積電", "鴻海", "聯發科", "華碩", "宏碁", "仁寶", "緯創", "中華電信",
+"遠傳", "台灣大哥大", "富士康", "新光三越", "國泰人壽", "統一超商"
+];
+
+autocomplete(document.getElementById('companyName'), companies);
+
+// 初始化年份範圍顯示
+updateTimeRange();
+document.getElementById('yearsRange').addEventListener('input', updateTimeRange);
+
+// 處理信息模態框
+const modal = document.getElementById("infoModal");
+const infoLink = document.getElementById("infoLink");
+const span = document.getElementsByClassName("close")[0];
+
+infoLink.onclick = function() {
+modal.style.display = "block";
+}
+
+span.onclick = function() {
+modal.style.display = "none";
+}
+
+window.onclick = function(event) {
+if (event.target == modal) {
+    modal.style.display = "none";
+}
+}
+
+// 在頁面加載時添加淡入效果
+document.addEventListener('DOMContentLoaded', () => {
+document.querySelector('h1').classList.add('fade-in');
+document.querySelector('.search-form').classList.add('fade-in');
+});
+    </script>
+</body>
+</html>
