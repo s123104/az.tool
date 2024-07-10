@@ -1,358 +1,294 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
+<html>
+    <head>  
     <meta charset="UTF-8">
-    <link rel="icon" href="img/impressed.png" type="image/x-icon">
+    <link rel="icon" href="https://s123104.github.io/az.tool/img/impressed.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1A2B 猜數字遊戲</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #ece9e6, #ffffff);
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #f9f9f9;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            position: relative;
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        .input-section {
-            margin-bottom: 20px;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        input[type="text"] {
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            width: 200px;
-            transition: all 0.3s ease;
-            margin-right: 10px;
-        }
-
-        input[type="text"]:focus {
-            border-color: #333;
-        }
-
-        button {
-            padding: 10px 20px;
-            border: none;
-            background: #333;
-            color: #fff;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s ease;
-        }
-
-        button:hover {
-            background: #555;
-        }
-
-        #result {
-            font-size: 18px;
-            margin-top: 20px;
-            font-weight: bold;
-        }
-
-        .history {
-            margin-top: 20px;
-            text-align: left;
-            width: 80%;
-            margin: 0 auto;
-        }
-
-        .history h3 {
-            text-align: center;
-            color: #333;
-        }
-
-        .character-group {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .character img {
-            width: 80px;
-            height: auto;
-            animation: bounce 2s infinite;
-        }
-
-        #character-speech {
-            background: #fff;
-            border-radius: 10px;
-            padding: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-left: 10px;
-            display: inline-block;
-            white-space: nowrap;
-            position: relative;
-        }
-
-        #character-speech::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 10px;
-            border-width: 10px;
-            border-style: solid;
-            border-color: #fff transparent transparent transparent;
-        }
-
-        .a-color {
-            color: green;
-        }
-
-        .b-color {
-            color: blue;
-        }
-
-        .fireworkDiv {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-            display: none;
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40% {
-                transform: translateY(-20px);
-            }
-            60% {
-                transform: translateY(-10px);
-            }
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 10px;
-            }
-
-            .input-section {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-
-            input[type="text"] {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-
-            button {
-                width: 100%;
-            }
-
-            .character-group {
-                flex-direction: column;
-            }
-
-            #character-speech {
-                margin-left: 0;
-                margin-top: 10px;
-            }
-        }
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+    
+      body {
+        font-family: 'Noto Sans TC', sans-serif;
+        background-color: #ffffff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden;
+      }
+      .game-container {
+        background-color: #ffffff;
+        border-radius: 20px;
+        width: 90%;
+        max-width: 400px;
+        height: 80vh;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .chat-header {
+        background-color: #3d3d3d;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 18px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+      .chat-body {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+      }
+      .message {
+        max-width: 70%;
+        margin-bottom: 15px;
+        padding: 10px 15px;
+        border-radius: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        animation: fadeIn 0.3s ease-out;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .wolf-message {
+        align-self: flex-start;
+        background-color: #f0f0f0;
+      }
+      .user-message {
+        align-self: flex-end;
+        background-color: #414141;
+        color: white;
+      }
+      .wolf-avatar {
+        width: 50px;
+        height: 50px;
+        margin-right: 10px;
+        background-image: url('https://s123104.github.io/az.tool/img/impressed.png');
+        background-size: cover;
+      }
+      .input-container {
+        display: flex;
+        padding: 10px;
+        background-color: #f0f0f0;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+      }
+      input {
+        flex-grow: 1;
+        padding: 10px;
+        font-size: 16px;
+        border: none;
+        border-radius: 20px;
+        margin-right: 10px;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #575757;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.1s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      }
+      button:hover {
+        background-color: #343434;
+      }
+      button:active {
+        transform: scale(0.98);
+      }
+      .result {
+        font-weight: bold;
+        margin-top: 5px;
+      }
+      .result .A { color: #4c69d0; }
+      .result .B { color: #b61f1f; }
+      #fireworks {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+      }
     </style>
-</head>
-<body>
-    <div class="container">
-        <h1>1A2B 猜數字遊戲</h1>
-        <div class="input-section">
-            <input type="text" id="guess" maxlength="4" placeholder="輸入4位數字">
-            <button onclick="makeGuess()">猜</button>
+    </head>
+    <body>
+    <div class="game-container">
+      <div class="chat-header">1A2B 數字猜謎遊戲</div>
+      <div class="chat-body" id="chatBody">
+        <div class="message wolf-message">
+          <div class="wolf-avatar"></div>
+          你好！我們來玩1A2B猜數字遊戲吧！我已經想好了一個4位不重複的數字，你來猜猜看？
         </div>
-        <div id="result"></div>
-        <div class="character-group">
-            <div class="character">
-                <img src="img/impressed.png" alt="Character">
-            </div>
-            <p id="character-speech">歡迎來玩 1A2B 猜數字遊戲！</p>
-        </div>
-        <div class="history">
-            <h3>歷史記錄</h3>
-            <div id="history"></div>
-            <button id="more-history" style="display:none;" onclick="showMoreHistory()">查看更多</button>
-        </div>
+      </div>
+      <div class="input-container">
+        <input type="text" id="guess" maxlength="4" placeholder="輸入4位數字">
+        <button onclick="checkGuess()">猜！</button>
+      </div>
     </div>
-    <div class="fireworkDiv"></div>
-
-    <script src="https://cdn.jsdelivr.net/npm/fireworks-js@latest/dist/fireworks.js"></script>
+    <canvas id="fireworks"></canvas>
+    
     <script>
-        function generateNumber() {
-            let digits = [];
-            while (digits.length < 4) {
-                let digit = Math.floor(Math.random() * 10);
-                if (digits.indexOf(digit) === -1 && (digits.length > 0 || digit !== 0)) {
-                    digits.push(digit);
-                }
+      let secretNumber = generateSecretNumber();
+      let attempts = 0;
+      const chatBody = document.getElementById('chatBody');
+    
+      function generateSecretNumber() {
+        const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        let result = '';
+        for (let i = 0; i < 4; i++) {
+          const index = Math.floor(Math.random() * digits.length);
+          result += digits[index];
+          digits.splice(index, 1);
+        }
+        return result;
+      }
+    
+      function addMessage(message, isUser = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user-message' : 'wolf-message'}`;
+        if (!isUser) {
+          const avatarDiv = document.createElement('div');
+          avatarDiv.className = 'wolf-avatar';
+          messageDiv.appendChild(avatarDiv);
+        }
+        messageDiv.innerHTML += message;
+        chatBody.appendChild(messageDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }
+    
+      function checkGuess() {
+        const guessInput = document.getElementById('guess');
+        const guess = guessInput.value;
+        
+        if (guess.length !== 4 || !/^\d{4}$/.test(guess) || new Set(guess).size !== 4) {
+          addMessage(guess, true);
+          addMessage('請輸入4個不重複的數字！再試一次吧。');
+          guessInput.value = '';
+          return;
+        }
+    
+        attempts++;
+        addMessage(guess, true);
+    
+        let a = 0, b = 0;
+        for (let i = 0; i < 4; i++) {
+          if (guess[i] === secretNumber[i]) {
+            a++;
+          } else if (secretNumber.includes(guess[i])) {
+            b++;
+          }
+        }
+    
+        if (a === 4) {
+          addMessage(`太棒了！你猜對了！答案就是 ${secretNumber}。你總共猜了 ${attempts} 次。`);
+          addMessage('要再玩一局嗎？輸入"是"開始新遊戲，或是"不要"結束遊戲。');
+          showFireworks();
+          guessInput.value = '';
+          guessInput.placeholder = '是 / 不要';
+          guessInput.onkeypress = handleReplay;
+        } else {
+          const resultMessage = `<div>嗯...讓我想想：</div><div class="result"><span class="A">${a}A</span><span class="B">${b}B</span></div>`;
+          addMessage(resultMessage);
+          guessInput.value = '';
+        }
+      }
+    
+      function handleReplay(event) {
+        if (event.key === 'Enter') {
+          const response = event.target.value.trim().toLowerCase();
+          if (response === '是') {
+            secretNumber = generateSecretNumber();
+            attempts = 0;
+            addMessage('是', true);
+            addMessage('太好了！我已經想好了新的數字，開始猜吧！');
+            event.target.value = '';
+            event.target.placeholder = '輸入4位數字';
+            event.target.onkeypress = null;
+          } else if (response === '不要') {
+            addMessage('不要', true);
+            addMessage('好的，謝謝你玩這個遊戲！下次再來挑戰吧！');
+            event.target.value = '';
+            event.target.placeholder = '遊戲結束';
+            event.target.disabled = true;
+          } else {
+            addMessage(response, true);
+            addMessage('抱歉，我沒聽懂。請輸入"是"開始新遊戲，或是"不要"結束遊戲。');
+            event.target.value = '';
+          }
+        }
+      }
+    
+      document.getElementById('guess').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+          checkGuess();
+        }
+      });
+    
+      // 煙花特效
+      function showFireworks() {
+        const canvas = document.getElementById('fireworks');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const ctx = canvas.getContext('2d');
+        const fireworks = [];
+    
+        function Firework() {
+          this.x = Math.random() * canvas.width;
+          this.y = canvas.height;
+          this.sx = Math.random() * 3 - 1.5;
+          this.sy = Math.random() * -3 - 3;
+          this.size = Math.random() * 2 + 1;
+          this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        }
+    
+        Firework.prototype.update = function() {
+          this.x += this.sx;
+          this.y += this.sy;
+          this.sy += 0.05;
+          this.size -= 0.02;
+          if (this.size < 0) this.size = 0;
+        }
+    
+        Firework.prototype.draw = function() {
+          ctx.fillStyle = this.color;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+    
+        function animate() {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+          if (Math.random() < 0.05) {
+            fireworks.push(new Firework());
+          }
+    
+          for (let i = fireworks.length - 1; i >= 0; i--) {
+            fireworks[i].update();
+            fireworks[i].draw();
+            if (fireworks[i].size <= 0) {
+              fireworks.splice(i, 1);
             }
-            return digits.join('');
+          }
+    
+          requestAnimationFrame(animate);
         }
-
-        function isValidInput(input) {
-            return /^\d{4}$/.test(input) && new Set(input).size === 4 && input[0] !== '0';
-        }
-
-        function calculateAB(guess, answer) {
-            let a = 0, b = 0;
-            for (let i = 0; i < 4; i++) {
-                if (guess[i] === answer[i]) {
-                    a++;
-                } else if (answer.includes(guess[i])) {
-                    b++;
-                }
-            }
-            return `<span class="a-color">${a}A</span><span class="b-color">${b}B</span>`;
-        }
-
-        function updateHistory(guess, result) {
-            let history = JSON.parse(sessionStorage.getItem('history')) || [];
-            history.push({ guess, result });
-            if (history.length > 10) {
-                document.getElementById('more-history').style.display = 'block';
-                history = history.slice(-10);
-            } else {
-                document.getElementById('more-history').style.display = 'none';
-            }
-            sessionStorage.setItem('history', JSON.stringify(history));
-            displayHistory();
-        }
-
-        function displayHistory() {
-            let history = JSON.parse(sessionStorage.getItem('history')) || [];
-            let historyDiv = document.getElementById('history');
-            historyDiv.innerHTML = history.map(entry => `猜測: ${entry.guess}, 結果: ${entry.result}`).join('<br>');
-        }
-
-        function showMoreHistory() {
-            let fullHistory = JSON.parse(sessionStorage.getItem('history')) || [];
-            let historyDiv = document.getElementById('history');
-            historyDiv.innerHTML = fullHistory.map(entry => `猜測: ${entry.guess}, 結果: ${entry.result}`).join('<br>');
-            document.getElementById('more-history').style.display = 'none';
-        }
-
-        function makeGuess() {
-            let guessInput = document.getElementById('guess').value;
-            if (!isValidInput(guessInput)) {
-                document.getElementById('result').innerText = '請輸入有效的4位數字，且每個數字不重複，首位不能為0';
-                updateCharacterSpeech('請輸入有效的4位數字，且每個數字不重複，首位不能為0');
-                return;
-            }
-
-            let answer = sessionStorage.getItem('answer');
-            if (!answer) {
-                answer = generateNumber();
-                sessionStorage.setItem('answer', answer);
-            }
-
-            let result = calculateAB(guessInput, answer);
-            document.getElementById('result').innerHTML = `結果: ${result}`;
-            updateHistory(guessInput, result);
-            if (result === '<span class="a-color">4A</span><span class="b-color">0B</span>') {
-                playFireworks();
-                updateCharacterSpeech('恭喜你猜中了！');
-            } else {
-                updateCharacterSpeech(`結果是：${result}`);
-            }
-        }
-
-        function updateCharacterSpeech(text) {
-            document.getElementById('character-speech').innerHTML = text;
-        }
-
-        function initGame() {
-            if (!sessionStorage.getItem('history')) {
-                sessionStorage.setItem('history', JSON.stringify([]));
-            }
-            displayHistory();
-            updateCharacterSpeech('歡迎來玩 1A2B 猜數字遊戲！');
-        }
-
-        function playFireworks() {
-            const container = document.querySelector(".fireworkDiv");
-            container.style.display = 'block';
-            const fireworks = new Fireworks(container, {
-                autoresize: true,
-                opacity: 0.5,
-                acceleration: 1.05,
-                friction: 0.97,
-                gravity: 1.5,
-                particles: 50,
-                traceLength: 3,
-                traceSpeed: 10,
-                explosion: 5,
-                intensity: 30,
-                flickering: 50,
-                lineStyle: 'round',
-                hue: {
-                    min: 0,
-                    max: 360
-                },
-                delay: {
-                    min: 30,
-                    max: 60
-                },
-                rocketsPoint: {
-                    min: 0,
-                    max: 100
-                },
-                lineWidth: {
-                    explosion: {
-                        min: 1,
-                        max: 3
-                    },
-                    trace: {
-                        min: 1,
-                        max: 2
-                    }
-                },
-                brightness: {
-                    min: 50,
-                    max: 80
-                },
-                decay: {
-                    min: 0.015,
-                    max: 0.03
-                },
-                mouse: {
-                    click: false,
-                    move: false,
-                    max: 1
-                }
-            });
-            fireworks.start();
-            setTimeout(() => {
-                fireworks.stop();
-                container.style.display = 'none';
-            }, 5000);  // 5秒後停止煙火效果
-        }
-
-        initGame();
+    
+        animate();
+    
+        setTimeout(() => {
+          canvas.style.display = 'none';
+        }, 5000);
+      }
     </script>
-</body>
-</html>
+    </body></html>
