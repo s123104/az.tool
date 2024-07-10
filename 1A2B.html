@@ -1,294 +1,240 @@
-<html>
-    <head>  
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
     <meta charset="UTF-8">
     <link rel="icon" href="https://s123104.github.io/az.tool/img/impressed.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
-    
-      body {
-        font-family: 'Noto Sans TC', sans-serif;
-        background-color: #ffffff;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        overflow: hidden;
-      }
-      .game-container {
-        background-color: #ffffff;
-        border-radius: 20px;
-        width: 90%;
-        max-width: 400px;
-        height: 80vh;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      }
-      .chat-header {
-        background-color: #3d3d3d;
-        color: white;
-        padding: 15px;
-        text-align: center;
-        font-weight: bold;
-        font-size: 18px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      }
-      .chat-body {
-        flex-grow: 1;
-        overflow-y: auto;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-      }
-      .message {
-        max-width: 70%;
-        margin-bottom: 15px;
-        padding: 10px 15px;
-        border-radius: 20px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        animation: fadeIn 0.3s ease-out;
-      }
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      .wolf-message {
-        align-self: flex-start;
-        background-color: #f0f0f0;
-      }
-      .user-message {
-        align-self: flex-end;
-        background-color: #414141;
-        color: white;
-      }
-      .wolf-avatar {
-        width: 50px;
-        height: 50px;
-        margin-right: 10px;
-        background-image: url('https://s123104.github.io/az.tool/img/impressed.png');
-        background-size: cover;
-      }
-      .input-container {
-        display: flex;
-        padding: 10px;
-        background-color: #f0f0f0;
-        box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
-      }
-      input {
-        flex-grow: 1;
-        padding: 10px;
-        font-size: 16px;
-        border: none;
-        border-radius: 20px;
-        margin-right: 10px;
-        box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
-      }
-      button {
-        padding: 10px 20px;
-        font-size: 16px;
-        background-color: #575757;
-        color: white;
-        border: none;
-        border-radius: 20px;
-        cursor: pointer;
-        transition: background-color 0.3s, transform 0.1s;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      }
-      button:hover {
-        background-color: #343434;
-      }
-      button:active {
-        transform: scale(0.98);
-      }
-      .result {
-        font-weight: bold;
-        margin-top: 5px;
-      }
-      .result .A { color: #4c69d0; }
-      .result .B { color: #b61f1f; }
-      #fireworks {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 9999;
-      }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            transition: background-color 0.5s;
+        }
+        .game-container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            height: 80vh;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: background-color 0.5s;
+        }
+        .chat-header {
+            background-color: #3d3d3d;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .chat-body {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .message {
+            max-width: 70%;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .wolf-message {
+            align-self: flex-start;
+            background-color: #f0f0f0;
+        }
+        .user-message {
+            align-self: flex-end;
+            background-color: #414141;
+            color: white;
+        }
+        .wolf-avatar {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+            background-image: url('https://s123104.github.io/az.tool/img/impressed.png');
+            background-size: cover;
+        }
+        .input-container {
+            display: flex;
+            padding: 10px;
+            background-color: #f0f0f0;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+        }
+        input {
+            flex-grow: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 20px;
+            margin-right: 10px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #575757;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        button:hover {
+            background-color: #343434;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .result {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .result .A { color: #4c69d0; }
+        .result .B { color: #b61f1f; }
     </style>
-    </head>
-    <body>
+</head>
+<body>
     <div class="game-container">
-      <div class="chat-header">1A2B 數字猜謎遊戲</div>
-      <div class="chat-body" id="chatBody">
-        <div class="message wolf-message">
-          <div class="wolf-avatar"></div>
-          你好！我們來玩1A2B猜數字遊戲吧！我已經想好了一個4位不重複的數字，你來猜猜看？
+        <div class="chat-header">1A2B 數字猜謎遊戲</div>
+        <div class="chat-body" id="chatBody">
+            <div class="message wolf-message">
+                <div class="wolf-avatar"></div>
+                你好！我們來玩1A2B猜數字遊戲吧！我已經想好了一個4位不重複的數字，你來猜猜看？
+            </div>
         </div>
-      </div>
-      <div class="input-container">
-        <input type="text" id="guess" maxlength="4" placeholder="輸入4位數字">
-        <button onclick="checkGuess()">猜！</button>
-      </div>
+        <div class="input-container">
+            <input type="text" id="guess" maxlength="4" placeholder="輸入4位數字">
+            <button onclick="checkGuess()">猜！</button>
+        </div>
     </div>
-    <canvas id="fireworks"></canvas>
-    
+
     <script>
-      let secretNumber = generateSecretNumber();
-      let attempts = 0;
-      const chatBody = document.getElementById('chatBody');
-    
-      function generateSecretNumber() {
-        const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        let result = '';
-        for (let i = 0; i < 4; i++) {
-          const index = Math.floor(Math.random() * digits.length);
-          result += digits[index];
-          digits.splice(index, 1);
+        let secretNumber = generateSecretNumber();
+        let attempts = 0;
+        const chatBody = document.getElementById('chatBody');
+
+        function generateSecretNumber() {
+            const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+            let result = '';
+            for (let i = 0; i < 4; i++) {
+                const index = Math.floor(Math.random() * digits.length);
+                result += digits[index];
+                digits.splice(index, 1);
+            }
+            return result;
         }
-        return result;
-      }
-    
-      function addMessage(message, isUser = false) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${isUser ? 'user-message' : 'wolf-message'}`;
-        if (!isUser) {
-          const avatarDiv = document.createElement('div');
-          avatarDiv.className = 'wolf-avatar';
-          messageDiv.appendChild(avatarDiv);
+
+        function addMessage(message, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'wolf-message'}`;
+            if (!isUser) {
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'wolf-avatar';
+                messageDiv.appendChild(avatarDiv);
+            }
+            messageDiv.innerHTML += message;
+            chatBody.appendChild(messageDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
         }
-        messageDiv.innerHTML += message;
-        chatBody.appendChild(messageDiv);
-        chatBody.scrollTop = chatBody.scrollHeight;
-      }
-    
-      function checkGuess() {
-        const guessInput = document.getElementById('guess');
-        const guess = guessInput.value;
-        
-        if (guess.length !== 4 || !/^\d{4}$/.test(guess) || new Set(guess).size !== 4) {
-          addMessage(guess, true);
-          addMessage('請輸入4個不重複的數字！再試一次吧。');
-          guessInput.value = '';
-          return;
+
+        function checkGuess() {
+            const guessInput = document.getElementById('guess');
+            const guess = guessInput.value;
+            
+            if (guess.length !== 4 || !/^\d{4}$/.test(guess) || new Set(guess).size !== 4) {
+                addMessage(guess, true);
+                addMessage('請輸入4個不重複的數字！再試一次吧。');
+                guessInput.value = '';
+                return;
+            }
+
+            attempts++;
+            addMessage(guess, true);
+
+            let a = 0, b = 0;
+            for (let i = 0; i < 4; i++) {
+                if (guess[i] === secretNumber[i]) {
+                    a++;
+                } else if (secretNumber.includes(guess[i])) {
+                    b++;
+                }
+            }
+
+            if (a === 4) {
+                addMessage(`太棒了！你猜對了！答案就是 ${secretNumber}。你總共猜了 ${attempts} 次。`);
+                addMessage('要再玩一局嗎？遊戲將自動重新開始。');
+                setTimeout(restartGame, 2000); // 短暫停留後重新開始遊戲
+                guessInput.value = '';
+                guessInput.placeholder = '輸入4位數字';
+            } else {
+                const resultMessage = `<div>嗯...讓我想想：</div><div class="result"><span class="A">${a}A</span><span class="B">${b}B</span></div>`;
+                addMessage(resultMessage);
+                guessInput.value = '';
+            }
         }
-    
-        attempts++;
-        addMessage(guess, true);
-    
-        let a = 0, b = 0;
-        for (let i = 0; i < 4; i++) {
-          if (guess[i] === secretNumber[i]) {
-            a++;
-          } else if (secretNumber.includes(guess[i])) {
-            b++;
-          }
-        }
-    
-        if (a === 4) {
-          addMessage(`太棒了！你猜對了！答案就是 ${secretNumber}。你總共猜了 ${attempts} 次。`);
-          addMessage('要再玩一局嗎？輸入"是"開始新遊戲，或是"不要"結束遊戲。');
-          showFireworks();
-          guessInput.value = '';
-          guessInput.placeholder = '是 / 不要';
-          guessInput.onkeypress = handleReplay;
-        } else {
-          const resultMessage = `<div>嗯...讓我想想：</div><div class="result"><span class="A">${a}A</span><span class="B">${b}B</span></div>`;
-          addMessage(resultMessage);
-          guessInput.value = '';
-        }
-      }
-    
-      function handleReplay(event) {
-        if (event.key === 'Enter') {
-          const response = event.target.value.trim().toLowerCase();
-          if (response === '是') {
+
+        function restartGame() {
             secretNumber = generateSecretNumber();
             attempts = 0;
-            addMessage('是', true);
-            addMessage('太好了！我已經想好了新的數字，開始猜吧！');
-            event.target.value = '';
-            event.target.placeholder = '輸入4位數字';
-            event.target.onkeypress = null;
-          } else if (response === '不要') {
-            addMessage('不要', true);
-            addMessage('好的，謝謝你玩這個遊戲！下次再來挑戰吧！');
-            event.target.value = '';
-            event.target.placeholder = '遊戲結束';
-            event.target.disabled = true;
-          } else {
-            addMessage(response, true);
-            addMessage('抱歉，我沒聽懂。請輸入"是"開始新遊戲，或是"不要"結束遊戲。');
-            event.target.value = '';
-          }
+            addMessage('新遊戲開始了！我已經想好了新的數字，開始猜吧！');
+            document.getElementById('guess').disabled = false;
+            document.body.style.backgroundColor = '#ffffff';
+            document.querySelector('.game-container').style.backgroundColor = '#ffffff';
         }
-      }
-    
-      document.getElementById('guess').addEventListener('keypress', function(event) {
-        if (event.key === 'Enter') {
-          checkGuess();
-        }
-      });
-    
-      // 煙花特效
-      function showFireworks() {
-        const canvas = document.getElementById('fireworks');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        const ctx = canvas.getContext('2d');
-        const fireworks = [];
-    
-        function Firework() {
-          this.x = Math.random() * canvas.width;
-          this.y = canvas.height;
-          this.sx = Math.random() * 3 - 1.5;
-          this.sy = Math.random() * -3 - 3;
-          this.size = Math.random() * 2 + 1;
-          this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
-        }
-    
-        Firework.prototype.update = function() {
-          this.x += this.sx;
-          this.y += this.sy;
-          this.sy += 0.05;
-          this.size -= 0.02;
-          if (this.size < 0) this.size = 0;
-        }
-    
-        Firework.prototype.draw = function() {
-          ctx.fillStyle = this.color;
-          ctx.beginPath();
-          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-          ctx.fill();
-        }
-    
-        function animate() {
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-          if (Math.random() < 0.05) {
-            fireworks.push(new Firework());
-          }
-    
-          for (let i = fireworks.length - 1; i >= 0; i--) {
-            fireworks[i].update();
-            fireworks[i].draw();
-            if (fireworks[i].size <= 0) {
-              fireworks.splice(i, 1);
+
+        document.getElementById('guess').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                checkGuess();
             }
-          }
-    
-          requestAnimationFrame(animate);
+        });
+
+        // 存取cookie的功能
+        function setCookie(name, value, days) {
+            const d = new Date();
+            d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+            const expires = "expires=" + d.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/";
         }
-    
-        animate();
-    
-        setTimeout(() => {
-          canvas.style.display = 'none';
-        }, 5000);
-      }
-    </script>
-    </body></html>
+
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        window.onload = function() {
+    let welcomeMessage = getCookie("welcomeMessage");
+    if (!welcomeMessage) {
+        addMessage('歡迎回來！我們來玩1A2B猜數字遊戲吧！');
+        setCookie("welcomeMessage", "seen", 1);
+    }
+}
+</script>
+</body>
+</html>
