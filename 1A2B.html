@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <link rel="icon" href="https://s123104.github.io/az.tool/img/impressed.png" type="image/x-icon">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>1A2B 數字猜謎遊戲</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
 
@@ -17,6 +18,8 @@
             margin: 0;
             overflow: hidden;
             transition: background-color 0.5s;
+            -ms-touch-action: none;
+            touch-action: none;
         }
         .game-container {
             background-color: #ffffff;
@@ -76,6 +79,7 @@
         }
         .input-container {
             display: flex;
+            flex-direction: column;
             padding: 10px;
             background-color: #f0f0f0;
             box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
@@ -86,7 +90,7 @@
             font-size: 16px;
             border: none;
             border-radius: 20px;
-            margin-right: 10px;
+            margin-bottom: 10px;
             box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
         }
         button {
@@ -112,6 +116,19 @@
         }
         .result .A { color: #4c69d0; }
         .result .B { color: #b61f1f; }
+        .number-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .number-buttons button {
+            width: 30%;
+            margin-bottom: 10px;
+        }
+        .control-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
     </style>
 </head>
 <body>
@@ -124,7 +141,10 @@
             </div>
         </div>
         <div class="input-container">
-            <input type="text" id="guess" maxlength="4" placeholder="輸入4位數字">
+            <input type="text" id="guess" maxlength="4" placeholder="輸入4位數字" readonly>
+            <div class="number-buttons" id="numberButtons">
+                <!-- 按鈕將由 JavaScript 動態生成 -->
+            </div>
             <button onclick="checkGuess()">猜！</button>
         </div>
     </div>
@@ -133,6 +153,8 @@
         let secretNumber = generateSecretNumber();
         let attempts = 0;
         const chatBody = document.getElementById('chatBody');
+        const guessInput = document.getElementById('guess');
+        const numberButtons = document.getElementById('numberButtons');
 
         function generateSecretNumber() {
             const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -159,13 +181,13 @@
         }
 
         function checkGuess() {
-            const guessInput = document.getElementById('guess');
             const guess = guessInput.value;
             
             if (guess.length !== 4 || !/^\d{4}$/.test(guess) || new Set(guess).size !== 4) {
                 addMessage(guess, true);
                 addMessage('請輸入4個不重複的數字！再試一次吧。');
                 guessInput.value = '';
+                updateNumberButtons();
                 return;
             }
 
@@ -187,10 +209,12 @@
                 setTimeout(restartGame, 2000); // 短暫停留後重新開始遊戲
                 guessInput.value = '';
                 guessInput.placeholder = '輸入4位數字';
+                updateNumberButtons();
             } else {
                 const resultMessage = `<div>嗯...讓我想想：</div><div class="result"><span class="A">${a}A</span><span class="B">${b}B</span></div>`;
                 addMessage(resultMessage);
                 guessInput.value = '';
+                updateNumberButtons();
             }
         }
 
@@ -198,9 +222,55 @@
             secretNumber = generateSecretNumber();
             attempts = 0;
             addMessage('新遊戲開始了！我已經想好了新的數字，開始猜吧！');
-            document.getElementById('guess').disabled = false;
-            document.body.style.backgroundColor = '#ffffff';
-            document.querySelector('.game-container').style.backgroundColor = '#ffffff';
+            guessInput.value = '';
+            updateNumberButtons();
+        }
+
+        function updateNumberButtons() {
+            numberButtons.innerHTML = '';
+            const buttonLayout = [
+                [1, 2, 3],
+                [4, 5, 6],
+                [0, '←', 'C']
+            ];
+            buttonLayout.forEach(row => {
+                row.forEach(item => {
+                    const button = document.createElement('button');
+                    button.textContent = item;
+                    button.onclick = () => handleButtonClick(item);
+                    if (typeof item === 'number' && guessInput.value.includes(item)) {
+                        button.disabled = true;
+                    }
+                    numberButtons.appendChild(button);
+                });
+            });
+        }
+
+        function handleButtonClick(value) {
+            if (typeof value === 'number') {
+                addNumberToGuess(value);
+            } else if (value === '←') {
+                deleteLastDigit();
+            } else if (value === 'C') {
+                clearGuess();
+            }
+        }
+
+        function addNumberToGuess(number) {
+            if (guessInput.value.length < 4) {
+                guessInput.value += number;
+                updateNumberButtons();
+            }
+        }
+
+        function deleteLastDigit() {
+            guessInput.value = guessInput.value.slice(0, -1);
+            updateNumberButtons();
+        }
+
+        function clearGuess() {
+            guessInput.value = '';
+            updateNumberButtons();
         }
 
         document.getElementById('guess').addEventListener('keypress', function(event) {
@@ -229,12 +299,18 @@
         }
 
         window.onload = function() {
-    let welcomeMessage = getCookie("welcomeMessage");
-    if (!welcomeMessage) {
-        addMessage('歡迎回來！我們來玩1A2B猜數字遊戲吧！');
-        setCookie("welcomeMessage", "seen", 1);
-    }
-}
-</script>
+            let welcomeMessage = getCookie("welcomeMessage");
+            if (!welcomeMessage) {
+                addMessage('歡迎回來！我們來玩1A2B猜數字遊戲吧！');
+                setCookie("welcomeMessage", "seen", 1);
+            }
+            updateNumberButtons();
+        }
+
+        // 禁止雙擊縮放
+        document.addEventListener('dblclick', function(event) {
+            event.preventDefault();
+        });
+    </script>
 </body>
 </html>
