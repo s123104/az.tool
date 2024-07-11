@@ -129,9 +129,8 @@
             width: 30%;
             margin-bottom: 10px;
         }
-        .control-buttons {
-            display: flex;
-            justify-content: space-between;
+        .number-buttons button.clicked {
+            background-color: #333;
         }
     </style>
 </head>
@@ -146,7 +145,6 @@
             <div class="number-buttons" id="numberButtons">
                 <!-- 按鈕將由 JavaScript 動態生成 -->
             </div>
-            <button onclick="checkGuess()">猜！</button>
         </div>
     </div>
 
@@ -239,7 +237,7 @@
                 row.forEach(item => {
                     const button = document.createElement('button');
                     button.textContent = item;
-                    button.onclick = () => handleButtonClick(item);
+                    button.onclick = () => handleButtonClick(button, item);
                     if (typeof item === 'number' && guessInput.value.includes(item)) {
                         button.disabled = true;
                     }
@@ -248,9 +246,9 @@
             });
         }
 
-        function handleButtonClick(value) {
+        function handleButtonClick(button, value) {
             if (typeof value === 'number') {
-                addNumberToGuess(value);
+                addNumberToGuess(button, value);
             } else if (value === '←') {
                 deleteLastDigit();
             } else if (value === 'C') {
@@ -258,10 +256,15 @@
             }
         }
 
-        function addNumberToGuess(number) {
+        function addNumberToGuess(button, number) {
             if (guessInput.value.length < 4) {
                 guessInput.value += number;
-                updateNumberButtons();
+                button.classList.add('clicked');
+                if (guessInput.value.length === 4) {
+                    checkGuess();
+                } else {
+                    updateNumberButtons();
+                }
             }
         }
 
