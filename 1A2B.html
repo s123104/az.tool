@@ -2,9 +2,9 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <title>1A2B 數字猜謎遊戲</title>
     <link rel="icon" href="https://s123104.github.io/az.tool/img/impressed.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>1A2B 數字猜謎遊戲</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
 
@@ -16,6 +16,7 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            padding: 0 10px;
             overflow: hidden;
             transition: background-color 0.5s;
             -ms-touch-action: none;
@@ -26,21 +27,24 @@
             border-radius: 20px;
             width: 90%;
             max-width: 400px;
-            height: 80vh;
+            height: 95vh;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             display: flex;
             flex-direction: column;
             overflow: hidden;
             transition: background-color 0.5s;
+            padding: 10px 0;
         }
         .chat-header {
             background-color: #3d3d3d;
             color: white;
-            padding: 15px;
+            padding: 10px;
             text-align: center;
             font-weight: bold;
             font-size: 18px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
         }
         .chat-body {
             flex-grow: 1;
@@ -135,10 +139,7 @@
     <div class="game-container">
         <div class="chat-header">1A2B 數字猜謎遊戲</div>
         <div class="chat-body" id="chatBody">
-            <div class="message wolf-message">
-                <div class="wolf-avatar"></div>
-                你好！我們來玩1A2B猜數字遊戲吧！我已經想好了一個4位不重複的數字，你來猜猜看？
-            </div>
+            <!-- 歡迎回來訊息將在此插入 -->
         </div>
         <div class="input-container">
             <input type="text" id="guess" maxlength="4" placeholder="輸入4位數字" readonly>
@@ -232,7 +233,7 @@
                 [1, 2, 3],
                 [4, 5, 6],
                 [7, 8, 9],
-                ['←', 0, 'C']
+                ['C', 0, '←']
             ];
             buttonLayout.forEach(row => {
                 row.forEach(item => {
@@ -305,6 +306,7 @@
                 addMessage('歡迎回來！我們來玩1A2B猜數字遊戲吧！');
                 setCookie("welcomeMessage", "seen", 1);
             }
+            addMessage('你好！我們來玩1A2B猜數字遊戲吧！我已經想好了一個4位不重複的數字，你來猜猜看？');
             updateNumberButtons();
         }
 
