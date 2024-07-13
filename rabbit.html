@@ -3,196 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>行事曆排班表</title>
+    <title>可愛兔兔排班表</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f8f8;
+        body, html {
+            font-family: 'Arial', sans-serif;
+            background-color: #fff0f5;
+            color: #ff69b4;
             margin: 0;
             padding: 0;
+            height: 100%;
+            font-size: 12px;
+            overflow: hidden;
         }
-        table {
-            width: 80%;
-            margin: 20px auto;
-            border-collapse: collapse;
+        .calendar-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background-color: #ffebee;
         }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 10px;
+        .header {
             text-align: center;
+            padding: 10px;
+            background-color: #ff69b4;
+            color: white;
         }
-        th {
-            background-color: #f0f0f0;
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
         }
-        .date {
-            background-color: #ffd966;
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
         }
-        .weekday {
-            background-color: #93c47d;
+        .nav-button {
+            background-color: #ff1493;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+        .week-view {
+            display: flex;
+            flex-grow: 1;
+        }
+        .time-scale {
+            width: 50px;
+            background-color: #ffd1dc;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 8px;
+            text-align: right;
+            border-right: 1px solid #ff69b4;
         }
         .time-slot {
-            height: 40px;
-            background-color: #d9ead3;
+            padding-right: 2px;
+            height: 5.55%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
         }
-        .shift {
-            background-color: #6fa8dc;
+        .week-grid {
+            display: flex;
+            flex-grow: 1;
+        }
+        .day-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #ff69b4;
+        }
+        .day-column:last-child {
+            border-right: none;
+        }
+        .day-header {
+            text-align: center;
+            padding: 5px 0;
+            font-weight: bold;
+            background-color: #ffd1dc;
+            border-bottom: 1px solid #ff69b4;
+        }
+        .day-content {
+            flex-grow: 1;
+            position: relative;
+        }
+        .schedule-item {
+            position: absolute;
+            left: 2px;
+            right: 2px;
+            background-color: #ff69b4;
             color: white;
-            border-radius: 5px;
-            padding: 5px;
+            font-size: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            border-radius: 3px;
+            padding: 2px;
+            text-align: center;
+        }
+        .vertical-line {
+            display: inline-block;
+            width: 1px;
+            height: 8px;
+            background-color: white;
+            margin: 2px 0;
+        }
+        .total-hours {
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            background-color: #ff69b4;
+            color: white;
         }
     </style>
 </head>
 <body>
+<div class="calendar-container">
+    <div class="header">
+        <h1 class="title">可愛兔兔排班表</h1>
+        <div class="navigation">
+            <button class="nav-button" id="prevWeek">上一週</button>
+            <button class="nav-button" id="nextWeek">下一週</button>
+        </div>
+    </div>
+    <div class="week-view">
+        <div class="time-scale">
+            <div class="time-slot">早上7:00</div>
+            <div class="time-slot">早上8:00</div>
+            <div class="time-slot">早上9:00</div>
+            <div class="time-slot">上午10:00</div>
+            <div class="time-slot">上午11:00</div>
+            <div class="time-slot">中午12:00</div>
+            <div class="time-slot">下午1:00</div>
+            <div class="time-slot">下午2:00</div>
+            <div class="time-slot">下午3:00</div>
+            <div class="time-slot">下午4:00</div>
+            <div class="time-slot">下午5:00</div>
+            <div class="time-slot">晚上6:00</div>
+            <div class="time-slot">晚上7:00</div>
+            <div class="time-slot">晚上8:00</div>
+            <div class="time-slot">晚上9:00</div>
+            <div class="time-slot">晚上10:00</div>
+            <div class="time-slot">晚上11:00</div>
+            <div class="time-slot">晚上12:00</div>
+        </div>
+        <div class="week-grid">
+            <div class="day-column">
+                <div class="day-header">一<br>7/22</div>
+                <div class="day-content"></div>
+            </div>
+            <div class="day-column">
+                <div class="day-header">二<br>7/16</div>
+                <div class="day-content"></div>
+            </div>
+            <div class="day-column">
+                <div class="day-header">三<br>7/23</div>
+                <div class="day-content"></div>
+            </div>
+            <div class="day-column">
+                <div class="day-header">四<br>7/18</div>
+                <div class="day-content"></div>
+            </div>
+            <div class="day-column">
+                <div class="day-header">五<br>7/20</div>
+                <div class="day-content"></div>
+            </div>
+            <div class="day-column">
+                <div class="day-header">六<br>7/24</div>
+                <div class="day-content"></div>
+            </div>
+            <div class="day-column">
+                <div class="day-header">日<br>7/27</div>
+                <div class="day-content"></div>
+            </div>
+        </div>
+    </div>
+    <div class="total-hours" id="totalHours">本週總工時：0小時</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    const prevWeekBtn = document.getElementById('prevWeek');
+    const nextWeekBtn = document.getElementById('nextWeek');
+    const totalHoursElement = document.getElementById('totalHours');
+    let currentWeek = new Date();
 
-    <table>
-        <thead>
-            <tr>
-                <th class="date">日期</th>
-                <th class="weekday">星期</th>
-                <th class="time">時間</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td rowspan="7" class="date">7/16</td>
-                <td rowspan="7" class="weekday">二</td>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot shift">16:00 - 22:00</td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td rowspan="7" class="date">7/18</td>
-                <td rowspan="7" class="weekday">四</td>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot shift">16:00 - 22:00</td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td rowspan="7" class="date">7/20</td>
-                <td rowspan="7" class="weekday">六</td>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot shift">14:30 - 22:00</td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td rowspan="7" class="date">7/22</td>
-                <td rowspan="7" class="weekday">一</td>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot shift">10:30 - 16:30</td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td rowspan="7" class="date">7/23</td>
-                <td rowspan="7" class="weekday">二</td>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot shift">10:30 - 16:30</td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td rowspan="7" class="date">7/24</td>
-                <td rowspan="7" class="weekday">三</td>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot shift">14:30 - 20:30</td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-            <tr>
-                <td class="time-slot"></td>
-            </tr>
-        </tbody>
-    </table>
+    function updateWeek(direction) {
+        currentWeek.setDate(currentWeek.getDate() + direction * 7);
+        updateDates();
+        updateSchedule();
+        updateTotalHours();
+    }
+
+    function updateDates() {
+        const dayHeaders = document.querySelectorAll('.day-header');
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(currentWeek);
+            date.setDate(date.getDate() - date.getDay() + i + 1);
+            dayHeaders[i].innerHTML = `${['一','二','三','四','五','六','日'][i]}<br>${date.getMonth() + 1}/${date.getDate()}`;
+        }
+    }
+
+    function updateSchedule() {
+        const schedule = {
+            "7/16": { start: "16:00", end: "22:00" },
+            "7/18": { start: "16:00", end: "22:00" },
+            "7/20": { start: "14:30", end: "22:00" },
+            "7/22": { start: "10:30", end: "16:30" },
+            "7/23": { start: "10:30", end: "16:30" },
+            "7/24": { start: "14:30", end: "20:30" }
+        };
+
+        const dayContents = document.querySelectorAll('.day-content');
+        dayContents.forEach(content => content.innerHTML = ''); // 清空原有內容
+
+        dayContents.forEach((content, index) => {
+            const header = content.parentElement.querySelector('.day-header').innerHTML.split('<br>')[1];
+            if (schedule[header]) {
+                const { start, end } = schedule[header];
+                const startTime = parseTime(start);
+                const endTime = parseTime(end);
+                const duration = (endTime - startTime) / 3600000; // 轉換為小時
+                const topPosition = ((startTime.getHours() - 7) * 60 + startTime.getMinutes()) / (17 * 60) * 100; // 假設早上7點開始
+                const height = (duration * 60) / (17 * 60) * 100; // 17小時的一天
+                const scheduleItem = document.createElement('div');
+                scheduleItem.classList.add('schedule-item');
+                scheduleItem.style.top = `${topPosition}%`;
+                scheduleItem.style.height = `${height}%`;
+                scheduleItem.innerHTML = `🐰<br>${start}<br><span class="vertical-line"></span><br>${end}`;
+
+                content.appendChild(scheduleItem);
+            }
+        });
+    }
+
+    function updateTotalHours() {
+        let totalHours = 0;
+        const scheduleItems = document.querySelectorAll('.schedule-item');
+        scheduleItems.forEach(item => {
+            const start = parseTime(item.innerHTML.split('<br>')[1]);
+            const end = parseTime(item.innerHTML.split('<br>')[3]);
+            totalHours += (end - start) / 3600000; // 轉換為小時
+        });
+        totalHoursElement.textContent = `本週總工時：${totalHours.toFixed(1)}小時`;
+    }
+
+    function parseTime(timeStr) {
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        return new Date(0, 0, 0, hours, minutes);
+    }
+
+    prevWeekBtn.addEventListener('click', () => updateWeek(-1));
+    nextWeekBtn.addEventListener('click', () => updateWeek(1));
+
+    updateDates();
+    updateSchedule();
+    updateTotalHours();
+});
+</script>
 
 </body>
 </html>
