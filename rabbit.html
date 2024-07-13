@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="https://s123104.github.io/az.tool/img/magician-hat.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>可愛兔兔排班表</title>
     <style>
@@ -15,28 +16,41 @@
             font-size: 12px;
             overflow: hidden;
         }
+
         .calendar-container {
             display: flex;
             flex-direction: column;
             height: 100%;
             background-color: #ffebee;
         }
+
         .header {
             text-align: center;
             padding: 10px;
             background-color: #ff69b4;
             color: white;
         }
+
         .title {
             font-size: 18px;
             font-weight: bold;
             margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
+        .title img {
+            margin-right: 5px; /* 添加間距 */
+            height: 24px; /* 調整圖片高度 */
+        }
+
         .navigation {
             display: flex;
             justify-content: space-between;
             margin-top: 5px;
         }
+
         .nav-button {
             background-color: #ff1493;
             border: none;
@@ -45,41 +59,47 @@
             border-radius: 15px;
             font-size: 12px;
         }
+
         .week-view {
             display: flex;
             flex-grow: 1;
         }
+
         .time-scale {
+            position: relative;
             width: 50px;
             background-color: #ffd1dc;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 5px 0;
             font-size: 8px;
             text-align: right;
             border-right: 1px solid #ff69b4;
+            padding-top: 50px; /* 確保時間刻度的初始位置與 day-header 的下邊緣對齊 */
         }
+
         .time-slot {
-            padding-right: 2px;
-            height: 5.55%;
+            position: absolute;
+            right: 2px;
             display: flex;
             align-items: center;
             justify-content: flex-end;
+            white-space: nowrap;
         }
+
         .week-grid {
             display: flex;
             flex-grow: 1;
         }
+
         .day-column {
             flex: 1;
             display: flex;
             flex-direction: column;
             border-right: 1px solid #ff69b4;
         }
+
         .day-column:last-child {
             border-right: none;
         }
+
         .day-header {
             text-align: center;
             padding: 5px 0;
@@ -87,10 +107,12 @@
             background-color: #ffd1dc;
             border-bottom: 1px solid #ff69b4;
         }
+
         .day-content {
             flex-grow: 1;
             position: relative;
         }
+
         .schedule-item {
             position: absolute;
             left: 2px;
@@ -106,6 +128,7 @@
             padding: 2px;
             text-align: center;
         }
+
         .vertical-line {
             display: inline-block;
             width: 1px;
@@ -113,6 +136,7 @@
             background-color: white;
             margin: 2px 0;
         }
+
         .total-hours {
             text-align: center;
             padding: 10px;
@@ -125,33 +149,17 @@
 <body>
 <div class="calendar-container">
     <div class="header">
-        <h1 class="title">可愛兔兔排班表</h1>
+        <h1 class="title">
+            <img src="https://s123104.github.io/az.tool/img/magician-hat.png" alt="magician hat">
+            可愛兔兔排班表
+        </h1>
         <div class="navigation">
             <button class="nav-button" id="prevWeek">上一週</button>
             <button class="nav-button" id="nextWeek">下一週</button>
         </div>
     </div>
     <div class="week-view">
-        <div class="time-scale">
-            <div class="time-slot">早上7:00</div>
-            <div class="time-slot">早上8:00</div>
-            <div class="time-slot">早上9:00</div>
-            <div class="time-slot">上午10:00</div>
-            <div class="time-slot">上午11:00</div>
-            <div class="time-slot">中午12:00</div>
-            <div class="time-slot">下午1:00</div>
-            <div class="time-slot">下午2:00</div>
-            <div class="time-slot">下午3:00</div>
-            <div class="time-slot">下午4:00</div>
-            <div class="time-slot">下午5:00</div>
-            <div class="time-slot">晚上6:00</div>
-            <div class="time-slot">晚上7:00</div>
-            <div class="time-slot">晚上8:00</div>
-            <div class="time-slot">晚上9:00</div>
-            <div class="time-slot">晚上10:00</div>
-            <div class="time-slot">晚上11:00</div>
-            <div class="time-slot">晚上12:00</div>
-        </div>
+        <div class="time-scale"></div>
         <div class="week-grid">
             <div class="day-column">
                 <div class="day-header">一<br>7/22</div>
@@ -197,6 +205,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         updateDates();
         updateSchedule();
         updateTotalHours();
+        updateTimeScale(); // 更新時間刻度
     }
 
     function updateDates() {
@@ -221,6 +230,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const dayContents = document.querySelectorAll('.day-content');
         dayContents.forEach(content => content.innerHTML = ''); // 清空原有內容
 
+        const firstDayContentHeight = dayContents[0].offsetHeight;
+        const totalMinutesInDay = 17 * 60; // 17 小時
+
         dayContents.forEach((content, index) => {
             const header = content.parentElement.querySelector('.day-header').innerHTML.split('<br>')[1];
             if (schedule[header]) {
@@ -228,12 +240,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 const startTime = parseTime(start);
                 const endTime = parseTime(end);
                 const duration = (endTime - startTime) / 3600000; // 轉換為小時
-                const topPosition = ((startTime.getHours() - 7) * 60 + startTime.getMinutes()) / (17 * 60) * 100; // 假設早上7點開始
-                const height = (duration * 60) / (17 * 60) * 100; // 17小時的一天
+                const topPosition = ((startTime.getHours() - 7) * 60 + startTime.getMinutes()) / totalMinutesInDay * firstDayContentHeight; // 假設早上7點開始
+                const height = (duration * 60) / totalMinutesInDay * firstDayContentHeight; // 17小時的一天
                 const scheduleItem = document.createElement('div');
                 scheduleItem.classList.add('schedule-item');
-                scheduleItem.style.top = `${topPosition}%`;
-                scheduleItem.style.height = `${height}%`;
+                scheduleItem.style.top = `${topPosition}px`;
+                scheduleItem.style.height = `${height}px`;
                 scheduleItem.innerHTML = `🐰<br>${start}<br><span class="vertical-line"></span><br>${end}`;
 
                 content.appendChild(scheduleItem);
@@ -257,12 +269,36 @@ document.addEventListener('DOMContentLoaded', (event) => {
         return new Date(0, 0, 0, hours, minutes);
     }
 
+    function updateTimeScale() {
+        const timeScale = document.querySelector('.time-scale');
+        timeScale.innerHTML = ''; // 清空原有內容
+
+        const firstDayContentHeight = document.querySelector('.day-content').offsetHeight;
+        const totalMinutesInDay = 17 * 60; // 17 小時
+        const headerHeight = document.querySelector('.day-header').offsetHeight; // 獲取 day-header 的高度
+        const timeIntervals = [
+            "早上7:00", "早上8:00", "早上9:00", "上午10:00", "上午11:00", "中午12:00",
+            "下午1:00", "下午2:00", "下午3:00", "下午4:00", "下午5:00", "晚上6:00",
+            "晚上7:00", "晚上8:00", "晚上9:00", "晚上10:00", "晚上11:00", "晚上12:00"
+        ];
+
+        timeIntervals.forEach((time, index) => {
+            const timeSlot = document.createElement('div');
+            timeSlot.classList.add('time-slot');
+            const topPosition = (index / (timeIntervals.length - 1)) * (firstDayContentHeight) + headerHeight;
+            timeSlot.style.top = `${topPosition}px`;
+            timeSlot.innerHTML = time;
+            timeScale.appendChild(timeSlot);
+        });
+    }
+
     prevWeekBtn.addEventListener('click', () => updateWeek(-1));
     nextWeekBtn.addEventListener('click', () => updateWeek(1));
 
     updateDates();
     updateSchedule();
     updateTotalHours();
+    updateTimeScale(); // 初始化時間刻度
 });
 </script>
 
