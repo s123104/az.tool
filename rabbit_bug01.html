@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可愛兔兔排班表</title>
+    <link rel="icon" href="https://s123104.github.io/az.tool/img/magician-hat.png">
+    <style>
+        body, html {
+            font-family: 'Arial', sans-serif;
+            background-color: #fff0f5;
+            color: #ff69b4;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-size: 12px;
+            overflow: hidden;
+        }
+
+        .calendar-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background-color: #ffebee;
+        }
+
+        .header {
+            text-align: center;
+            padding: 10px;
+            background-color: #ff69b4;
+            color: white;
+            position: relative;
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title img {
+            margin-right: 8px; /* 添加間距 */
+            height: 24px; /* 調整圖片高度 */
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+
+        .nav-button {
+            background-color: #ff1493;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .add-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff1493;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 50%;
+            font-size: 20px;
+            line-height: 20px;
+            cursor: pointer;
+        }
+
+        .week-view {
+            display: flex;
+            flex-grow: 1;
+        }
+
+        .time-scale {
+            position: relative;
+            width: 50px;
+            background-color: #ffd1dc;
+            font-size: 8px;
+            text-align: right;
+            border-right: 1px solid #ff69b4;
+            padding-top: 50px; /* 確保時間刻度的初始位置與 day-header 的下邊緣對齊 */
+        }
+
+        .time-slot {
+            position: absolute;
+            right: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            white-space: nowrap;
+        }
+
+        .week-grid {
+            display: flex;
+            flex-grow: 1;
+        }
+
+        .day-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #ff69b4;
+        }
+
+        .day-column:last-child {
+            border-right: none;
+        }
+
+        .day-header {
+            text-align: center;
+            padding: 5px 0;
+            font-weight: bold;
+            background-color: #ffd1dc;
+            border-bottom: 1px solid #ff69b4;
+        }
+
+        .day-content {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .schedule-item {
+            position: absolute;
+            left: 2px;
+            right: 2px;
+            background-color: #ff69b4;
+            color: white;
+            font-size: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            border-radius: 3px;
+            padding: 2px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .vertical-line {
+            display: inline-block;
+            width: 1px;
+            height: 8px;
+            background-color: white;
+            margin: 2px 0;
+        }
+
+        .total-hours {
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            background-color: #ff69b4;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 300px;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="calendar-container">
+    <div class="header">
+        <h1 class="title">
+            <img src="https://s123104.github.io/az.tool/img/magician-hat.png" alt="magician hat">
+            可愛兔兔排班表
+        </h1>
+        <button class="add-button" id="addButton">+</button>
+        <div class="navigation">
+            <button class="nav-button" id="prevWeek">上一週</button>
+            <button class="nav-button" id="nextWeek">下一週</button>
+        </div>
+    </div>
+    <div class="week-view">
+        <div class="time-scale"></div>
+        <div class="week-grid">
+            <!-- 這些內容由JavaScript動態生成 -->
+        </div>
+    </div>
+    <div class="total-hours" id="totalHours">本週總工時：0小時</div>
+</div>
+
+<!-- 模態框 -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>新增/修改工作</h2>
+        <form id="scheduleForm">
+            <label for="jobName">工作名稱</label>
+            <input type="text" id="jobName" name="jobName" required>
+            <label for="jobDate">日期</label>
+            <input type="date" id="jobDate" name="jobDate" required>
+            <label for="startTime">開始時間</label>
+            <input type="time" id="startTime" name="startTime" required>
+            <label for="endTime">結束時間</label>
+            <input type="time" id="endTime" name="endTime" required>
+            <button type="submit">保存</button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    const prevWeekBtn = document.getElementById('prevWeek');
+    const nextWeekBtn = document.getElementById('nextWeek');
+    const totalHoursElement = document.getElementById('totalHours');
+    const addButton = document.getElementById('addButton');
+    const modal = document.getElementById('modal');
+    const closeBtn = document.querySelector('.close');
+    const scheduleForm = document.getElementById('scheduleForm');
+
+    let currentWeek = new Date();
+    let schedules = JSON.parse(localStorage.getItem('schedules')) || {};
+
+    // 預設的工作內容
+    const defaultSchedules = {
+        "2024-07-16": { jobName: "百貨公司", start: "16:00", end: "22:00", color: "#ff69b4" },
+        "2024-07-18": { jobName: "百貨公司", start: "16:00", end: "22:00", color: "#ff69b4" },
+        "2024-07-20": { jobName: "百貨公司", start: "14:30", end: "22:00", color: "#ff69b4" },
+        "2024-07-22": { jobName: "百貨公司", start: "10:30", end: "16:30", color: "#ff69b4" },
+        "2024-07-23": { jobName: "百貨公司", start: "10:30", end: "16:30", color: "#ff69b4" },
+        "2024-07-24": { jobName: "百貨公司", start: "14:30", end: "20:30", color: "#ff69b4" }
+    };
+
+    // 將預設工作內容合併到schedules中
+    schedules = { ...defaultSchedules, ...schedules };
+
+    function updateWeek(direction) {
+        currentWeek.setDate(currentWeek.getDate() + direction * 7);
+        generateWeekGrid();
+        updateDates();
+        updateSchedule();
+        updateTotalHours();
+        updateTimeScale(); // 更新時間刻度
+    }
+
+    function generateWeekGrid() {
+        const weekGrid = document.querySelector('.week-grid');
+        weekGrid.innerHTML = ''; // 清空原有內容
+        for (let i = 0; i < 7; i++) {
+            const dayColumn = document.createElement('div');
+            dayColumn.classList.add('day-column');
+
+            const dayHeader = document.createElement('div');
+            dayHeader.classList.add('day-header');
+            dayHeader.innerHTML = ['一', '二', '三', '四', '五', '六', '日'][i] + '<br>';
+            dayColumn.appendChild(dayHeader);
+
+            const dayContent = document.createElement('div');
+            dayContent.classList.add('day-content');
+            dayColumn.appendChild(dayContent);
+
+            weekGrid.appendChild(dayColumn);
+        }
+    }
+
+    function updateDates() {
+        const dayHeaders = document.querySelectorAll('.day-header');
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(currentWeek);
+            date.setDate(date.getDate() - date.getDay() + i + 1);
+            dayHeaders[i].innerHTML += `${date.getMonth() + 1}/${date.getDate()}`;
+        }
+    }
+
+    function updateSchedule() {
+        const dayContents = document.querySelectorAll('.day-content');
+        dayContents.forEach(content => content.innerHTML = ''); // 清空原有內容
+
+        const firstDayContentHeight = dayContents[0].offsetHeight;
+        const totalMinutesInDay = 17 * 60; // 17 小時
+
+        Object.keys(schedules).forEach(dateKey => {
+            const { jobName, start, end, color } = schedules[dateKey];
+            const scheduleDate = new Date(dateKey);
+            const weekStartDate = new Date(currentWeek);
+            weekStartDate.setDate(weekStartDate.getDate() - weekStartDate.getDay() + 1);
+
+            if (scheduleDate >= weekStartDate && scheduleDate < new Date(weekStartDate.getTime() + 7 * 24 * 60 * 60 * 1000)) {
+                const dayIndex = (scheduleDate.getDay() + 6) % 7;
+                const startTime = parseTime(start);
+                const endTime = parseTime(end);
+                const duration = (endTime - startTime) / 3600000; // 轉換為小時
+                const topPosition = ((startTime.getHours() - 7) * 60 + startTime.getMinutes()) / totalMinutesInDay * firstDayContentHeight; // 假設早上7點開始
+                const height = (duration * 60) / totalMinutesInDay * firstDayContentHeight; // 17小時的一天
+                const scheduleItem = document.createElement('div');
+                scheduleItem.classList.add('schedule-item');
+                scheduleItem.style.top = `${topPosition}px`;
+                scheduleItem.style.height = `${height}px`;
+                scheduleItem.style.backgroundColor = color;
+                scheduleItem.innerHTML = `🐰<br>${jobName}<br>${formatTime(start)}<br><span class="vertical-line"></span><br>${formatTime(end)}`;
+
+                const content = dayContents[dayIndex];
+                content.appendChild(scheduleItem);
+
+                scheduleItem.addEventListener('click', () => editSchedule(dateKey));
+            }
+        });
+    }
+
+    function updateTotalHours() {
+        let totalHours = 0;
+        Object.values(schedules).forEach(({ start, end }) => {
+            totalHours += (parseTime(end) - parseTime(start)) / 3600000; // 轉換為小時
+        });
+        totalHoursElement.textContent = `本週總工時：${totalHours.toFixed(1)}小時`;
+    }
+
+    function parseTime(timeStr) {
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        return new Date(0, 0, 0, hours, minutes);
+    }
+
+    function formatTime(timeStr) {
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        const period = hours < 12 ? '早上' : hours < 18 ? '下午' : '晚上';
+        const formattedHours = hours % 12 || 12;
+        return `${period} ${formattedHours}:${minutes.toString().padStart(2, '0')}`;
+    }
+
+    function generateColor(jobName) {
+        const colors = ['#ffc0cb', '#ffb6c1', '#ff69b4', '#ff1493', '#db7093'];
+        const index = Array.from(jobName).reduce((sum, char) => sum + char.charCodeAt(0), 0) % colors.length;
+        return colors[index];
+    }
+
+    function editSchedule(dateKey) {
+        const { jobName, start, end } = schedules[dateKey];
+        document.getElementById('jobName').value = jobName;
+        document.getElementById('jobDate').value = dateKey;
+        document.getElementById('startTime').value = start;
+        document.getElementById('endTime').value = end;
+        showModal();
+        scheduleForm.onsubmit = (e) => {
+            e.preventDefault();
+            delete schedules[dateKey];
+            saveSchedule();
+        };
+    }
+
+    function saveSchedule() {
+        const jobName = document.getElementById('jobName').value;
+        const jobDate = document.getElementById('jobDate').value;
+        const startTime = document.getElementById('startTime').value;
+        const endTime = document.getElementById('endTime').value;
+        const color = generateColor(jobName);
+
+        schedules[jobDate] = { jobName, start: startTime, end: endTime, color };
+        localStorage.setItem('schedules', JSON.stringify(schedules));
+        closeModal();
+        updateSchedule();
+        updateTotalHours();
+    }
+
+    function showModal() {
+        modal.style.display = 'block';
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+    }
+
+    addButton.addEventListener('click', () => {
+        showModal();
+        scheduleForm.onsubmit = (e) => {
+            e.preventDefault();
+            saveSchedule();
+        };
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+
+    window.addEventListener('click', (event) => {
+        if (event.target == modal) {
+            closeModal();
+        }
+    });
+
+    prevWeekBtn.addEventListener('click', () => updateWeek(-1));
+    nextWeekBtn.addEventListener('click', () => updateWeek(1));
+
+    function updateTimeScale() {
+        const timeScale = document.querySelector('.time-scale');
+        timeScale.innerHTML = ''; // 清空原有內容
+
+        const firstDayContentHeight = document.querySelector('.day-content').offsetHeight;
+        const totalMinutesInDay = 17 * 60; // 17 小時
+        const headerHeight = document.querySelector('.day-header').offsetHeight; // 獲取 day-header 的高度
+        const timeIntervals = [
+            "早上7:00","早上8:00", "早上9:00", "上午10:00", "上午11:00", "中午12:00",
+"下午1:00", "下午2:00", "下午3:00", "下午4:00", "下午5:00", "晚上6:00",
+"晚上7:00", "晚上8:00", "晚上9:00", "晚上10:00", "晚上11:00", "晚上12:00"
+];
+timeIntervals.forEach((time, index) => {
+        const timeSlot = document.createElement('div');
+        timeSlot.classList.add('time-slot');
+        const topPosition = (index / (timeIntervals.length - 1)) * (firstDayContentHeight) + headerHeight;
+        timeSlot.style.top = `${topPosition}px`;
+        timeSlot.innerHTML = time;
+        timeScale.appendChild(timeSlot);
+    });
+}
+
+generateWeekGrid();
+updateDates();
+updateSchedule();
+updateTotalHours();
+updateTimeScale(); // 初始化時間刻度
+});
+</script>
+</body>
+</html>
