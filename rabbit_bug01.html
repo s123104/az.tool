@@ -59,6 +59,11 @@
             padding: 5px 10px;
             border-radius: 15px;
             font-size: 12px;
+            cursor: pointer;
+        }
+
+        .nav-button:hover {
+            background-color: #ff69b4;
         }
 
         .add-button {
@@ -73,6 +78,10 @@
             font-size: 20px;
             line-height: 20px;
             cursor: pointer;
+        }
+
+        .add-button:hover {
+            background-color: #ff69b4;
         }
 
         .week-view {
@@ -197,6 +206,64 @@
             text-decoration: none;
             cursor: pointer;
         }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"] {
+            width: calc(100% - 10px);
+            padding: 5px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button[type="submit"] {
+            background-color: #ff1493;
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #ff69b4;
+        }
+
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #d4d4d4;
+            border-bottom: none;
+            border-top: none;
+            z-index: 99;
+            top: 100%;
+            left: 0;
+            right: 0;
+        }
+
+        .autocomplete-items div {
+            padding: 10px;
+            cursor: pointer;
+            background-color: #fff;
+            border-bottom: 1px solid #d4d4d4;
+        }
+
+        .autocomplete-items div:hover {
+            background-color: #e9e9e9;
+        }
+
+        .autocomplete-active {
+            background-color: DodgerBlue !important;
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
@@ -226,15 +293,15 @@
     <div class="modal-content">
         <span class="close">&times;</span>
         <h2>新增/修改工作</h2>
-        <form id="scheduleForm">
+        <form id="scheduleForm" autocomplete="off">
             <label for="jobName">工作名稱</label>
             <input type="text" id="jobName" name="jobName" required>
             <label for="jobDate">日期</label>
             <input type="date" id="jobDate" name="jobDate" required>
             <label for="startTime">開始時間</label>
-            <input type="time" id="startTime" name="startTime" required>
+            <input type="time" id="startTime" name="startTime" required step="600">
             <label for="endTime">結束時間</label>
-            <input type="time" id="endTime" name="endTime" required>
+            <input type="time" id="endTime" name="endTime" required step="600">
             <button type="submit">保存</button>
         </form>
     </div>
@@ -249,9 +316,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const modal = document.getElementById('modal');
     const closeBtn = document.querySelector('.close');
     const scheduleForm = document.getElementById('scheduleForm');
+    const jobNameInput = document.getElementById('jobName');
 
     let currentWeek = new Date();
     let schedules = JSON.parse(localStorage.getItem('schedules')) || {};
+    let jobNames = JSON.parse(localStorage.getItem('jobNames')) || [];
 
     // 預設的工作內容
     const defaultSchedules = {
@@ -388,6 +457,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
         schedules[jobDate] = { jobName, start: startTime, end: endTime, color };
         localStorage.setItem('schedules', JSON.stringify(schedules));
+        if (!jobNames.includes(jobName)) {
+            jobNames.push(jobName);
+            localStorage.setItem('jobNames', JSON.stringify(jobNames));
+        }
         closeModal();
         updateSchedule();
         updateTotalHours();
@@ -401,45 +474,111 @@ document.addEventListener('DOMContentLoaded', (event) => {
         modal.style.display = 'none';
     }
 
-    addButton.addEventListener('click', () => {
-        showModal();
-        scheduleForm.onsubmit = (e) => {
-            e.preventDefault();
-            saveSchedule();
-        };
-    });
-
-    closeBtn.addEventListener('click', closeModal);
-
-    window.addEventListener('click', (event) => {
-        if (event.target == modal) {
-            closeModal();
+    function autocomplete(inp, arr) {
+        let currentFocus;
+        inp.addEventListener("input", function(e) {
+            let a, b, i, val = this.value;
+            closeAllLists();
+            if (!val) { return false;}
+            currentFocus = -1;
+            a = document.createElement("DIV");
+            a.setAttribute("id", this.id + "autocomplete-list");
+            a.setAttribute("class", "autocomplete-items");
+            this.parentNode.appendChild(a);
+            for (i = 0; i < arr.length; i++) {
+                if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                    b = document.createElement("DIV");
+                    b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+                    b.innerHTML += arr[i].substr(val.length);
+                    b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                    b.addEventListener("click", function(e) {
+                        inp.value = this.getElementsByTagName("input")[0].value;
+                        closeAllLists();
+                    });
+                    a.appendChild(b);
+                }
+            }
+});
+inp.addEventListener("keydown", function(e) {
+    let x = document.getElementById(this.id + "autocomplete-list");
+    if (x) x = x.getElementsByTagName("div");
+    if (e.keyCode == 40) {
+        currentFocus++;
+        addActive(x);
+    } else if (e.keyCode == 38) {
+        currentFocus--;
+        addActive(x);
+    } else if (e.keyCode == 13) {
+        e.preventDefault();
+        if (currentFocus > -1) {
+            if (x) x[currentFocus].click();
         }
-    });
+    }
+});
+function addActive(x) {
+    if (!x) return false;
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    x[currentFocus].classList.add("autocomplete-active");
+}
+function removeActive(x) {
+    for (let i = 0; i < x.length; i++) {
+        x[i].classList.remove("autocomplete-active");
+    }
+}
+function closeAllLists(elmnt) {
+    let x = document.getElementsByClassName("autocomplete-items");
+    for (let i = 0; i < x.length; i++) {
+        if (elmnt != x[i] && elmnt != inp) {
+            x[i].parentNode.removeChild(x[i]);
+        }
+    }
+}
+document.addEventListener("click", function (e) {
+    closeAllLists(e.target);
+});
+}
 
-    prevWeekBtn.addEventListener('click', () => updateWeek(-1));
-    nextWeekBtn.addEventListener('click', () => updateWeek(1));
+addButton.addEventListener('click', () => {
+showModal();
+scheduleForm.onsubmit = (e) => {
+    e.preventDefault();
+    saveSchedule();
+};
+});
 
-    function updateTimeScale() {
-        const timeScale = document.querySelector('.time-scale');
-        timeScale.innerHTML = ''; // 清空原有內容
+closeBtn.addEventListener('click', closeModal);
 
-        const firstDayContentHeight = document.querySelector('.day-content').offsetHeight;
-        const totalMinutesInDay = 17 * 60; // 17 小時
-        const headerHeight = document.querySelector('.day-header').offsetHeight; // 獲取 day-header 的高度
-        const timeIntervals = [
-            "早上7:00","早上8:00", "早上9:00", "上午10:00", "上午11:00", "中午12:00",
-"下午1:00", "下午2:00", "下午3:00", "下午4:00", "下午5:00", "晚上6:00",
-"晚上7:00", "晚上8:00", "晚上9:00", "晚上10:00", "晚上11:00", "晚上12:00"
+window.addEventListener('click', (event) => {
+if (event.target == modal) {
+    closeModal();
+}
+});
+
+prevWeekBtn.addEventListener('click', () => updateWeek(-1));
+nextWeekBtn.addEventListener('click', () => updateWeek(1));
+
+function updateTimeScale() {
+const timeScale = document.querySelector('.time-scale');
+timeScale.innerHTML = ''; // 清空原有內容
+
+const firstDayContentHeight = document.querySelector('.day-content').offsetHeight;
+const totalMinutesInDay = 17 * 60; // 17 小時
+const headerHeight = document.querySelector('.day-header').offsetHeight; // 獲取 day-header 的高度
+const timeIntervals = [
+    "早上7:00","早上8:00", "早上9:00", "上午10:00", "上午11:00", "中午12:00",
+    "下午1:00", "下午2:00", "下午3:00", "下午4:00", "下午5:00", "晚上6:00",
+    "晚上7:00", "晚上8:00", "晚上9:00", "晚上10:00", "晚上11:00", "晚上12:00"
 ];
 timeIntervals.forEach((time, index) => {
-        const timeSlot = document.createElement('div');
-        timeSlot.classList.add('time-slot');
-        const topPosition = (index / (timeIntervals.length - 1)) * (firstDayContentHeight) + headerHeight;
-        timeSlot.style.top = `${topPosition}px`;
-        timeSlot.innerHTML = time;
-        timeScale.appendChild(timeSlot);
-    });
+    const timeSlot = document.createElement('div');
+    timeSlot.classList.add('time-slot');
+    const topPosition = (index / (timeIntervals.length - 1)) * (firstDayContentHeight) + headerHeight;
+    timeSlot.style.top = `${topPosition}px`;
+    timeSlot.innerHTML = time;
+    timeScale.appendChild(timeSlot);
+});
 }
 
 generateWeekGrid();
@@ -447,6 +586,7 @@ updateDates();
 updateSchedule();
 updateTotalHours();
 updateTimeScale(); // 初始化時間刻度
+autocomplete(jobNameInput, jobNames);
 });
 </script>
 </body>
