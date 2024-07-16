@@ -272,6 +272,15 @@
             background-color: DodgerBlue !important;
             color: #ffffff;
         }
+
+        .delete-btn {
+            background: url('https://s123104.github.io/az.tool/img/trash.png') no-repeat center center;
+            background-size: contain;
+            border: none;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
     </style>
 </head>
 <body>
@@ -296,22 +305,42 @@
     <div class="total-hours" id="totalHours">本週總工時：0小時</div>
 </div>
 
-<!-- 模態框 -->
-<div id="modal" class="modal">
+<!-- 新增工作模態框 -->
+<div id="modal-add" class="modal">
     <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>新增/修改工作</h2>
-        <form id="scheduleForm" autocomplete="off">
-            <label for="jobName">工作名稱</label>
-            <input type="text" id="jobName" name="jobName" required>
-            <label for="jobDate">日期</label>
-            <input type="date" id="jobDate" name="jobDate" required>
-            <label for="startTime">開始時間</label>
-            <input type="time" id="startTime" name="startTime" required step="600">
-            <label for="endTime">結束時間</label>
-            <input type="time" id="endTime" name="endTime" required step="600">
+        <span class="close" id="closeAdd">&times;</span>
+        <h2>新增工作</h2>
+        <form id="addForm" autocomplete="off">
+            <label for="addJobName">工作名稱</label>
+            <input type="text" id="addJobName" name="addJobName" maxlength="4" required>
+            <label for="addJobDate">日期</label>
+            <input type="date" id="addJobDate" name="addJobDate" required>
+            <label for="addStartTime">開始時間</label>
+            <input type="time" id="addStartTime" name="addStartTime" required step="600">
+            <label for="addEndTime">結束時間</label>
+            <input type="time" id="addEndTime" name="addEndTime" required step="600">
             <button type="submit">保存</button>
         </form>
+    </div>
+</div>
+
+<!-- 修改工作模態框 -->
+<div id="modal-edit" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeEdit">&times;</span>
+        <h2>修改工作</h2>
+        <form id="editForm" autocomplete="off">
+            <label for="editJobName">工作名稱</label>
+            <input type="text" id="editJobName" name="editJobName" maxlength="4" required>
+            <label for="editJobDate">日期</label>
+            <input type="date" id="editJobDate" name="editJobDate" required>
+            <label for="editStartTime">開始時間</label>
+            <input type="time" id="editStartTime" name="editStartTime" required step="600">
+            <label for="editEndTime">結束時間</label>
+            <input type="time" id="editEndTime" name="editEndTime" required step="600">
+            <button type="submit">保存</button>
+        </form>
+        <button class="delete-btn" id="deleteBtn">刪除</button>
     </div>
 </div>
 
@@ -321,22 +350,28 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const nextWeekBtn = document.getElementById('nextWeek');
     const totalHoursElement = document.getElementById('totalHours');
     const addButton = document.getElementById('addButton');
-    const modal = document.getElementById('modal');
-    const closeBtn = document.querySelector('.close');
-    const scheduleForm = document.getElementById('scheduleForm');
-    const jobNameInput = document.getElementById('jobName');
+    const modalAdd = document.getElementById('modal-add');
+    const modalEdit = document.getElementById('modal-edit');
+    const closeAddBtn = document.getElementById('closeAdd');
+    const closeEditBtn = document.getElementById('closeEdit');
+    const addForm = document.getElementById('addForm');
+    const editForm = document.getElementById('editForm');
+    const jobNameInputAdd = document.getElementById('addJobName');
+    const jobNameInputEdit = document.getElementById('editJobName');
+    const deleteBtn = document.getElementById('deleteBtn');
 
     let currentWeek = new Date();
     let schedules = JSON.parse(localStorage.getItem('schedules')) || {};
     let jobNames = JSON.parse(localStorage.getItem('jobNames')) || [];
+    let currentEditKey = null;
 
     // 預設的工作內容
     const defaultSchedules = {
-        "2024-07-16": { jobName: "百貨公司", start: "16:00", end: "22:00", color: "#ff69b4" },
-        "2024-07-18": { jobName: "百貨公司", start: "16:00", end: "22:00", color: "#ff69b4" },
-        "2024-07-20": { jobName: "百貨公司", start: "14:30", end: "22:00", color: "#ff69b4" },
-        "2024-07-23": { jobName: "百貨公司", start: "10:30", end: "16:30", color: "#ff69b4" },
-        "2024-07-24": { jobName: "百貨公司", start: "14:30", end: "20:30", color: "#ff69b4" }
+        "2024-07-16": { jobName: "百貨", start: "16:00", end: "22:00", color: "#ff69b4" },
+        "2024-07-18": { jobName: "百貨", start: "16:00", end: "22:00", color: "#ff69b4" },
+        "2024-07-20": { jobName: "百貨", start: "14:30", end: "22:00", color: "#ff69b4" },
+        "2024-07-23": { jobName: "百貨", start: "10:30", end: "16:30", color: "#ff69b4" },
+        "2024-07-24": { jobName: "百貨", start: "14:30", end: "20:30", color: "#ff69b4" }
     };
 
     // 將預設工作內容合併到schedules中
@@ -405,15 +440,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 scheduleItem.style.top = `${topPosition}px`;
                 scheduleItem.style.height = `${height}px`;
                 scheduleItem.style.backgroundColor = color;
-                scheduleItem.innerHTML = `
-                    🐰<br>${jobName}<br>${formatTime(start)}<br><span class="vertical-line"></span><br>${formatTime(end)}
-                    <button class="delete-btn" onclick="deleteSchedule('${dateKey}')">✖</button>
-                `;
+                scheduleItem.innerHTML = `🐰<br>${jobName}<br>${formatTime(start)}<br><span class="vertical-line"></span><br>${formatTime(end)}`;
 
                 const content = dayContents[dayIndex];
                 content.appendChild(scheduleItem);
 
-                scheduleItem.addEventListener('click', () => editSchedule(dateKey));
+                scheduleItem.addEventListener('click', () => openEditModal(dateKey));
             }
         });
     }
@@ -423,7 +455,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const weekStartDate = new Date(currentWeek);
         weekStartDate.setDate(weekStartDate.getDate() - weekStartDate.getDay() + 1);
         const weekEndDate = new Date(weekStartDate.getTime() + 7 * 24 * 60 * 60 * 1000);
-        
+
         Object.keys(schedules).forEach(dateKey => {
             const scheduleDate = new Date(dateKey);
             if (scheduleDate >= weekStartDate && scheduleDate < weekEndDate) {
@@ -447,37 +479,46 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 
     function generateColor(jobName) {
-        const colors = ['#ffc0cb', '#ffb6c1', '#ff69b4', '#ff1493', '#db7093'];
-        const index = Array.from(jobName).reduce((sum, char) => sum + char.charCodeAt(0), 0) % colors.length;
-        return colors[index];
+        const colors = ['#ffc0cb', '#ffb6c1', '#ff69b4', '#ff1493', '#db7093', '#ff8c69', '#ff6347', '#ff4500'];
+        const jobType = jobName.charCodeAt(0) % colors.length;
+        return colors[jobType];
     }
 
-    function editSchedule(dateKey) {
+    function openAddModal() {
+        modalAdd.style.display = 'block';
+    }
+
+    function closeAddModal() {
+        modalAdd.style.display = 'none';
+    }
+
+    function openEditModal(dateKey) {
         const { jobName, start, end } = schedules[dateKey];
-        document.getElementById('jobName').value = jobName;
-        document.getElementById('jobDate').value = dateKey;
-        document.getElementById('startTime').value = start;
-        document.getElementById('endTime').value = end;
-        showModal();
-        scheduleForm.onsubmit = (e) => {
-            e.preventDefault();
-            delete schedules[dateKey];
-            saveSchedule();
-        };
+        currentEditKey = dateKey;
+        document.getElementById('editJobName').value = jobName;
+        document.getElementById('editJobDate').value = dateKey;
+        document.getElementById('editStartTime').value = start;
+        document.getElementById('editEndTime').value = end;
+        modalEdit.style.display = 'block';
     }
 
-    function deleteSchedule(dateKey) {
-        delete schedules[dateKey];
+    function closeEditModal() {
+        modalEdit.style.display = 'none';
+    }
+
+    function deleteSchedule() {
+        delete schedules[currentEditKey];
         localStorage.setItem('schedules', JSON.stringify(schedules));
+        closeEditModal();
         updateSchedule();
         updateTotalHours();
     }
 
-    function saveSchedule() {
-        const jobName = document.getElementById('jobName').value;
-        const jobDate = document.getElementById('jobDate').value;
-        const startTime = document.getElementById('startTime').value;
-        const endTime = document.getElementById('endTime').value;
+    function saveAddSchedule() {
+        const jobName = document.getElementById('addJobName').value;
+        const jobDate = document.getElementById('addJobDate').value;
+        const startTime = document.getElementById('addStartTime').value;
+        const endTime = document.getElementById('addEndTime').value;
         const color = generateColor(jobName);
 
         schedules[jobDate] = { jobName, start: startTime, end: endTime, color };
@@ -486,17 +527,28 @@ document.addEventListener('DOMContentLoaded', (event) => {
             jobNames.push(jobName);
             localStorage.setItem('jobNames', JSON.stringify(jobNames));
         }
-        closeModal();
+        closeAddModal();
         updateSchedule();
         updateTotalHours();
     }
 
-    function showModal() {
-        modal.style.display = 'block';
-    }
+    function saveEditSchedule() {
+        const jobName = document.getElementById('editJobName').value;
+        const jobDate = document.getElementById('editJobDate').value;
+        const startTime = document.getElementById('editStartTime').value;
+        const endTime = document.getElementById('editEndTime').value;
+        const color = generateColor(jobName);
 
-    function closeModal() {
-        modal.style.display = 'none';
+        delete schedules[currentEditKey];
+        schedules[jobDate] = { jobName, start: startTime, end: endTime, color };
+        localStorage.setItem('schedules', JSON.stringify(schedules));
+        if (!jobNames.includes(jobName)) {
+            jobNames.push(jobName);
+            localStorage.setItem('jobNames', JSON.stringify(jobNames));
+        }
+        closeEditModal();
+        updateSchedule();
+        updateTotalHours();
     }
 
     function autocomplete(inp, arr) {
@@ -566,23 +618,34 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 
     addButton.addEventListener('click', () => {
-        showModal();
-        scheduleForm.onsubmit = (e) => {
-            e.preventDefault();
-            saveSchedule();
-        };
+        openAddModal();
     });
 
-    closeBtn.addEventListener('click', closeModal);
+    closeAddBtn.addEventListener('click', closeAddModal);
+    closeEditBtn.addEventListener('click', closeEditModal);
+    deleteBtn.addEventListener('click', deleteSchedule);
 
     window.addEventListener('click', (event) => {
-        if (event.target == modal) {
-            closeModal();
+        if (event.target == modalAdd) {
+            closeAddModal();
+        }
+        if (event.target == modalEdit) {
+            closeEditModal();
         }
     });
 
     prevWeekBtn.addEventListener('click', () => updateWeek(-1));
     nextWeekBtn.addEventListener('click', () => updateWeek(1));
+
+    addForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        saveAddSchedule();
+    });
+
+    editForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        saveEditSchedule();
+    });
 
     function updateTimeScale() {
         const timeScale = document.querySelector('.time-scale');
@@ -611,7 +674,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
     updateSchedule();
     updateTotalHours();
     updateTimeScale(); // 初始化時間刻度
-    autocomplete(jobNameInput, jobNames);
+    autocomplete(jobNameInputAdd, jobNames);
+    autocomplete(jobNameInputEdit, jobNames);
 });
 </script>
 </body>
