@@ -154,6 +154,14 @@
             cursor: pointer;
         }
 
+        .schedule-item .delete-btn {
+            font-size: 10px;
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
         .vertical-line {
             display: inline-block;
             width: 1px;
@@ -327,7 +335,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         "2024-07-16": { jobName: "百貨公司", start: "16:00", end: "22:00", color: "#ff69b4" },
         "2024-07-18": { jobName: "百貨公司", start: "16:00", end: "22:00", color: "#ff69b4" },
         "2024-07-20": { jobName: "百貨公司", start: "14:30", end: "22:00", color: "#ff69b4" },
-        "2024-07-22": { jobName: "百貨公司", start: "10:30", end: "16:30", color: "#ff69b4" },
         "2024-07-23": { jobName: "百貨公司", start: "10:30", end: "16:30", color: "#ff69b4" },
         "2024-07-24": { jobName: "百貨公司", start: "14:30", end: "20:30", color: "#ff69b4" }
     };
@@ -398,7 +405,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 scheduleItem.style.top = `${topPosition}px`;
                 scheduleItem.style.height = `${height}px`;
                 scheduleItem.style.backgroundColor = color;
-                scheduleItem.innerHTML = `🐰<br>${jobName}<br>${formatTime(start)}<br><span class="vertical-line"></span><br>${formatTime(end)}`;
+                scheduleItem.innerHTML = `
+                    🐰<br>${jobName}<br>${formatTime(start)}<br><span class="vertical-line"></span><br>${formatTime(end)}
+                    <button class="delete-btn" onclick="deleteSchedule('${dateKey}')">✖</button>
+                `;
 
                 const content = dayContents[dayIndex];
                 content.appendChild(scheduleItem);
@@ -410,8 +420,16 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     function updateTotalHours() {
         let totalHours = 0;
-        Object.values(schedules).forEach(({ start, end }) => {
-            totalHours += (parseTime(end) - parseTime(start)) / 3600000; // 轉換為小時
+        const weekStartDate = new Date(currentWeek);
+        weekStartDate.setDate(weekStartDate.getDate() - weekStartDate.getDay() + 1);
+        const weekEndDate = new Date(weekStartDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+        
+        Object.keys(schedules).forEach(dateKey => {
+            const scheduleDate = new Date(dateKey);
+            if (scheduleDate >= weekStartDate && scheduleDate < weekEndDate) {
+                const { start, end } = schedules[dateKey];
+                totalHours += (parseTime(end) - parseTime(start)) / 3600000; // 轉換為小時
+            }
         });
         totalHoursElement.textContent = `本週總工時：${totalHours.toFixed(1)}小時`;
     }
@@ -446,6 +464,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
             delete schedules[dateKey];
             saveSchedule();
         };
+    }
+
+    function deleteSchedule(dateKey) {
+        delete schedules[dateKey];
+        localStorage.setItem('schedules', JSON.stringify(schedules));
+        updateSchedule();
+        updateTotalHours();
     }
 
     function saveSchedule() {
@@ -498,95 +523,95 @@ document.addEventListener('DOMContentLoaded', (event) => {
                     a.appendChild(b);
                 }
             }
-});
-inp.addEventListener("keydown", function(e) {
-    let x = document.getElementById(this.id + "autocomplete-list");
-    if (x) x = x.getElementsByTagName("div");
-    if (e.keyCode == 40) {
-        currentFocus++;
-        addActive(x);
-    } else if (e.keyCode == 38) {
-        currentFocus--;
-        addActive(x);
-    } else if (e.keyCode == 13) {
-        e.preventDefault();
-        if (currentFocus > -1) {
-            if (x) x[currentFocus].click();
+        });
+        inp.addEventListener("keydown", function(e) {
+            let x = document.getElementById(this.id + "autocomplete-list");
+            if (x) x = x.getElementsByTagName("div");
+            if (e.keyCode == 40) {
+                currentFocus++;
+                addActive(x);
+            } else if (e.keyCode == 38) {
+                currentFocus--;
+                addActive(x);
+            } else if (e.keyCode == 13) {
+                e.preventDefault();
+                if (currentFocus > -1) {
+                    if (x) x[currentFocus].click();
+                }
+            }
+        });
+        function addActive(x) {
+            if (!x) return false;
+            removeActive(x);
+            if (currentFocus >= x.length) currentFocus = 0;
+            if (currentFocus < 0) currentFocus = (x.length - 1);
+            x[currentFocus].classList.add("autocomplete-active");
         }
-    }
-});
-function addActive(x) {
-    if (!x) return false;
-    removeActive(x);
-    if (currentFocus >= x.length) currentFocus = 0;
-    if (currentFocus < 0) currentFocus = (x.length - 1);
-    x[currentFocus].classList.add("autocomplete-active");
-}
-function removeActive(x) {
-    for (let i = 0; i < x.length; i++) {
-        x[i].classList.remove("autocomplete-active");
-    }
-}
-function closeAllLists(elmnt) {
-    let x = document.getElementsByClassName("autocomplete-items");
-    for (let i = 0; i < x.length; i++) {
-        if (elmnt != x[i] && elmnt != inp) {
-            x[i].parentNode.removeChild(x[i]);
+        function removeActive(x) {
+            for (let i = 0; i < x.length; i++) {
+                x[i].classList.remove("autocomplete-active");
+            }
         }
+        function closeAllLists(elmnt) {
+            let x = document.getElementsByClassName("autocomplete-items");
+            for (let i = 0; i < x.length; i++) {
+                if (elmnt != x[i] && elmnt != inp) {
+                    x[i].parentNode.removeChild(x[i]);
+                }
+            }
+        }
+        document.addEventListener("click", function (e) {
+            closeAllLists(e.target);
+        });
     }
-}
-document.addEventListener("click", function (e) {
-    closeAllLists(e.target);
-});
-}
 
-addButton.addEventListener('click', () => {
-showModal();
-scheduleForm.onsubmit = (e) => {
-    e.preventDefault();
-    saveSchedule();
-};
-});
+    addButton.addEventListener('click', () => {
+        showModal();
+        scheduleForm.onsubmit = (e) => {
+            e.preventDefault();
+            saveSchedule();
+        };
+    });
 
-closeBtn.addEventListener('click', closeModal);
+    closeBtn.addEventListener('click', closeModal);
 
-window.addEventListener('click', (event) => {
-if (event.target == modal) {
-    closeModal();
-}
-});
+    window.addEventListener('click', (event) => {
+        if (event.target == modal) {
+            closeModal();
+        }
+    });
 
-prevWeekBtn.addEventListener('click', () => updateWeek(-1));
-nextWeekBtn.addEventListener('click', () => updateWeek(1));
+    prevWeekBtn.addEventListener('click', () => updateWeek(-1));
+    nextWeekBtn.addEventListener('click', () => updateWeek(1));
 
-function updateTimeScale() {
-const timeScale = document.querySelector('.time-scale');
-timeScale.innerHTML = ''; // 清空原有內容
+    function updateTimeScale() {
+        const timeScale = document.querySelector('.time-scale');
+        timeScale.innerHTML = ''; // 清空原有內容
 
-const firstDayContentHeight = document.querySelector('.day-content').offsetHeight;
-const totalMinutesInDay = 17 * 60; // 17 小時
-const headerHeight = document.querySelector('.day-header').offsetHeight; // 獲取 day-header 的高度
-const timeIntervals = [
-    "早上7:00","早上8:00", "早上9:00", "上午10:00", "上午11:00", "中午12:00",
-    "下午1:00", "下午2:00", "下午3:00", "下午4:00", "下午5:00", "晚上6:00",
-    "晚上7:00", "晚上8:00", "晚上9:00", "晚上10:00", "晚上11:00", "晚上12:00"
-];
-timeIntervals.forEach((time, index) => {
-    const timeSlot = document.createElement('div');
-    timeSlot.classList.add('time-slot');
-    const topPosition = (index / (timeIntervals.length - 1)) * (firstDayContentHeight) + headerHeight;
-    timeSlot.style.top = `${topPosition}px`;
-    timeSlot.innerHTML = time;
-    timeScale.appendChild(timeSlot);
-});
-}
+        const firstDayContentHeight = document.querySelector('.day-content').offsetHeight;
+        const totalMinutesInDay = 17 * 60; // 17 小時
+        const headerHeight = document.querySelector('.day-header').offsetHeight; // 獲取 day-header 的高度
+        const timeIntervals = [
+            "早上7:00","早上8:00", "早上9:00", "上午10:00", "上午11:00", "中午12:00",
+            "下午1:00", "下午2:00", "下午3:00", "下午4:00", "下午5:00", "晚上6:00",
+            "晚上7:00", "晚上8:00", "晚上9:00", "晚上10:00", "晚上11:00", "晚上12:00"
+        ];
+        timeIntervals.forEach((time, index) => {
+            const timeSlot = document.createElement('div');
+            timeSlot.classList.add('time-slot');
+            const topPosition = (index / (timeIntervals.length - 1)) * (firstDayContentHeight) + headerHeight;
+            timeSlot.style.top = `${topPosition}px`;
+            timeSlot.innerHTML = time;
+            timeScale.appendChild(timeSlot);
+        });
+    }
 
-generateWeekGrid();
-updateDates();
-updateSchedule();
-updateTotalHours();
-updateTimeScale(); // 初始化時間刻度
-autocomplete(jobNameInput, jobNames);
+    generateWeekGrid();
+    updateDates();
+    updateSchedule();
+    updateTotalHours();
+    updateTimeScale(); // 初始化時間刻度
+    autocomplete(jobNameInput, jobNames);
 });
 </script>
 </body>
