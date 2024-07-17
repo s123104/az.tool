@@ -160,6 +160,9 @@
             background: none;
             border: none;
             cursor: pointer;
+            position: absolute;
+            top: 2px;
+            right: 2px;
         }
 
         .vertical-line {
@@ -221,9 +224,23 @@
         }
 
         input[type="text"],
-        input[type="date"],
-        input[type="time"] {
+        input[type="date"] {
             width: calc(100% - 10px);
+            padding: 5px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .time-input {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        input[type="number"] {
+            width: 60px;
             padding: 5px;
             margin: 5px 0;
             border: 1px solid #ccc;
@@ -280,6 +297,47 @@
             cursor: pointer;
             width: 16px;
             height: 16px;
+            position: absolute;
+            top: 2px;
+            right: 2px;
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                padding: 5px;
+            }
+
+            .title {
+                font-size: 16px;
+            }
+
+            .nav-button {
+                padding: 3px 8px;
+                font-size: 10px;
+            }
+
+            .add-button {
+                font-size: 16px;
+                padding: 4px;
+            }
+
+            .total-hours {
+                padding: 5px;
+                font-size: 10px;
+            }
+
+            .modal-content {
+                width: 90%;
+                padding: 10px;
+            }
+
+            .close {
+                font-size: 24px;
+            }
+
+            label, input, button[type="submit"] {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -315,10 +373,16 @@
             <input type="text" id="addJobName" name="addJobName" maxlength="4" required>
             <label for="addJobDate">日期</label>
             <input type="date" id="addJobDate" name="addJobDate" required>
-            <label for="addStartTime">開始時間</label>
-            <input type="time" id="addStartTime" name="addStartTime" required step="600">
-            <label for="addEndTime">結束時間</label>
-            <input type="time" id="addEndTime" name="addEndTime" required step="600">
+            <div class="time-input">
+                <label for="addStartTime">開始時間</label>
+                <input type="number" id="addStartHour" name="addStartHour" min="0" max="23" placeholder="HH" required>
+                <input type="number" id="addStartMinute" name="addStartMinute" min="0" max="50" step="10" placeholder="MM" required>
+            </div>
+            <div class="time-input">
+                <label for="addEndTime">結束時間</label>
+                <input type="number" id="addEndHour" name="addEndHour" min="0" max="23" placeholder="HH" required>
+                <input type="number" id="addEndMinute" name="addEndMinute" min="0" max="50" step="10" placeholder="MM" required>
+            </div>
             <button type="submit">保存</button>
         </form>
     </div>
@@ -334,10 +398,16 @@
             <input type="text" id="editJobName" name="editJobName" maxlength="4" required>
             <label for="editJobDate">日期</label>
             <input type="date" id="editJobDate" name="editJobDate" required>
-            <label for="editStartTime">開始時間</label>
-            <input type="time" id="editStartTime" name="editStartTime" required step="600">
-            <label for="editEndTime">結束時間</label>
-            <input type="time" id="editEndTime" name="editEndTime" required step="600">
+            <div class="time-input">
+                <label for="editStartTime">開始時間</label>
+                <input type="number" id="editStartHour" name="editStartHour" min="0" max="23" placeholder="HH" required>
+                <input type="number" id="editStartMinute" name="editStartMinute" min="0" max="50" step="10" placeholder="MM" required>
+            </div>
+            <div class="time-input">
+                <label for="editEndTime">結束時間</label>
+                <input type="number" id="editEndHour" name="editEndHour" min="0" max="23" placeholder="HH" required>
+                <input type="number" id="editEndMinute" name="editEndMinute" min="0" max="50" step="10" placeholder="MM" required>
+            </div>
             <button type="submit">保存</button>
         </form>
         <button class="delete-btn" id="deleteBtn">刪除</button>
@@ -367,11 +437,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     // 預設的工作內容
     const defaultSchedules = {
-        "2024-07-16": { jobName: "百貨", start: "16:00", end: "22:00", color: "#ff69b4" },
-        "2024-07-18": { jobName: "百貨", start: "16:00", end: "22:00", color: "#ff69b4" },
-        "2024-07-20": { jobName: "百貨", start: "14:30", end: "22:00", color: "#ff69b4" },
-        "2024-07-23": { jobName: "百貨", start: "10:30", end: "16:30", color: "#ff69b4" },
-        "2024-07-24": { jobName: "百貨", start: "14:30", end: "20:30", color: "#ff69b4" }
+        "2024-07-16": { jobName: "百貨公司", start: "16:00", end: "22:00", color: "#ff69b4" },
+        "2024-07-18": { jobName: "百貨公司", start: "16:00", end: "22:00", color: "#ff69b4" },
+        "2024-07-20": { jobName: "百貨公司", start: "14:30", end: "22:00", color: "#ff69b4" },
+        "2024-07-23": { jobName: "百貨公司", start: "10:30", end: "16:30", color: "#ff69b4" },
+        "2024-07-24": { jobName: "百貨公司", start: "14:30", end: "20:30", color: "#ff69b4" }
     };
 
     // 將預設工作內容合併到schedules中
@@ -440,7 +510,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 scheduleItem.style.top = `${topPosition}px`;
                 scheduleItem.style.height = `${height}px`;
                 scheduleItem.style.backgroundColor = color;
-                scheduleItem.innerHTML = `🐰<br>${jobName}<br>${formatTime(start)}<br><span class="vertical-line"></span><br>${formatTime(end)}`;
+                scheduleItem.innerHTML = `
+                    🐰<br>${jobName}<br>${formatTime(start)}<br><span class="vertical-line"></span><br>${formatTime(end)}
+                    <button class="delete-btn" onclick="deleteSchedule('${dateKey}')"></button>
+                `;
 
                 const content = dayContents[dayIndex];
                 content.appendChild(scheduleItem);
@@ -497,8 +570,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
         currentEditKey = dateKey;
         document.getElementById('editJobName').value = jobName;
         document.getElementById('editJobDate').value = dateKey;
-        document.getElementById('editStartTime').value = start;
-        document.getElementById('editEndTime').value = end;
+        const [editStartHour, editStartMinute] = start.split(':');
+        document.getElementById('editStartHour').value = editStartHour;
+        document.getElementById('editStartMinute').value = editStartMinute;
+        const [editEndHour, editEndMinute] = end.split(':');
+        document.getElementById('editEndHour').value = editEndHour;
+        document.getElementById('editEndMinute').value = editEndMinute;
         modalEdit.style.display = 'block';
     }
 
@@ -517,8 +594,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
     function saveAddSchedule() {
         const jobName = document.getElementById('addJobName').value;
         const jobDate = document.getElementById('addJobDate').value;
-        const startTime = document.getElementById('addStartTime').value;
-        const endTime = document.getElementById('addEndTime').value;
+        const startTime = `${document.getElementById('addStartHour').value.padStart(2, '0')}:${document.getElementById('addStartMinute').value.padStart(2, '0')}`;
+        const endTime = `${document.getElementById('addEndHour').value.padStart(2, '0')}:${document.getElementById('addEndMinute').value.padStart(2, '0')}`;
         const color = generateColor(jobName);
 
         schedules[jobDate] = { jobName, start: startTime, end: endTime, color };
@@ -535,8 +612,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
     function saveEditSchedule() {
         const jobName = document.getElementById('editJobName').value;
         const jobDate = document.getElementById('editJobDate').value;
-        const startTime = document.getElementById('editStartTime').value;
-        const endTime = document.getElementById('editEndTime').value;
+        const startTime = `${document.getElementById('editStartHour').value.padStart(2, '0')}:${document.getElementById('editStartMinute').value.padStart(2, '0')}`;
+        const endTime = `${document.getElementById('editEndHour').value.padStart(2, '0')}:${document.getElementById('editEndMinute').value.padStart(2, '0')}`;
         const color = generateColor(jobName);
 
         delete schedules[currentEditKey];
