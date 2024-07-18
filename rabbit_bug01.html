@@ -42,8 +42,8 @@
         }
 
         .title img {
-            margin-right: 8px; /* 添加間距 */
-            height: 24px; /* 調整圖片高度 */
+            margin-right: 8px;
+            height: 24px;
         }
 
         .navigation {
@@ -87,6 +87,7 @@
         .week-view {
             display: flex;
             flex-grow: 1;
+            overflow-y: auto;
         }
 
         .time-scale {
@@ -96,7 +97,7 @@
             font-size: 8px;
             text-align: right;
             border-right: 1px solid #ff69b4;
-            padding-top: 50px; /* 確保時間刻度的初始位置與 day-header 的下邊緣對齊 */
+            padding-top: 50px;
         }
 
         .time-slot {
@@ -111,6 +112,7 @@
         .week-grid {
             display: flex;
             flex-grow: 1;
+            overflow-x: auto;
         }
 
         .day-column {
@@ -152,17 +154,6 @@
             padding: 2px;
             text-align: center;
             cursor: pointer;
-        }
-
-        .schedule-item .delete-btn {
-            font-size: 10px;
-            color: white;
-            background: none;
-            border: none;
-            cursor: pointer;
-            position: absolute;
-            top: 2px;
-            right: 2px;
         }
 
         .vertical-line {
@@ -224,7 +215,8 @@
         }
 
         input[type="text"],
-        input[type="date"] {
+        input[type="date"],
+        input[type="time"] {
             width: calc(100% - 10px);
             padding: 5px;
             margin: 5px 0;
@@ -233,16 +225,15 @@
             box-sizing: border-box;
         }
 
-        .time-input {
+        .time-input-wrapper {
             display: flex;
             align-items: center;
-            gap: 5px;
         }
 
-        input[type="number"] {
-            width: 60px;
+        .time-input-wrapper input[type="number"] {
+            width: calc(50% - 5px);
             padding: 5px;
-            margin: 5px 0;
+            margin: 5px 5px 5px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
             box-sizing: border-box;
@@ -297,12 +288,13 @@
             cursor: pointer;
             width: 16px;
             height: 16px;
-            position: absolute;
-            top: 2px;
-            right: 2px;
         }
+        
+        @media only screen and (max-width: 600px) {
+            .calendar-container {
+                padding: 5px;
+            }
 
-        @media (max-width: 600px) {
             .header {
                 padding: 5px;
             }
@@ -311,14 +303,13 @@
                 font-size: 16px;
             }
 
-            .nav-button {
-                padding: 3px 8px;
+            .nav-button, .add-button {
+                padding: 3px 7px;
                 font-size: 10px;
             }
 
-            .add-button {
-                font-size: 16px;
-                padding: 4px;
+            .time-scale {
+                font-size: 7px;
             }
 
             .total-hours {
@@ -328,14 +319,15 @@
 
             .modal-content {
                 width: 90%;
-                padding: 10px;
+                max-width: 260px;
             }
 
-            .close {
-                font-size: 24px;
+            input[type="text"], input[type="date"], input[type="number"], button[type="submit"] {
+                padding: 7px;
+                margin: 3px 0;
             }
 
-            label, input, button[type="submit"] {
+            button[type="submit"] {
                 font-size: 14px;
             }
         }
@@ -373,16 +365,10 @@
             <input type="text" id="addJobName" name="addJobName" maxlength="4" required>
             <label for="addJobDate">日期</label>
             <input type="date" id="addJobDate" name="addJobDate" required>
-            <div class="time-input">
-                <label for="addStartTime">開始時間</label>
-                <input type="number" id="addStartHour" name="addStartHour" min="0" max="23" placeholder="HH" required>
-                <input type="number" id="addStartMinute" name="addStartMinute" min="0" max="50" step="10" placeholder="MM" required>
-            </div>
-            <div class="time-input">
-                <label for="addEndTime">結束時間</label>
-                <input type="number" id="addEndHour" name="addEndHour" min="0" max="23" placeholder="HH" required>
-                <input type="number" id="addEndMinute" name="addEndMinute" min="0" max="50" step="10" placeholder="MM" required>
-            </div>
+            <label for="addStartTime">開始時間</label>
+            <input type="time" id="addStartTime" name="addStartTime" required step="600">
+            <label for="addEndTime">結束時間</label>
+            <input type="time" id="addEndTime" name="addEndTime" required step="600">
             <button type="submit">保存</button>
         </form>
     </div>
@@ -398,15 +384,15 @@
             <input type="text" id="editJobName" name="editJobName" maxlength="4" required>
             <label for="editJobDate">日期</label>
             <input type="date" id="editJobDate" name="editJobDate" required>
-            <div class="time-input">
-                <label for="editStartTime">開始時間</label>
-                <input type="number" id="editStartHour" name="editStartHour" min="0" max="23" placeholder="HH" required>
-                <input type="number" id="editStartMinute" name="editStartMinute" min="0" max="50" step="10" placeholder="MM" required>
+            <label for="editStartTime">開始時間</label>
+            <div class="time-input-wrapper">
+                <input type="number" id="editStartHour" name="editStartHour" min="0" max="23" required> :
+                <input type="number" id="editStartMinute" name="editStartMinute" step="10" min="0" max="50" required>
             </div>
-            <div class="time-input">
-                <label for="editEndTime">結束時間</label>
-                <input type="number" id="editEndHour" name="editEndHour" min="0" max="23" placeholder="HH" required>
-                <input type="number" id="editEndMinute" name="editEndMinute" min="0" max="50" step="10" placeholder="MM" required>
+            <label for="editEndTime">結束時間</label>
+            <div class="time-input-wrapper">
+                <input type="number" id="editEndHour" name="editEndHour" min="0" max="23" required> :
+                <input type="number" id="editEndMinute" name="editEndMinute" step="10" min="0" max="50" required>
             </div>
             <button type="submit">保存</button>
         </form>
@@ -510,10 +496,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 scheduleItem.style.top = `${topPosition}px`;
                 scheduleItem.style.height = `${height}px`;
                 scheduleItem.style.backgroundColor = color;
-                scheduleItem.innerHTML = `
-                    🐰<br>${jobName}<br>${formatTime(start)}<br><span class="vertical-line"></span><br>${formatTime(end)}
-                    <button class="delete-btn" onclick="deleteSchedule('${dateKey}')"></button>
-                `;
+                scheduleItem.innerHTML = `🐰<br>${jobName}<br>${formatTime(start)}<br><span class="vertical-line"></span><br>${formatTime(end)}`;
 
                 const content = dayContents[dayIndex];
                 content.appendChild(scheduleItem);
@@ -570,12 +553,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
         currentEditKey = dateKey;
         document.getElementById('editJobName').value = jobName;
         document.getElementById('editJobDate').value = dateKey;
-        const [editStartHour, editStartMinute] = start.split(':');
-        document.getElementById('editStartHour').value = editStartHour;
-        document.getElementById('editStartMinute').value = editStartMinute;
-        const [editEndHour, editEndMinute] = end.split(':');
-        document.getElementById('editEndHour').value = editEndHour;
-        document.getElementById('editEndMinute').value = editEndMinute;
+        document.getElementById('editStartHour').value = parseTime(start).getHours();
+        document.getElementById('editStartMinute').value = parseTime(start).getMinutes().toString().padStart(2, '0');
+        document.getElementById('editEndHour').value = parseTime(end).getHours();
+        document.getElementById('editEndMinute').value = parseTime(end).getMinutes().toString().padStart(2, '0');
         modalEdit.style.display = 'block';
     }
 
@@ -594,8 +575,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
     function saveAddSchedule() {
         const jobName = document.getElementById('addJobName').value;
         const jobDate = document.getElementById('addJobDate').value;
-        const startTime = `${document.getElementById('addStartHour').value.padStart(2, '0')}:${document.getElementById('addStartMinute').value.padStart(2, '0')}`;
-        const endTime = `${document.getElementById('addEndHour').value.padStart(2, '0')}:${document.getElementById('addEndMinute').value.padStart(2, '0')}`;
+        const startTime = document.getElementById('addStartTime').value;
+        const endTime = document.getElementById('addEndTime').value;
         const color = generateColor(jobName);
 
         schedules[jobDate] = { jobName, start: startTime, end: endTime, color };
@@ -612,8 +593,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
     function saveEditSchedule() {
         const jobName = document.getElementById('editJobName').value;
         const jobDate = document.getElementById('editJobDate').value;
-        const startTime = `${document.getElementById('editStartHour').value.padStart(2, '0')}:${document.getElementById('editStartMinute').value.padStart(2, '0')}`;
-        const endTime = `${document.getElementById('editEndHour').value.padStart(2, '0')}:${document.getElementById('editEndMinute').value.padStart(2, '0')}`;
+        const startTime = document.getElementById('editStartHour').value.padStart(2, '0') + ':' + document.getElementById('editStartMinute').value.padStart(2, '0');
+        const endTime = document.getElementById('editEndHour').value.padStart(2, '0') + ':' + document.getElementById('editEndMinute').value.padStart(2, '0');
         const color = generateColor(jobName);
 
         delete schedules[currentEditKey];
@@ -746,13 +727,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
         });
     }
 
-    generateWeekGrid();
-    updateDates();
-    updateSchedule();
-    updateTotalHours();
-    updateTimeScale(); // 初始化時間刻度
-    autocomplete(jobNameInputAdd, jobNames);
-    autocomplete(jobNameInputEdit, jobNames);
+generateWeekGrid();
+updateDates();
+updateSchedule();
+updateTotalHours();
+updateTimeScale(); // 初始化時間刻度
+autocomplete(jobNameInputAdd, jobNames);
+autocomplete(jobNameInputEdit, jobNames);
 });
 </script>
 </body>
