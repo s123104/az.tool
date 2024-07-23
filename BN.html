@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幣安群友紅包抽獎活動</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #51ccc8;
+            --secondary-color: #2c3e50;
+            --background-color: #f9f9f9;
+            --container-background: #ffffff;
+            --text-color: #333333;
+            --accent-color: #3498db;
+            --highlight-color: #ffb917;
+        }
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            margin: 0;
+        }
+        .wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: var(--secondary-color);
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        h1 i {
+            color: var(--primary-color);
+            margin-right: 10px;
+        }
+        h2::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background: var(--accent-color);
+            margin: 10px auto 0;
+        }
+        .container {
+            background-color: var(--container-background);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 10px;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .result-list, .history-list {
+            margin-top: 20px;
+        }
+        .result-item, .history-item {
+            background-color: #ecf0f1;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+        .result-item::before {
+            content: '🎉';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .result-item::after {
+            content: '🎉';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .history-item {
+            color: red;
+        }
+        .instructions {
+            background-color: #e8f6f3;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .instructions ol {
+            padding-left: 20px;
+        }
+        .instructions li {
+            padding: 3px 0px;
+        }
+        .instructions li span {
+            background-color: var(--highlight-color);
+            padding: 2px 10px;
+            margin: 0px 4px;
+            border-radius: 15px;
+            color: white;
+        }
+        .bitget-link {
+            text-align: center;
+            margin-top: 20px;
+            background-color: #f0f8ff;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .bitget-link a {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        .bitget-link a:hover {
+            background-color: #5ab6b3;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .official-link {
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        @media (max-width: 600px) {
+            .wrapper {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+        }
+        @keyframes firework {
+            0% { transform: translate(var(--x), var(--initialY)); width: var(--initialSize); opacity: 1; }
+            50% { width: 0.5vmin; opacity: 1; }
+            100% { width: var(--finalSize); opacity: 0; }
+        }
+        .firework,
+        .firework::before,
+        .firework::after {
+            --initialSize: 0.5vmin;
+            --finalSize: 45vmin;
+            --particleSize: 0.2vmin;
+            --color1: yellow;
+            --color2: khaki;
+            --color3: white;
+            --color4: lime;
+            --color5: gold;
+            --color6: mediumseagreen;
+            --y: -30vmin;
+            --x: -50%;
+            --initialY: 60vmin;
+            content: "";
+            animation: firework 2s infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, var(--y));
+            width: var(--initialSize);
+            aspect-ratio: 1;
+            background: 
+                radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 50% 0%,
+                radial-gradient(circle, var(--color2) var(--particleSize), #0000 0) 100% 50%,
+                radial-gradient(circle, var(--color3) var(--particleSize), #0000 0) 50% 100%,
+                radial-gradient(circle, var(--color4) var(--particleSize), #0000 0) 0% 50%,
+                radial-gradient(circle, var(--color5) var(--particleSize), #0000 0) 80% 90%,
+                radial-gradient(circle, var(--color6) var(--particleSize), #0000 0) 95% 90%,
+                radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 90% 70%,
+                radial-gradient(circle, var(--color2) var (--particleSize), #0000 0) 100% 60%,
+                radial-gradient(circle, var(--color3) var (--particleSize), #0000 0) 20% 30%,
+                radial-gradient(circle, var(--color4) var (--particleSize), #0000 0) 0% 100%,
+                radial-gradient(circle, var (--color5) var (--particleSize), #0000 0) 70% 10%;
+            background-size: var(--initialSize) var(--initialSize);
+            background-repeat: no-repeat;
+        }
+        .firework::before {
+            --x: -50%;
+            --y: -50%;
+            --initialY: -50%;
+        }
+        .firework::after {
+            --x: -50%;
+            --y: -50%;
+            --initialY: -50%;
+        }
+        #fireworksContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .custom-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: none;
+            text-align: center;
+        }
+        .custom-alert button {
+            width: auto;
+            padding: 5px 10px;
+            margin: 0 auto;
+        }
+        .uid-count {
+            display: inline-block;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            text-align: center;
+            line-height: 24px;
+            margin-left: 10px;
+        }
+        .copy-button {
+            background-color: #2ecc71;
+            margin-left: 10px;
+        }
+        .copied {
+            background-color: #18255a;
+        }
+        .json-update-time {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+        .history-container {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--container-background);
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            z-index: 1001;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .history-container.active {
+            display: block;
+        }
+        .history-item{
+            border-radius: 8px;
+            padding: 10px 100px;
+            margin-bottom: 5px;
+        }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .history-close {
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            text-align: center;
+            font-size: 18px;
+        }
+        .pagination-controls button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 5px 5px;
+            margin: 2.5px 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .pagination-controls button:hover {
+            background-color: #5ab6b3;
+        }
+    </style>
+</head>
+<body>
+    <div id="fireworksContainer"></div>
+    <div class="wrapper">
+        <h1><i class="fas fa-gift"></i>幣安群友紅包抽獎活動</h1>
+        
+        <div class="container">
+            <h2>輸入幣安UID進入群友紅包池</h2>
+            <button onclick="window.open('https://docs.google.com/spreadsheets/d/1VTQTI0x4ZXZg_sTLcZ3Ec74TJ_B8EugsTtm4uzBvJw4/edit?usp=sharing', '_blank')">前往Google Sheet</button>
+        </div>
+        
+        <div class="container">
+            <h2>抽獎 <span id="uidCount" class="uid-count">0</span></h2>
+            <button onclick="drawUIDs()">抽取幸運UID</button>
+            <div id="resultList" class="result-list"></div>
+            <div id="jsonUpdateTime" class="json-update-time"></div>
+        </div>
+
+        <div class="container">
+            <h2>歷史記錄 <span id="historyCount" class="uid-count">0</span></h2>
+            <button onclick="toggleHistory()">查看歷史記錄</button>
+        </div>
+
+        <div class="instructions container">
+            <h2>幣安活動指導</h2>
+            <ol>
+                <li>主頁點選<span>更多</span></li>
+                <li>點選<span>支付</span></li>
+                <li>點選<span>發送活動</span></li>
+                <li>點選<span>給好友</span></li>
+                <li>輸入抽到的<span>群友幣安UID</span></li>
+                <li>點選<span>轉帳</span>0.001USDT抽獎 (每天能發10次)</li>
+            </ol>
+        </div>
+        
+        <div class="bitget-link container">
+            <h2>Bitget TG Bot 集氣輪盤活動</h2>
+            <p>幫助我集滿30幾個人，如果獲得100USDT將會抽50U給進入該頁面的UID用戶</p>
+            <p>活動發起人：@azmusk</p>
+            <p>活動時間：截止至7/26 晚上23:59</p>
+            <a href="https://t.me/BitgetOfficialBot/Bitget?startapp=mWeAIuEdeetcKyNdd9BZlkiAjkJTiuuX7rorgSzjPqNMK3bY3n0JPV1r20j" target="_blank">點擊參與Bitget活動</a>
+            <p class="official-link">
+                官方推特: <a href="https://x.com/bitgetglobal/status/1812683322319155485?s=46" target="_blank">查看活動詳情</a>
+            </p>
+            <p>請記得綁定您的Bitget帳號！</p>
+        </div>
+    </div>
+
+    <div id="customAlert" class="custom-alert">
+        <div class="custom-alert-content"></div>
+        <button onclick="closeCustomAlert()">確定</button>
+    </div>
+
+    <div id="historyContainer" class="history-container">
+        <div class="history-header">
+            <h3>歷史記錄</h3>
+            <button class="history-close" onclick="toggleHistory()">×</button>
+        </div>
+        <div id="historyList" class="history-list"></div>
+        <div id="paginationControls" class="pagination-controls"></div>
+    </div>
+
+    <script>
+    let uids = [];
+    let drawnUIDs = [];
+    let currentPage = 1;
+    const itemsPerPage = 5;
+
+    // 從 JSON 文件載入 UID
+    async function loadUIDs() {
+        try {
+            const response = await fetch('uids.json');
+            const data = await response.json();
+            uids = data.uids;
+            updateUIDCount();
+            document.getElementById('jsonUpdateTime').textContent = `JSON 更新時間：${new Date(data.lastUpdated).toLocaleString()}`;
+        } catch (error) {
+            console.error('載入 UID 失敗:', error);
+        }
+    }
+
+    // 從 cookie 載入已抽取的 UID
+    function loadDrawnUIDs() {
+        let cookie = document.cookie.split('; ').find(row => row.startsWith('drawnUIDs='));
+        if (cookie) {
+            drawnUIDs = JSON.parse(cookie.split('=')[1]);
+            updateHistory(drawnUIDs);
+        }
+    }
+
+    // 保存已抽取的 UID 到 cookie
+    function saveDrawnUIDs() {
+        document.cookie = `drawnUIDs=${JSON.stringify(drawnUIDs)}; expires=${new Date(Date.now() + 86400000).toUTCString()}; path=/`;
+    }
+
+    function drawUIDs() {
+        let availableUIDs = uids.filter(uid => !drawnUIDs.includes(uid));
+        let drawCount = Math.min(10, availableUIDs.length);
+        if (drawCount === 0) {
+            showCustomAlert('沒有可抽取的UID。');
+            return;
+        }
+
+        let drawn = [];
+        for (let i = 0; i < drawCount; i++) {
+            let index = Math.floor(Math.random() * availableUIDs.length);
+            drawn.push(availableUIDs[index]);
+            availableUIDs.splice(index, 1);
+        }
+
+        displayResults(drawn);
+        drawnUIDs = drawnUIDs.concat(drawn);
+        updateHistory(drawnUIDs);
+        updateUIDCount();
+        showFireworks();
+        saveDrawnUIDs();
+    }
+
+    function displayResults(results) {
+        let container = document.getElementById('resultList');
+        container.innerHTML = '';
+        results.forEach(uid => {
+            let item = document.createElement('div');
+            item.className = 'result-item';
+            item.textContent = uid;
+            let copyButton = document.createElement('button');
+            copyButton.textContent = '複製';
+            copyButton.className = 'copy-button';
+            copyButton.onclick = (event) => {
+                copyToClipboard(uid, event.target);
+            };
+            item.appendChild(copyButton);
+            container.appendChild(item);
+        });
+    }
+
+    function updateHistory(drawn) {
+        let container = document.getElementById('historyList');
+        container.innerHTML = '';
+        let uniqueDrawnUIDs = [...new Set(drawn)];
+        const totalPages = Math.ceil(uniqueDrawnUIDs.length / itemsPerPage);
+
+        displayPage(container, uniqueDrawnUIDs, currentPage);
+
+        document.getElementById('historyCount').textContent = uniqueDrawnUIDs.length;
+        setupPagination(totalPages);
+    }
+
+    function displayPage(container, uids, page) {
+        container.innerHTML = '';
+        const start = (page - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const pageUids = uids.slice(start, end);
+
+        pageUids.forEach(uid => {
+            let item = document.createElement('div');
+            item.className = 'history-item';
+            item.textContent = uid;
+            container.appendChild(item);
+        });
+    }
+
+    function setupPagination(totalPages) {
+        let paginationControls = document.getElementById('paginationControls');
+        paginationControls.innerHTML = '';
+
+        for (let i = 1; i <= totalPages; i++) {
+            let pageButton = document.createElement('button');
+            pageButton.textContent = i;
+            pageButton.onclick = () => changePage(i);
+            paginationControls.appendChild(pageButton);
+        }
+    }
+
+    function changePage(page) {
+        currentPage = page;
+        updateHistory(drawnUIDs);
+    }
+
+    function updateUIDCount() {
+        let availableUIDsCount = uids.filter(uid => !drawnUIDs.includes(uid)).length;
+        document.getElementById('uidCount').textContent = availableUIDsCount;
+    }
+
+    function showCustomAlert(message) {
+        let alert = document.getElementById('customAlert');
+        alert.querySelector('.custom-alert-content').textContent = message;
+        alert.style.display = 'block';
+    }
+
+    function closeCustomAlert() {
+        document.getElementById('customAlert').style.display = 'none';
+    }
+
+    function copyToClipboard(text, button) {
+        navigator.clipboard.writeText(text).then(() => {
+            button.classList.add('copied');
+            button.textContent = '已複製';
+        }, () => {
+            showCustomAlert('複製失敗');
+        });
+    }
+
+    function toggleHistory() {
+        let historyContainer = document.getElementById('historyContainer');
+        historyContainer.classList.toggle('active');
+    }
+
+    // 載入頁面時執行
+    loadUIDs();
+    loadDrawnUIDs();
+
+    function showFireworks() {
+        const fireworksContainer = document.getElementById('fireworksContainer');
+        for (let i = 0; i < 5; i++) {
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            firework.style.setProperty('--x', `${Math.random() * 100}%`);
+            firework.style.setProperty('--y', `${Math.random() * 100}%`);
+            fireworksContainer.appendChild(firework);
+        }
+        setTimeout(() => {
+            fireworksContainer.innerHTML = '';
+        }, 2000);
+    }
+    </script>
+</body>
+</html>
