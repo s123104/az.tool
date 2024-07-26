@@ -8,13 +8,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
-            --primary-color: #51ccc8;
+            --primary-color: #ffae00;
             --secondary-color: #2c3e50;
             --background-color: #f9f9f9;
             --container-background: #ffffff;
             --text-color: #333333;
+            --accent-color_w: #c4dae8;
             --accent-color: #3498db;
-            --highlight-color: #ffb917;
+            --accent-color_b: #14579f;
+            --highlight-color: #ffb648;
         }
         body {
             font-family: 'Noto Sans TC', sans-serif;
@@ -46,6 +48,9 @@
             background: var(--accent-color);
             margin: 10px auto 0;
         }
+        #top::after {
+            background: var(--highlight-color);
+        }
         .container {
             background-color: var(--container-background);
             border-radius: 8px;
@@ -70,6 +75,12 @@
             background-color: #2980b9;
             transform: translateY(-2px);
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .active-user {
+            background-color: var(--accent-color_b) !important;
+        }
+        .btn1{
+            background-color: var(--accent-color_w) 
         }
         .result-list, .history-list {
             margin-top: 20px;
@@ -102,7 +113,7 @@
             color: red;
         }
         .instructions {
-            background-color: #e8f6f3;
+            background-color: #fff3b6;
             padding: 15px;
             border-radius: 4px;
             margin-top: 20px;
@@ -311,26 +322,50 @@
         .pagination-controls button:hover {
             background-color: #5ab6b3;
         }
+        .user-selector {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .user-selector button {
+            width: auto;
+            margin: 5px;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .user-selector button.active-user {
+            background-color: var(--accent-color_b);
+        }
     </style>
 </head>
 <body>
     <div id="fireworksContainer"></div>
     <div class="wrapper">
         <h1><i class="fas fa-gift"></i>幣安群友紅包抽獎活動</h1>
-
+    
         <div class="instructions container">
-            <h2>幣安活動指導</h2>
+            <h2 id="top">幣安活動指導</h2>
             <ol>
                 <li>主頁點選<span>更多</span></li>
                 <li>點選<span>支付</span></li>
                 <li>點選<span>發送活動</span></li>
                 <li>點選<span>給好友</span></li>
                 <li>輸入抽到的<span>群友幣安UID</span></li>
-                <li>點選<span>轉帳</span>0.001USDT抽獎 (每天能發10次)</li>
+                <li>點選<span>轉帳</span>0.001USDT抽獎 (每天能發5次)</li>
             </ol>
         </div>    
         <div class="container">
             <h2>抽獎 <span id="uidCount" class="uid-count">0</span></h2>
+
+            <div class="user-selector">
+                <button id="user1" class="btn1" onclick="changeUser(1)">用戶1</button>
+                <button id="user2" class="btn1" onclick="changeUser(2)">用戶2</button>
+                <button id="user3" class="btn1" onclick="changeUser(3)">用戶3</button>
+            </div>
+    
             <button onclick="drawUIDs()">抽取幸運UID</button>
             <div id="resultList" class="result-list"></div>
             <div id="jsonUpdateTime" class="json-update-time"></div>
@@ -341,14 +376,10 @@
             <button onclick="window.open('https://docs.google.com/spreadsheets/d/1VTQTI0x4ZXZg_sTLcZ3Ec74TJ_B8EugsTtm4uzBvJw4/edit?usp=sharing', '_blank')">前往Google Sheet</button>
         </div>
         
-       
         <div class="container">
             <h2>歷史記錄 <span id="historyCount" class="uid-count">0</span></h2>
             <button onclick="toggleHistory()">查看歷史記錄</button>
         </div>
-        
-
-
     </div>
 
     <div id="customAlert" class="custom-alert">
@@ -368,10 +399,15 @@
     <script>
     let uids = [];
     let drawnUIDs = [];
+    let currentUser = 1;
     let currentPage = 1;
     const itemsPerPage = 5;
 
-    // 從 JSON 文件載入 UID
+    document.addEventListener('DOMContentLoaded', () => {
+        loadUIDs();
+        changeUser(1); // 預設選擇使用者 1
+    });
+
     async function loadUIDs() {
         try {
             const response = await fetch('uids.json');
@@ -384,18 +420,19 @@
         }
     }
 
-    // 從 cookie 載入已抽取的 UID
     function loadDrawnUIDs() {
-        let cookie = document.cookie.split('; ').find(row => row.startsWith('drawnUIDs='));
+        let cookie = document.cookie.split('; ').find(row => row.startsWith(`drawnUIDs_user${currentUser}=`));
         if (cookie) {
             drawnUIDs = JSON.parse(cookie.split('=')[1]);
-            updateHistory(drawnUIDs);
+        } else {
+            drawnUIDs = [];
         }
+        updateHistory(drawnUIDs);
+        updateUIDCount();
     }
 
-    // 保存已抽取的 UID 到 cookie
     function saveDrawnUIDs() {
-        document.cookie = `drawnUIDs=${JSON.stringify(drawnUIDs)}; expires=${new Date(Date.now() + 86400000).toUTCString()}; path=/`;
+        document.cookie = `drawnUIDs_user${currentUser}=${JSON.stringify(drawnUIDs)}; expires=${new Date(Date.now() + 86400000).toUTCString()}; path=/`;
     }
 
     function drawUIDs() {
@@ -414,11 +451,8 @@
         }
 
         displayResults(drawn);
-        drawnUIDs = drawnUIDs.concat(drawn);
-        updateHistory(drawnUIDs);
         updateUIDCount();
         showFireworks();
-        saveDrawnUIDs();
     }
 
     function displayResults(results) {
@@ -501,6 +535,10 @@
         navigator.clipboard.writeText(text).then(() => {
             button.classList.add('copied');
             button.textContent = '已複製';
+            drawnUIDs.push(text);
+            updateHistory(drawnUIDs);
+            saveDrawnUIDs();
+            updateUIDCount(); // 更新抽獎次數
         }, () => {
             showCustomAlert('複製失敗');
         });
@@ -511,9 +549,24 @@
         historyContainer.classList.toggle('active');
     }
 
-    // 載入頁面時執行
-    loadUIDs();
-    loadDrawnUIDs();
+    function changeUser(user) {
+        currentUser = user;
+        setActiveUserButton();
+        loadDrawnUIDs();
+        clearResults();
+    }
+
+    function setActiveUserButton() {
+        document.querySelectorAll('.user-selector button').forEach(button => {
+            button.classList.remove('active-user');
+        });
+        document.getElementById(`user${currentUser}`).classList.add('active-user');
+    }
+
+    function clearResults() {
+        let container = document.getElementById('resultList');
+        container.innerHTML = '';
+    }
 
     function showFireworks() {
         const fireworksContainer = document.getElementById('fireworksContainer');
