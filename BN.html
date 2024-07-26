@@ -238,12 +238,13 @@
             display: inline-block;
             background-color: #e74c3c;
             color: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            border-radius: 10px;
+            width: 48px;
+            height: 20px;
             text-align: center;
             line-height: 24px;
             margin-left: 10px;
+            font-size: 0.6em;
         }
         .copy-button {
             background-color: #2ecc71;
@@ -292,11 +293,10 @@
             background-color: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            border-radius: 20px;
+            width: 10px;
             text-align: center;
-            font-size: 18px;
+            font-size: 15px;
         }
         .pagination-controls button {
             background-color: var(--primary-color);
@@ -317,23 +317,6 @@
     <div id="fireworksContainer"></div>
     <div class="wrapper">
         <h1><i class="fas fa-gift"></i>幣安群友紅包抽獎活動</h1>
-        
-        <div class="container">
-            <h2>輸入幣安UID進入群友紅包池</h2>
-            <button onclick="window.open('https://docs.google.com/spreadsheets/d/1VTQTI0x4ZXZg_sTLcZ3Ec74TJ_B8EugsTtm4uzBvJw4/edit?usp=sharing', '_blank')">前往Google Sheet</button>
-        </div>
-        
-        <div class="container">
-            <h2>抽獎 <span id="uidCount" class="uid-count">0</span></h2>
-            <button onclick="drawUIDs()">抽取幸運UID</button>
-            <div id="resultList" class="result-list"></div>
-            <div id="jsonUpdateTime" class="json-update-time"></div>
-        </div>
-
-        <div class="container">
-            <h2>歷史記錄 <span id="historyCount" class="uid-count">0</span></h2>
-            <button onclick="toggleHistory()">查看歷史記錄</button>
-        </div>
 
         <div class="instructions container">
             <h2>幣安活動指導</h2>
@@ -345,19 +328,27 @@
                 <li>輸入抽到的<span>群友幣安UID</span></li>
                 <li>點選<span>轉帳</span>0.001USDT抽獎 (每天能發10次)</li>
             </ol>
+        </div>    
+        <div class="container">
+            <h2>抽獎 <span id="uidCount" class="uid-count">0</span></h2>
+            <button onclick="drawUIDs()">抽取幸運UID</button>
+            <div id="resultList" class="result-list"></div>
+            <div id="jsonUpdateTime" class="json-update-time"></div>
+        </div>
+
+        <div class="container">
+            <h2>輸入幣安UID進入群友紅包池</h2>
+            <button onclick="window.open('https://docs.google.com/spreadsheets/d/1VTQTI0x4ZXZg_sTLcZ3Ec74TJ_B8EugsTtm4uzBvJw4/edit?usp=sharing', '_blank')">前往Google Sheet</button>
         </div>
         
-        <div class="bitget-link container">
-            <h2>Bitget TG Bot 集氣輪盤活動</h2>
-            <p>幫助我集滿30幾個人，如果獲得100USDT將會抽50U給進入該頁面的UID用戶</p>
-            <p>活動發起人：@azmusk</p>
-            <p>活動時間：截止至7/26 晚上23:59</p>
-            <a href="https://t.me/BitgetOfficialBot/Bitget?startapp=mWeAIuEdeetcKyNdd9BZlkiAjkJTiuuX7rorgSzjPqNMK3bY3n0JPV1r20j" target="_blank">點擊參與Bitget活動</a>
-            <p class="official-link">
-                官方推特: <a href="https://x.com/bitgetglobal/status/1812683322319155485?s=46" target="_blank">查看活動詳情</a>
-            </p>
-            <p>請記得綁定您的Bitget帳號！</p>
+       
+        <div class="container">
+            <h2>歷史記錄 <span id="historyCount" class="uid-count">0</span></h2>
+            <button onclick="toggleHistory()">查看歷史記錄</button>
         </div>
+        
+
+
     </div>
 
     <div id="customAlert" class="custom-alert">
