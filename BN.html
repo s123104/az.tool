@@ -409,7 +409,7 @@
 
     function drawUIDs() {
         let availableUIDs = uids.filter(uid => !drawnUIDs.includes(uid));
-        let drawCount = Math.min(10, availableUIDs.length);
+        let drawCount = Math.min(5, availableUIDs.length);
         if (drawCount === 0) {
             showCustomAlert('沒有可抽取的UID。');
             return;
