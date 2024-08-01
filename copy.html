@@ -1,20 +1,27 @@
 <!DOCTYPE html>
-<html lang="zh-tw">
+<html lang="zh-Hant">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="https://app.galxe.com/quest/MapleStoryUniverse/GCgfPtkjHm" />
     <title>楓之谷銀河答題懶人包</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
       :root {
         --primary-color: #2c3e50;
         --secondary-color: #3498db;
+        --accent-color: #e74c3c;
         --background-color: #ecf0f1;
         --card-background: white;
         --shadow-color: rgba(0, 0, 0, 0.1);
         --success-color: #2ecc71;
-        --link-color: #e74c3c;
+        --button-hover: #2980b9;
+        --unreleased-color: #95a5a6;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
       }
 
       body {
@@ -28,10 +35,10 @@
       }
 
       .container {
-        max-width: 1000px;
+        max-width: 1200px;
         margin: 0 auto;
         background-color: var(--card-background);
-        padding: 30px;
+        padding: 40px;
         border-radius: 20px;
         box-shadow: 0 15px 30px var(--shadow-color);
       }
@@ -44,10 +51,9 @@
       }
 
       .section {
-        background-color: #e8f4fd;
-        border: 2px solid var(--secondary-color);
+        background-color: #f8f9fa;
         border-radius: 15px;
-        padding: 20px;
+        padding: 30px;
         margin-bottom: 40px;
         text-align: center;
         font-size: 1.1em;
@@ -57,17 +63,17 @@
       .quest-list {
         list-style-type: none;
         padding: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
       }
 
       .quest-item {
-        background-color: #f8f9fa;
-        border: 1px solid #e9ecef;
+        background-color: #fff;
         border-radius: 15px;
         padding: 25px;
-        margin-bottom: 25px;
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        flex-direction: column;
         transition: all 0.3s ease;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
       }
@@ -79,224 +85,323 @@
 
       .quest-item .question {
         color: var(--primary-color);
-        flex: 1;
         font-weight: bold;
+        margin-bottom: 10px;
       }
 
       .quest-item .answer {
-        flex: 1;
-        text-align: right;
         color: var(--secondary-color);
+        margin-bottom: 15px;
+        flex-grow: 1;
       }
 
-      .copy-btn {
+      .btn {
         background-color: var(--secondary-color);
         color: white;
         border: none;
-        padding: 10px 20px;
+        padding: 12px 20px;
         border-radius: 25px;
         cursor: pointer;
-        transition: all 0.3s ease;
-        margin-left: 15px;
+        transition: all 0.2s ease;
         font-size: 0.9em;
         font-weight: bold;
         text-transform: uppercase;
+        align-self: center;
+        position: relative;
+        overflow: hidden;
+        margin: 5px;
       }
 
-      .copy-btn:hover {
-        background-color: #2980b9;
+      .btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          120deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
+        transition: all 0.4s;
+      }
+
+      .btn:hover::before {
+        left: 100%;
+      }
+
+      .btn:hover {
+        background-color: var(--button-hover);
         transform: translateY(-2px);
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
       }
 
       .incomplete {
-        color: #e74c3c;
+        color: var(--unreleased-color);
         font-style: italic;
       }
 
       .link {
-        color: var(--link-color);
+        color: var(--accent-color);
         text-decoration: none;
         font-weight: bold;
+        transition: color 0.3s ease;
+        cursor: pointer;
       }
 
       .link:hover {
+        color: #c0392b;
         text-decoration: underline;
       }
 
+      .unreleased {
+        background-color: var(--unreleased-color);
+        cursor: not-allowed;
+      }
+
+      .unreleased:hover {
+        background-color: var(--unreleased-color);
+        transform: none;
+        box-shadow: none;
+      }
+
+      .task-links {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+
+      .task-link {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .task-link:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .task-link a {
+        margin-bottom: 15px;
+        font-size: 1.1em;
+      }
+
+      .live-answers {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+
+      .live-answer {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .live-answer:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .live-answer strong {
+        display: block;
+        margin-bottom: 10px;
+        color: var(--primary-color);
+        font-size: 1.1em;
+      }
+
+      .live-answer span {
+        font-size: 1.2em;
+        color: var(--secondary-color);
+        margin-bottom: 15px;
+      }
+
       @media (max-width: 768px) {
+        body {
+          padding: 10px;
+          font-size: 14px;
+        }
+
+        .container {
+          padding: 20px;
+        }
+
+        .section {
+          padding: 20px;
+        }
+
         .quest-item {
-          flex-direction: column;
-          align-items: flex-start;
+          padding: 20px;
+        }
+
+        .btn {
+          padding: 10px 15px;
+          font-size: 0.8em;
+        }
+
+        h1 {
+          font-size: 1.8em;
+        }
+
+        h2 {
+          font-size: 1.5em;
+        }
+
+        .quest-item .question {
+          font-size: 0.9em;
         }
 
         .quest-item .answer {
-          text-align: left;
-          margin-top: 15px;
-        }
-
-        .copy-btn {
-          margin-left: 0;
-          margin-top: 15px;
+          font-size: 0.9em;
         }
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1>楓之谷銀河答題懶人包</h1>
+      <h1>楓之谷答題懶人包</h1>
 
       <div class="section">
         <h2>任務連結</h2>
-        <p>
-          <strong>直播、社交任務與收藏：</strong>
-          <a
-            href="https://app.galxe.com/quest/MapleStoryUniverse/GC1pPtk1MN"
-            class="link"
-            target="_blank"
-            >https://app.galxe.com/quest/MapleStoryUniverse/GC1pPtk1MN</a
-          >
-          <button
-            class="copy-btn"
-            data-answer="https://app.galxe.com/quest/MapleStoryUniverse/GC1pPtk1MN"
-          >
-            複製連結
-          </button>
-        </p>
-        <p>
-          <strong>QA問答：</strong>
-          <a
-            href="https://app.galxe.com/quest/MapleStoryUniverse/GCgfPtkjHm"
-            class="link"
-            target="_blank"
-            >https://app.galxe.com/quest/MapleStoryUniverse/GCgfPtkjHm</a
-          >
-          <button
-            class="copy-btn"
-            data-answer="https://app.galxe.com/quest/MapleStoryUniverse/GCgfPtkjHm"
-          >
-            複製連結
-          </button>
-        </p>
+        <div class="task-links">
+          <div class="task-link">
+            <a
+              href="https://app.galxe.com/quest/MapleStoryUniverse/GC1pPtk1MN"
+              class="link"
+              target="_blank"
+              >直播、社交任務與收藏</a
+            >
+            <button
+              class="btn"
+              data-answer="https://app.galxe.com/quest/MapleStoryUniverse/GC1pPtk1MN"
+            >
+              複製連結
+            </button>
+          </div>
+          <div class="task-link">
+            <a
+              href="https://app.galxe.com/quest/MapleStoryUniverse/GCgfPtkjHm"
+              class="link"
+              target="_blank"
+              >QA問答</a
+            >
+            <button
+              class="btn"
+              data-answer="https://app.galxe.com/quest/MapleStoryUniverse/GCgfPtkjHm"
+            >
+              複製連結
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="section">
-        <h2>直播答案(限時一天)</h2>
-        <p>
-          <strong>Round 11：</strong>
-          ♧Lith Harbor♣
-          <button class="copy-btn" data-answer="♧Lith Harbor♣">複製</button>
-        </p>
-        <p>
-          <strong>Round 12：</strong>
-          ▷Yeti & pepe◁
-          <button class="copy-btn" data-answer="▷Yeti & pepe◁">複製</button>
-        </p>
+        <h2>直播答案</h2>
+        <div class="live-answers">
+          <div class="live-answer">
+            <strong>Round 11：</strong>
+            <span>♧Lith Harbor♣</span>
+            <button class="btn" data-answer="♧Lith Harbor♣">複製</button>
+          </div>
+          <div class="live-answer">
+            <strong>Round 12：</strong>
+            <span>▷Yeti & pepe◁</span>
+            <button class="btn" data-answer="▷Yeti & pepe◁">複製</button>
+          </div>
+        </div>
       </div>
 
       <h2>任務成就與獎勵</h2>
       <ul class="quest-list">
         <li class="quest-item">
           <span class="question">Reach 200,000 Twitter Followers:</span>
-          <span class="answer"
-            >RIEN CACTUS
-            <button class="copy-btn" data-answer="RIEN CACTUS">
-              複製
-            </button></span
-          >
+          <span class="answer">RIEN CACTUS</span>
+          <button class="btn" data-answer="RIEN CACTUS">複製</button>
         </li>
         <li class="quest-item">
           <span class="question">Reach 210,000 Twitter Followers:</span>
-          <span class="answer incomplete"
-            >尚未達成
-            <button class="copy-btn" data-answer="" disabled>複製</button></span
-          >
+          <span class="answer incomplete">尚未公佈</span>
+          <button class="btn unreleased" data-answer="" disabled>
+            等待公佈
+          </button>
         </li>
         <li class="quest-item">
           <span class="question">Reach 5,000 YouTube Subscribers:</span>
-          <span class="answer"
-            >Maple
-            <button class="copy-btn" data-answer="Maple">複製</button></span
-          >
+          <span class="answer">Maple</span>
+          <button class="btn" data-answer="Maple">複製</button>
         </li>
         <li class="quest-item">
           <span class="question">Reach 4,000 Medium Followers:</span>
-          <span class="answer"
-            >PANTHEON ARCHER
-            <button class="copy-btn" data-answer="PANTHEON ARCHER">
-              複製
-            </button></span
-          >
+          <span class="answer">PANTHEON ARCHER</span>
+          <button class="btn" data-answer="PANTHEON ARCHER">複製</button>
         </li>
         <li class="quest-item">
           <span class="question">Reach 5,000 Medium Followers:</span>
-          <span class="answer incomplete"
-            >尚未達成
-            <button class="copy-btn" data-answer="" disabled>複製</button></span
-          >
+          <span class="answer incomplete">尚未公佈</span>
+          <button class="btn unreleased" data-answer="" disabled>
+            等待公佈
+          </button>
         </li>
         <li class="quest-item">
           <span class="question">Reach 6,000 NFTs Minted:</span>
-          <span class="answer"
-            >SOUTHPERRY RACOCO
-            <button class="copy-btn" data-answer="SOUTHPERRY RACOCO">
-              複製
-            </button></span
-          >
+          <span class="answer">SOUTHPERRY RACOCO</span>
+          <button class="btn" data-answer="SOUTHPERRY RACOCO">複製</button>
         </li>
         <li class="quest-item">
           <span class="question">Reach 15,000 NFTs Minted:</span>
-          <span class="answer"
-            >HELISEUM GO@LEM
-            <button class="copy-btn" data-answer="HELISEUM GO@LEM">
-              複製
-            </button></span
-          >
+          <span class="answer">HELISEUM GO@LEM</span>
+          <button class="btn" data-answer="HELISEUM GO@LEM">複製</button>
         </li>
         <li class="quest-item">
           <span class="question">Reach 1,000 Daily Quests Completed:</span>
-          <span class="answer"
-            >KERNING CITY ANGEL
-            <button class="copy-btn" data-answer="KERNING CITY ANGEL">
-              複製
-            </button></span
-          >
+          <span class="answer">KERNING CITY ANGEL</span>
+          <button class="btn" data-answer="KERNING CITY ANGEL">複製</button>
         </li>
         <li class="quest-item">
           <span class="question">Reach 3,000 Daily Quests Completed:</span>
-          <span class="answer incomplete"
-            >尚未達成
-            <button class="copy-btn" data-answer="" disabled>複製</button></span
-          >
+          <span class="answer incomplete">尚未公佈</span>
+          <button class="btn unreleased" data-answer="" disabled>
+            等待公佈
+          </button>
         </li>
         <li class="quest-item">
           <span class="question"
             >Reach 4,000 total levels for all characters:</span
           >
-          <span class="answer"
-            >AMHERST BALROG
-            <button class="copy-btn" data-answer="AMHERST BALROG">
-              複製
-            </button></span
-          >
+          <span class="answer">AMHERST BALROG</span>
+          <button class="btn" data-answer="AMHERST BALROG">複製</button>
         </li>
         <li class="quest-item">
           <span class="question"
             >Reach 15,000 total levels for all characters:</span
           >
-          <span class="answer"
-            >ORBIS// DEVIL//
-            <button class="copy-btn" data-answer="ORBIS// DEVIL//">
-              複製
-            </button></span
-          >
+          <span class="answer">ORBIS// DEVIL//</span>
+          <button class="btn" data-answer="ORBIS// DEVIL//">複製</button>
         </li>
       </ul>
     </div>
 
     <script>
       document.addEventListener("DOMContentLoaded", (event) => {
-        const copyButtons = document.querySelectorAll(".copy-btn");
+        const copyButtons = document.querySelectorAll(".btn:not(.unreleased)");
         copyButtons.forEach((button) => {
           button.addEventListener("click", () => {
             const answer = button.getAttribute("data-answer");
@@ -308,7 +413,7 @@
               setTimeout(() => {
                 button.textContent = originalText;
                 button.style.backgroundColor = originalColor;
-              }, 2000);
+              }, 1000);
             });
           });
         });
