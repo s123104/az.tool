@@ -1,215 +1,280 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>區塊鏈楓之谷銀河答題懶人包</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f0f2f5;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
 
-        .container {
-            max-width: 600px;
-            width: 100%;
-            margin: 20px;
-            padding: 20px;
-            background-color: #ffffff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
+      .container {
+        max-width: 600px;
+        width: 100%;
+        margin: 20px;
+        padding: 20px;
+        background-color: #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+      }
 
-        h1 {
-            text-align: center;
-            color: #333;
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
+      h1,
+      h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+      }
 
+      .links {
+        margin-bottom: 20px;
+      }
+
+      .link-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .link-item:last-child {
+        border-bottom: none;
+      }
+
+      .link-text {
+        color: #007bff;
+        text-decoration: none;
+        font-size: 16px;
+      }
+
+      .link-text:hover {
+        text-decoration: underline;
+      }
+
+      .copy-button {
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .copy-button:hover {
+        background-color: #0056b3;
+      }
+
+      .qa-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .qa-section:last-child {
+        border-bottom: none;
+      }
+
+      .question p,
+      .answer p {
+        margin: 0;
+        color: #555;
+        font-size: 16px;
+      }
+
+      button {
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      button:active {
+        transform: scale(0.98);
+      }
+
+      button.copied {
+        background-color: #28a745;
+      }
+
+      @media (max-width: 600px) {
         .qa-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .qa-section:last-child {
-            border-bottom: none;
-        }
-
-        .question p, .answer p {
-            margin: 0;
-            color: #555;
-            font-size: 16px;
+          flex-direction: column;
+          align-items: flex-start;
         }
 
         button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
+          margin-top: 10px;
         }
 
-        button:hover {
-            background-color: #0056b3;
+        .link-item {
+          flex-direction: column;
+          align-items: flex-start;
         }
 
-        button:active {
-            transform: scale(0.98);
+        .copy-button {
+          margin-top: 5px;
         }
-
-        button.copied {
-            background-color: #28a745;
-        }
-
-        @media (max-width: 600px) {
-            .qa-section {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            button {
-                margin-top: 10px;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h1>區塊鏈楓之谷銀河答題懶人包</h1>
-        <div class="qa-section">
-            <div class="question">
-                <p>Round 11 Coupon Code:</p>
-            </div>
-            <div class="answer">
-                <p>♧Lith Harbor♣</p>
-                <button onclick="copyToClipboard(this, '♧Lith Harbor♣')">複製</button>
-            </div>
+      <h1>區塊鏈楓之谷答題懶人包</h1>
+      <h2>任務連結</h2>
+      <div class="links">
+        <div class="link-item">
+          <a
+            href="https://app.galxe.com/quest/MapleStoryUniverse/GC1pPtk1MN"
+            class="link-text"
+            target="_blank"
+          >
+            任務連結（直播 社交任務與收藏）
+          </a>
+          <button
+            class="copy-button"
+            onclick="copyLink('https://app.galxe.com/quest/MapleStoryUniverse/GC1pPtk1MN', this)"
+          >
+            複製連結
+          </button>
         </div>
-        <div class="qa-section">
-            <div class="question">
-                <p>Reach 200,000 Twitter Followers:</p>
-            </div>
-            <div class="answer">
-                <p>RIEN CACTUS</p>
-                <button onclick="copyToClipboard(this, 'RIEN CACTUS')">複製</button>
-            </div>
+        <div class="link-item">
+          <a
+            href="https://app.galxe.com/quest/MapleStoryUniverse/GCgfPtkjHm"
+            class="link-text"
+            target="_blank"
+          >
+            任務連結（QA問答）
+          </a>
+          <button
+            class="copy-button"
+            onclick="copyLink('https://app.galxe.com/quest/MapleStoryUniverse/GCgfPtkjHm', this)"
+          >
+            複製連結
+          </button>
         </div>
-        <div class="qa-section">
-            <div class="question">
-                <p>Reach 210,000 Twitter Followers:</p>
-            </div>
-            <div class="answer">
-                <p>(答案待更新)</p>
-                <button onclick="copyToClipboard(this, '(答案待更新)')">複製</button>
-            </div>
-        </div>
-        <div class="qa-section">
-            <div class="question">
-                <p>Reach 5,000 YouTube Subscribers:</p>
-            </div>
-            <div class="answer">
-                <p>Maple</p>
-                <button onclick="copyToClipboard(this, 'Maple')">複製</button>
-            </div>
-        </div>
-        <div class="qa-section">
-            <div class="question">
-                <p>Reach 4,000 Medium Followers:</p>
-            </div>
-            <div class="answer">
-                <p>PANTHEON ARCHER</p>
-                <button onclick="copyToClipboard(this, 'PANTHEON ARCHER')">複製</button>
-            </div>
-        </div>
-        <div class="qa-section">
-            <div class="question">
-                <p>Reach 5,000 Medium Followers:</p>
-            </div>
-            <div class="answer">
-                <p>(答案待更新)</p>
-                <button onclick="copyToClipboard(this, '(答案待更新)')">複製</button>
-            </div>
-        </div>
-        <div class="qa-section">
-            <div class="question">
-                <p>Reach 6,000 NFTs Minted:</p>
-            </div>
-            <div class="answer">
-                <p>SOUTHPERRY RACOCO</p>
-                <button onclick="copyToClipboard(this, 'SOUTHPERRY RACOCO')">複製</button>
-            </div>
-        </div>
-        <div class="qa-section">
-            <div class="question">
-                <p>Reach 15,000 NFTs Minted:</p>
-            </div>
-            <div class="answer">
-                <p>HELISEUM GO@LEM</p>
-                <button onclick="copyToClipboard(this, 'HELISEUM GO@LEM')">複製</button>
-            </div>
-        </div>
-        <div class="qa-section">
-            <div class="question">
-                <p>Reach 1,000 Daily Quests Completed:</p>
-            </div>
-            <div class="answer">
-                <p>KERNING CITY ANGEL</p>
-                <button onclick="copyToClipboard(this, 'KERNING CITY ANGEL')">複製</button>
-            </div>
-        </div>
-        <div class="qa-section">
-            <div class="question">
-                <p>Reach 3,000 Daily Quests Completed:</p>
-            </div>
-            <div class="answer">
-                <p>(答案待更新)</p>
-                <button onclick="copyToClipboard(this, '(答案待更新)')">複製</button>
-            </div>
-        </div>
-        <div class="qa-section">
-            <div class="question">
-                <p>Reach 4,000 total levels for all characters:</p>
-            </div>
-            <div class="answer">
-                <p>AMHERST BALROG</p>
-                <button onclick="copyToClipboard(this, 'AMHERST BALROG')">複製</button>
-            </div>
-        </div>
-        <div class="qa-section">
-            <div class="question">
-                <p>Reach 15,000 total levels for all characters:</p>
-            </div>
-            <div class="answer">
-                <p>ORBIS// DEVIL//</p>
-                <button onclick="copyToClipboard(this, 'ORBIS// DEVIL//')">複製</button>
-            </div>
-        </div>
+      </div>
+
+      <div id="qa-container"></div>
     </div>
     <script>
-        function copyToClipboard(button, text) {
-            navigator.clipboard.writeText(text).then(() => {
-                button.textContent = '已複製';
-                button.classList.add('copied');
-                setTimeout(() => {
-                    button.textContent = '複製';
-                    button.classList.remove('copied');
-                }, 2000);
-            }).catch(err => {
-                console.error('複製失敗', err);
-            });
-        }
+      // JSON data containing the questions and answers
+      const qaData = [
+        { question: "Round 11 Coupon Code:", answer: "♧Lith Harbor♣" },
+        { question: "Reach 200,000 Twitter Followers:", answer: "RIEN CACTUS" },
+        {
+          question: "Reach 210,000 Twitter Followers:",
+          answer: "(答案待更新)",
+        },
+        { question: "Reach 5,000 YouTube Subscribers:", answer: "Maple" },
+        {
+          question: "Reach 4,000 Medium Followers:",
+          answer: "PANTHEON ARCHER",
+        },
+        { question: "Reach 5,000 Medium Followers:", answer: "(答案待更新)" },
+        { question: "Reach 6,000 NFTs Minted:", answer: "SOUTHPERRY RACOCO" },
+        { question: "Reach 15,000 NFTs Minted:", answer: "HELISEUM GO@LEM" },
+        {
+          question: "Reach 1,000 Daily Quests Completed:",
+          answer: "KERNING CITY ANGEL",
+        },
+        {
+          question: "Reach 3,000 Daily Quests Completed:",
+          answer: "(答案待更新)",
+        },
+        {
+          question: "Reach 4,000 total levels for all characters:",
+          answer: "AMHERST BALROG",
+        },
+        {
+          question: "Reach 15,000 total levels for all characters:",
+          answer: "ORBIS// DEVIL//",
+        },
+      ];
+
+      // Function to generate the QA sections
+      function generateQASections(data) {
+        const container = document.getElementById("qa-container");
+        data.forEach((item) => {
+          const qaSection = document.createElement("div");
+          qaSection.className = "qa-section";
+
+          const questionDiv = document.createElement("div");
+          questionDiv.className = "question";
+          const questionP = document.createElement("p");
+          questionP.textContent = item.question;
+          questionDiv.appendChild(questionP);
+
+          const answerDiv = document.createElement("div");
+          answerDiv.className = "answer";
+          const answerP = document.createElement("p");
+          answerP.textContent = item.answer;
+          const button = document.createElement("button");
+          button.textContent = "複製";
+          button.onclick = () => copyToClipboard(button, item.answer);
+          answerDiv.appendChild(answerP);
+          answerDiv.appendChild(button);
+
+          qaSection.appendChild(questionDiv);
+          qaSection.appendChild(answerDiv);
+
+          container.appendChild(qaSection);
+        });
+      }
+
+      // Function to copy text to clipboard and update button
+      function copyToClipboard(button, text) {
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            button.textContent = "已複製";
+            button.classList.add("copied");
+            setTimeout(() => {
+              button.textContent = "複製";
+              button.classList.remove("copied");
+            }, 2000);
+          })
+          .catch((err) => {
+            console.error("複製失敗", err);
+          });
+      }
+
+      // Function to copy link to clipboard and update button
+      function copyLink(link, button) {
+        navigator.clipboard
+          .writeText(link)
+          .then(() => {
+            button.textContent = "已複製";
+            button.classList.add("copied");
+            setTimeout(() => {
+              button.textContent = "複製連結";
+              button.classList.remove("copied");
+            }, 2000);
+          })
+          .catch((err) => {
+            console.error("複製失敗", err);
+          });
+      }
+
+      // Generate the QA sections on page load
+      generateQASections(qaData);
     </script>
-</body>
+  </body>
 </html>
