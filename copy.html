@@ -15,6 +15,7 @@
         --success-color: #2ecc71;
         --button-hover: #2980b9;
         --unreleased-color: #95a5a6;
+        --warning-color: #c0392b;
       }
 
       * {
@@ -191,6 +192,59 @@
         font-size: 1.2em;
       }
 
+      .search-section {
+        text-align: center;
+        margin-top: 40px;
+      }
+
+      .search-input-wrapper {
+        position: relative;
+        display: inline-block;
+        max-width: 600px;
+        width: 100%;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 10px 40px 10px 15px;
+        border-radius: 25px;
+        border: 1px solid var(--secondary-color);
+        outline: none;
+      }
+
+      .search-clear {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 1.2em;
+        color: var(--unreleased-color);
+      }
+
+      .search-button {
+        margin-top: 10px;
+        padding: 10px 20px;
+        border-radius: 25px;
+        border: none;
+        background-color: var(--secondary-color);
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .search-button:hover {
+        background-color: var(--button-hover);
+      }
+
+      .warning {
+        color: var(--warning-color);
+        font-weight: bold;
+        margin-top: 20px;
+      }
+
       @media (min-width: 769px) {
         .btn {
           padding: 14px 24px;
@@ -267,6 +321,22 @@
       <div class="section">
         <h2>QA任務成就與獎勵</h2>
         <div id="quests" class="grid-container"></div>
+      </div>
+
+      <div class="search-section">
+        <h2>還沒等到@azmusk更新答案嗎？試試搜尋功能吧！</h2>
+        <p>搜尋範例：Reach 5,000 Medium Followers 或 5,000 Medium Followers</p>
+        <div class="search-input-wrapper">
+          <input
+            type="text"
+            id="search-input"
+            class="search-input"
+            placeholder="輸入搜尋內容..."
+          />
+          <span class="search-clear" onclick="clearSearch()">×</span>
+        </div>
+        <button class="search-button" onclick="searchQuery()">搜尋</button>
+        <p class="warning">請勿隨意點擊陌生人連結!!</p>
       </div>
     </div>
 
@@ -397,12 +467,19 @@
 
           const answerElement = document.createElement("span");
           answerElement.className = "answer";
-          answerElement.textContent = item.answer;
+          answerElement.textContent = item.answer || "尚未公佈";
+          if (!item.answer) {
+            answerElement.classList.add("incomplete");
+          }
 
           const buttonElement = document.createElement("button");
           buttonElement.className = "btn";
-          buttonElement.textContent = "複製";
+          buttonElement.textContent = item.answer ? "複製" : "等待公佈";
           buttonElement.setAttribute("data-answer", item.answer);
+          if (!item.answer) {
+            buttonElement.classList.add("unreleased");
+            buttonElement.disabled = true;
+          }
 
           liveAnswerDiv.appendChild(questionElement);
           liveAnswerDiv.appendChild(answerElement);
@@ -480,6 +557,20 @@
           });
         });
       });
+
+      function searchQuery() {
+        const query = document.getElementById("search-input").value;
+        if (query.trim()) {
+          const url = `https://x.com/search?q=${encodeURIComponent(query)}`;
+          window.open(url, "_blank");
+        } else {
+          alert("請輸入搜尋內容");
+        }
+      }
+
+      function clearSearch() {
+        document.getElementById("search-input").value = "";
+      }
     </script>
   </body>
 </html>
