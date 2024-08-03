@@ -1,316 +1,402 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CodeSymbolFixer - 自動修正程式符號</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛠️</text></svg>">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛠️</text></svg>"
+    />
     <style>
-        :root {
-            --primary-color: #4fc3f7;
-            --secondary-color: #03a9f4;
-            --background-color: #e1f5fe;
-            --text-color: #01579b;
-            --shadow-color: rgba(1, 87, 155, 0.1);
-        }
+      :root {
+        --primary-color: #4fc3f7;
+        --secondary-color: #03a9f4;
+        --background-color: #e1f5fe;
+        --text-color: #01579b;
+        --shadow-color: rgba(1, 87, 155, 0.1);
+        --active-button-background: #0288d1;
+        --active-button-text-color: white;
+      }
 
-        * {
-            box-sizing: border-box;
-        }
+      * {
+        box-sizing: border-box;
+      }
 
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
 
-        .container {
-            background-color: white;
-            border-radius: 24px;
-            box-shadow: 0 20px 40px var(--shadow-color);
-            padding: 40px;
-            width: 95%;
-            max-width: 1200px;
-            animation: fadeIn 0.5s ease-out;
-        }
+      .container {
+        background-color: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 40px var(--shadow-color);
+        padding: 40px;
+        width: 95%;
+        max-width: 1200px;
+        animation: fadeIn 0.5s ease-out;
+      }
 
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 30px;
+      }
 
-        .logo {
-            font-size: 3em;
-            margin-right: 20px;
-            color: var(--primary-color);
-            animation: float 3s ease-in-out infinite;
-        }
+      .logo {
+        font-size: 3em;
+        margin-right: 20px;
+        color: var(--primary-color);
+        animation: float 3s ease-in-out infinite;
+      }
 
-        h1 {
-            color: var(--secondary-color);
-            font-size: 2.5em;
-            margin: 0;
-            text-shadow: 2px 2px 4px var(--shadow-color);
-        }
+      h1 {
+        color: var(--secondary-color);
+        font-size: 2.5em;
+        margin: 0;
+        text-shadow: 2px 2px 4px var(--shadow-color);
+      }
 
-        .button-group {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
+      .button-group {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
 
-        .button-group button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px var(--shadow-color);
-            margin: 0 10px;
-        }
+      .button-group button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px var(--shadow-color);
+        margin: 0 10px;
+        outline: none;
+      }
 
-        .button-group button:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px var(--shadow-color);
-        }
+      .button-group button.active {
+        background-color: var(--active-button-background);
+        color: var(--active-button-text-color);
+        box-shadow: 0 6px 12px var(--shadow-color);
+        transform: scale(1.05);
+      }
 
+      .input-output {
+        display: flex;
+        gap: 30px;
+        height: 60vh;
+      }
+
+      .column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+
+      textarea {
+        width: 100%;
+        height: 100%;
+        padding: 20px;
+        border: 2px solid var(--primary-color);
+        border-radius: 12px;
+        font-size: 16px;
+        resize: none;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 2px 4px var(--shadow-color);
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 3px rgba(3, 169, 244, 0.2);
+      }
+
+      .count-display {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        font-size: 1.2em;
+        font-weight: bold;
+        color: var(--text-color);
+      }
+
+      .copy-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: var(--secondary-color);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 50px;
+        opacity: 0;
+        transition: all 0.3s ease;
+        transform: translateY(-20px);
+        box-shadow: 0 4px 6px var(--shadow-color);
+      }
+
+      .show-notification {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+        100% {
+          transform: translateY(0px);
+        }
+      }
+
+      @media (max-width: 768px) {
         .input-output {
-            display: flex;
-            gap: 30px;
-            height: 60vh;
-        }
-
-        .column {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            position: relative;
+          flex-direction: column;
+          height: auto;
         }
 
         textarea {
-            width: 100%;
-            height: 100%;
-            padding: 20px;
-            border: 2px solid var(--primary-color);
-            border-radius: 12px;
-            font-size: 16px;
-            resize: none;
-            transition: all 0.3s ease;
-            box-shadow: inset 0 2px 4px var(--shadow-color);
+          height: 200px;
         }
-
-        textarea:focus {
-            outline: none;
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 3px rgba(3, 169, 244, 0.2);
-        }
-
-        .count-display {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            font-size: 1.2em;
-            font-weight: bold;
-            color: var(--text-color);
-        }
-
-        .copy-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 50px;
-            opacity: 0;
-            transition: all 0.3s ease;
-            transform: translateY(-20px);
-            box-shadow: 0 4px 6px var(--shadow-color);
-        }
-
-        .show-notification {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-
-        @media (max-width: 768px) {
-            .input-output {
-                flex-direction: column;
-                height: auto;
-            }
-            
-            textarea {
-                height: 200px;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="header">
-            <span class="logo">🛠️</span>
-            <h1>CodeSymbolFixer</h1>
+      <div class="header">
+        <span class="logo">🛠️</span>
+        <h1>CodeSymbolFixer</h1>
+      </div>
+      <div class="button-group">
+        <button id="generalBtn" class="active">通用</button>
+        <button id="htmlBtn">HTML</button>
+        <button id="jsBtn">JavaScript</button>
+        <button id="cssBtn">CSS</button>
+        <button id="phpBtn">PHP</button>
+        <button id="pythonBtn">Python</button>
+      </div>
+      <div class="input-output">
+        <div class="column">
+          <textarea id="input" placeholder="在此貼上您的程式碼..."></textarea>
+          <div
+            class="button-group"
+            style="justify-content: flex-start; margin-top: 10px"
+          >
+            <button id="pasteBtn">
+              貼上程式碼（<span id="pasteCount">０</span>）
+            </button>
+            <button id="clearBtn">清除</button>
+          </div>
+          <div class="count-display">
+            總行數: <span id="inputLineCount">０</span>
+          </div>
         </div>
-        <div class="button-group">
-            <button id="htmlBtn">HTML</button>
-            <button id="jsBtn">JavaScript</button>
-            <button id="cssBtn">CSS</button>
+        <div class="column">
+          <textarea
+            id="output"
+            readonly
+            placeholder="修正後的程式碼將顯示在這裡..."
+          ></textarea>
+          <div
+            class="button-group"
+            style="justify-content: flex-start; margin-top: 10px"
+          >
+            <button id="copyBtn">複製修正後的程式碼</button>
+          </div>
+          <div class="count-display">
+            總行數: <span id="outputLineCount">０</span>
+          </div>
         </div>
-        <div class="input-output">
-            <div class="column">
-                <textarea id="input" placeholder="在此貼上您的程式碼..."></textarea>
-                <div class="button-group" style="justify-content: flex-start; margin-top: 10px;">
-                    <button id="pasteBtn">貼上程式碼（<span id="pasteCount">０</span>）</button>
-                    <button id="clearBtn">清除</button>
-                </div>
-                <div class="count-display">總行數: <span id="inputLineCount">０</span></div>
-            </div>
-            <div class="column">
-                <textarea id="output" readonly placeholder="修正後的程式碼將顯示在這裡..."></textarea>
-                <div class="button-group" style="justify-content: flex-start; margin-top: 10px;">
-                    <button id="copyBtn">複製修正後的程式碼</button>
-                </div>
-                <div class="count-display">總行數: <span id="outputLineCount">０</span></div>
-            </div>
-        </div>
+      </div>
     </div>
     <div id="copyNotification" class="copy-notification">複製成功！</div>
 
     <script>
-        const input = document.getElementById('input');
-        const output = document.getElementById('output');
-        const copyBtn = document.getElementById('copyBtn');
-        const pasteBtn = document.getElementById('pasteBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const copyNotification = document.getElementById('copyNotification');
-        const pasteCount = document.getElementById('pasteCount');
-        const inputLineCount = document.getElementById('inputLineCount');
-        const outputLineCount = document.getElementById('outputLineCount');
-        let pasteTimes = 0;
-        let pastedTextSet = new Set();
+      const input = document.getElementById("input");
+      const output = document.getElementById("output");
+      const copyBtn = document.getElementById("copyBtn");
+      const pasteBtn = document.getElementById("pasteBtn");
+      const clearBtn = document.getElementById("clearBtn");
+      const copyNotification = document.getElementById("copyNotification");
+      const pasteCount = document.getElementById("pasteCount");
+      const inputLineCount = document.getElementById("inputLineCount");
+      const outputLineCount = document.getElementById("outputLineCount");
+      const buttons = document.querySelectorAll(".button-group button");
+      let pasteTimes = 0;
+      let pastedTextSet = new Set();
+      let selectedButton = document.querySelector(
+        ".button-group button.active"
+      ); // 初始化為通用模式的按鈕
 
-        function fixSymbols(text) {
-            return text
-                .replace(/”/g, '\"')
-                .replace(/“/g, '\"')
-                .replace(/‘/g, '\'')
-                .replace(/’/g, '\'');
+      function fixSymbols(text) {
+        return text
+          .replace(/”/g, '"')
+          .replace(/“/g, '"')
+          .replace(/‘/g, "'")
+          .replace(/’/g, "'");
+      }
+
+      function fixHTMLStructure(text) {
+        const startTag = "<!DOCTYPE html>";
+        const endTag = "</html>";
+        const startIndex = text.indexOf(startTag);
+        const endIndex = text.lastIndexOf(endTag);
+
+        if (startIndex !== -1 && endIndex !== -1) {
+          text = text.substring(startIndex, endIndex + endTag.length);
+
+          const headTag = "<head>";
+          const headCloseTag = "</head>";
+          const bodyTag = "<body>";
+          const bodyCloseTag = "</body>";
+          const scriptTag = "<script>";
+          const scriptCloseTag = "</" + "script>";
+          const styleTag = "<style>";
+          const styleCloseTag = "</" + "style>";
+
+          const cleanEndTag = /<\/html>/g;
+          const cleanBodyCloseTag = /<\/body>/g;
+          const cleanBodyTag = /<body>/g;
+          const cleanHeadCloseTag = /<\/head>/g;
+
+          while (text.includes(bodyTag) && !text.match(cleanBodyCloseTag)) {
+            text = text.replace(cleanEndTag, `${bodyCloseTag}\n${endTag}`);
+          }
+          while (text.includes(scriptTag) && !text.includes(scriptCloseTag)) {
+            text = text.replace(
+              cleanBodyCloseTag,
+              `\t${scriptCloseTag}${bodyCloseTag}`
+            );
+          }
+          while (text.includes(headTag) && !text.includes(headCloseTag)) {
+            text = text.replace(cleanBodyTag, `${headCloseTag}\n${bodyTag}`);
+          }
+          while (text.includes(styleTag) && !text.includes(styleCloseTag)) {
+            text = text.replace(
+              cleanHeadCloseTag,
+              `\t${styleCloseTag}${headCloseTag}`
+            );
+          }
+        }
+        return text;
+      }
+
+      function removeIntroductionText(text) {
+        // 正則表達式去除 ```html 或其他語言前綴及其上下的文本
+        const codeBlockPattern =
+          /([\s\S]*?)```(html|javascript|css|php|python)\n([\s\S]*?)\n```([\s\S]*)/;
+        const match = text.match(codeBlockPattern);
+
+        if (match) {
+          text = match[3]; // 只保留程式碼本身
         }
 
-        function fixHTMLStructure(text) {
-            const startTag = '<!DOCTYPE html>';
-            const endTag = '</html>';
-            const startIndex = text.indexOf(startTag);
-            const endIndex = text.lastIndexOf(endTag);
+        return text;
+      }
 
-            if (startIndex !== -1 && endIndex !== -1) {
-                text = text.substring(startIndex, endIndex + endTag.length);
+      function applyFixes(type) {
+        let fixedText = input.value;
 
-                // 檢查 <head> 和 <body> 的結構
-                const headTag = '<head>';
-                const headCloseTag = '</head>';
-                const bodyTag = '<body>';
-                const bodyCloseTag = '</body>';
-                const scriptTag = '<script>';
-                const scriptCloseTag = '</' + 'script>';
-                const styleTag = '<style>';
-                const styleCloseTag = '</' + 'style>';
-
-                // 使用正規表示式匹配乾淨的閉合標籤
-                const cleanEndTag = /<\/html>/g;
-                const cleanBodyCloseTag = /<\/body>/g;
-                const cleanBodyTag = /<body>/g;
-                const cleanHeadCloseTag = /<\/head>/g;
-
-                // 依次檢查和修正
-                while (text.includes(bodyTag) && !text.match(cleanBodyCloseTag)) {
-                    text = text.replace(cleanEndTag, `${bodyCloseTag}\n${endTag}`);
-                }
-                while (text.includes(scriptTag) && !text.includes(scriptCloseTag)) {
-                    text = text.replace(cleanBodyCloseTag, `\t${scriptCloseTag}${bodyCloseTag}`);
-                }
-                while (text.includes(headTag) && !text.includes(headCloseTag)) {
-                    text = text.replace(cleanBodyTag, `${headCloseTag}\n${bodyTag}`);
-                }
-                while (text.includes(styleTag) && !text.includes(styleCloseTag)) {
-                    text = text.replace(cleanHeadCloseTag, `\t${styleCloseTag}${headCloseTag}`);
-                }
-            }
-            return text;
+        if (type === "HTML") {
+          fixedText = fixHTMLStructure(fixedText);
         }
 
-        function updateOutput() {
-            let fixedText = fixSymbols(input.value);
-            fixedText = fixHTMLStructure(fixedText); // 先修正 HTML 結構
-            output.value = fixedText;
-            inputLineCount.textContent = input.value ? input.value.split('\n').length : 0;
-            outputLineCount.textContent = fixedText ? fixedText.split('\n').length : 0;
+        if (type === "通用" || type !== "HTML") {
+          fixedText = removeIntroductionText(fixedText);
         }
 
-        input.addEventListener('input', updateOutput);
+        fixedText = fixSymbols(fixedText);
+        output.value = fixedText;
+        inputLineCount.textContent = input.value
+          ? input.value.split("\n").length
+          : 0;
+        outputLineCount.textContent = fixedText
+          ? fixedText.split("\n").length
+          : 0;
+      }
 
-        copyBtn.addEventListener('click', function() {
-            output.select();
-            document.execCommand('copy');
-            
-            copyNotification.classList.add('show-notification');
-            setTimeout(() => {
-                copyNotification.classList.remove('show-notification');
-            }, 1000);
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          selectedButton.classList.remove("active");
+          button.classList.add("active");
+          selectedButton = button; // 更新當前選定的按鈕
+          applyFixes(selectedButton.textContent);
         });
+      });
 
-        pasteBtn.addEventListener('click', async function() {
-            try {
-                const text = await navigator.clipboard.readText();
-                if (!pastedTextSet.has(text)) {
-                    input.value += text;
-                    pastedTextSet.add(text);
-                    pasteTimes++;
-                    pasteCount.textContent = pasteTimes;
-                    updateOutput();
-                }
-            } catch (err) {
-                console.error('無法讀取剪貼簿:', err);
-            }
-        });
+      input.addEventListener("input", () =>
+        applyFixes(selectedButton.textContent)
+      );
 
-        clearBtn.addEventListener('click', function() {
-            input.value = '';
-            output.value = '';
-            pastedTextSet.clear();
-            pasteTimes = 0;
+      copyBtn.addEventListener("click", function () {
+        output.select();
+        document.execCommand("copy");
+
+        // 顯示複製成功通知
+        copyNotification.classList.add("show-notification");
+        setTimeout(() => {
+          copyNotification.classList.remove("show-notification");
+        }, 1000);
+      });
+
+      pasteBtn.addEventListener("click", async function () {
+        try {
+          const text = await navigator.clipboard.readText();
+          if (!pastedTextSet.has(text)) {
+            input.value += text;
+            pastedTextSet.add(text);
+            pasteTimes++;
             pasteCount.textContent = pasteTimes;
-            inputLineCount.textContent = 0;
-            outputLineCount.textContent = 0;
-        });
+            applyFixes(selectedButton.textContent); // 使用當前選定的按鈕類型
+          }
+        } catch (err) {
+          console.error("無法讀取剪貼簿:", err);
+        }
+      });
 
-        // 初始化輸出
-        updateOutput();
+      clearBtn.addEventListener("click", function () {
+        input.value = "";
+        output.value = "";
+        pastedTextSet.clear();
+        pasteTimes = 0;
+        pasteCount.textContent = pasteTimes;
+        inputLineCount.textContent = 0;
+        outputLineCount.textContent = 0;
+      });
+
+      // 初始化輸出
+      applyFixes(selectedButton.textContent);
     </script>
-</body>
+  </body>
 </html>
