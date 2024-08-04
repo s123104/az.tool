@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
     <title>可愛兔兔排班表</title>
     <link
       rel="icon"
@@ -596,43 +599,6 @@
         let jobNames = JSON.parse(localStorage.getItem("jobNames")) || [];
         let currentEditKey = null;
 
-        // 預設的工作內容
-        const defaultSchedules = {
-          "2024-07-16": {
-            jobName: "百貨公司",
-            start: "16:00",
-            end: "22:00",
-            color: "#ff69b4",
-          },
-          "2024-07-18": {
-            jobName: "百貨公司",
-            start: "16:00",
-            end: "22:00",
-            color: "#ff69b4",
-          },
-          "2024-07-20": {
-            jobName: "百貨公司",
-            start: "14:30",
-            end: "22:00",
-            color: "#ff69b4",
-          },
-          "2024-07-23": {
-            jobName: "百貨公司",
-            start: "10:30",
-            end: "16:30",
-            color: "#ff69b4",
-          },
-          "2024-07-24": {
-            jobName: "百貨公司",
-            start: "14:30",
-            end: "20:30",
-            color: "#ff69b4",
-          },
-        };
-
-        // 將預設工作內容合併到schedules中
-        schedules = { ...defaultSchedules, ...schedules };
-
         function updateWeek(direction) {
           currentWeek.setDate(currentWeek.getDate() + direction * 7);
           generateWeekGrid();
@@ -797,18 +763,27 @@
           currentEditKey = dateKey;
           document.getElementById("editJobName").value = jobName;
           document.getElementById("editJobDate").value = dateKey;
-          document.getElementById("editStartHour").value =
-            parseTime(start).getHours();
-          document.getElementById("editStartMinute").value = parseTime(start)
-            .getMinutes()
-            .toString()
-            .padStart(2, "0");
-          document.getElementById("editEndHour").value =
-            parseTime(end).getHours();
-          document.getElementById("editEndMinute").value = parseTime(end)
-            .getMinutes()
-            .toString()
-            .padStart(2, "0");
+
+          // 確保時間值為數字並且顯示兩位數
+          const startHour = String(
+            parseInt(parseTime(start).getHours())
+          ).padStart(2, "0");
+          const startMinute = String(
+            parseInt(parseTime(start).getMinutes())
+          ).padStart(2, "0");
+          const endHour = String(parseInt(parseTime(end).getHours())).padStart(
+            2,
+            "0"
+          );
+          const endMinute = String(
+            parseInt(parseTime(end).getMinutes())
+          ).padStart(2, "0");
+
+          document.getElementById("editStartHour").value = startHour;
+          document.getElementById("editStartMinute").value = startMinute;
+          document.getElementById("editEndHour").value = endHour;
+          document.getElementById("editEndMinute").value = endMinute;
+
           modalEdit.style.display = "block";
         }
 
