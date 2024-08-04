@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
     />
     <title>可愛兔兔排班表</title>
     <link
@@ -98,12 +98,15 @@
       }
 
       .time-scale {
-        position: relative;
+        position: sticky;
+        top: 0;
+        left: 0;
         width: 50px;
         background-color: #ffd1dc;
         font-size: 8px;
         text-align: right;
         border-right: 1px solid #ff69b4;
+        z-index: 1000;
         padding-top: 50px;
       }
 
