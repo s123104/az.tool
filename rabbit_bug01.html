@@ -200,7 +200,7 @@
         padding: 20px;
         border: 1px solid #888;
         width: 80%;
-        max-width: 300px;
+        max-width: 400px;
         border-radius: 10px;
       }
 
@@ -216,6 +216,34 @@
         color: black;
         text-decoration: none;
         cursor: pointer;
+      }
+
+      .toggle-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+
+      .toggle-button {
+        flex: 1;
+        padding: 10px;
+        cursor: pointer;
+        text-align: center;
+        border: 1px solid #ff69b4;
+        color: #fff;
+      }
+
+      .toggle-button.single {
+        background-color: #ff1493;
+      }
+
+      .toggle-button.multi {
+        background-color: #ffb6c1;
+      }
+
+      .toggle-button.active {
+        background-color: #ff1493;
+        color: #fff;
       }
 
       label {
@@ -245,26 +273,6 @@
         border: 1px solid #ccc;
         border-radius: 5px;
         box-sizing: border-box;
-      }
-
-      .batch-add-toggle {
-        background-color: #ff1493;
-        border: none;
-        color: white;
-        padding: 5px 10px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 12px;
-        margin-top: 10px;
-      }
-
-      .batch-add-toggle:hover {
-        background-color: #ff69b4;
-      }
-
-      .batch-add-container {
-        display: none;
-        margin-top: 20px;
       }
 
       .weekdays {
@@ -392,7 +400,7 @@
 
         .modal-content {
           width: 90%;
-          max-width: 260px;
+          max-width: 300px;
         }
 
         input[type="text"],
@@ -438,36 +446,45 @@
     <div id="modal-add" class="modal">
       <div class="modal-content">
         <span class="close" id="closeAdd">&times;</span>
-        <h2>新增工作</h2>
-        <form id="addForm" autocomplete="off">
-          <label for="addJobName">工作名稱</label>
-          <input
-            type="text"
-            id="addJobName"
-            name="addJobName"
-            maxlength="4"
-            required
-          />
-          <label for="addJobDate">日期</label>
-          <input type="date" id="addJobDate" name="addJobDate" required />
-          <label for="addStartTime">開始時間</label>
-          <div class="time-input-wrapper">
-            <select id="addStartHour" name="addStartHour" required></select>
-            :
-            <select id="addStartMinute" name="addStartMinute" required></select>
+        <div class="toggle-container">
+          <div class="toggle-button single active" id="singleAddToggle">
+            單次
           </div>
-          <label for="addEndTime">結束時間</label>
-          <div class="time-input-wrapper">
-            <select id="addEndHour" name="addEndHour" required></select>
-            :
-            <select id="addEndMinute" name="addEndMinute" required></select>
-          </div>
-          <button type="submit">保存</button>
-        </form>
-        <button class="batch-add-toggle" id="batchAddToggle">
-          批量新增工作
-        </button>
-        <div class="batch-add-container" id="batchAddContainer">
+          <div class="toggle-button multi" id="batchAddToggle">批量</div>
+        </div>
+        <div id="singleAddContainer">
+          <h2>新增工作</h2>
+          <form id="addForm" autocomplete="off">
+            <label for="addJobName">工作名稱</label>
+            <input
+              type="text"
+              id="addJobName"
+              name="addJobName"
+              maxlength="4"
+              required
+            />
+            <label for="addJobDate">日期</label>
+            <input type="date" id="addJobDate" name="addJobDate" required />
+            <label for="addStartTime">開始時間</label>
+            <div class="time-input-wrapper">
+              <select id="addStartHour" name="addStartHour" required></select>
+              :
+              <select
+                id="addStartMinute"
+                name="addStartMinute"
+                required
+              ></select>
+            </div>
+            <label for="addEndTime">結束時間</label>
+            <div class="time-input-wrapper">
+              <select id="addEndHour" name="addEndHour" required></select>
+              :
+              <select id="addEndMinute" name="addEndMinute" required></select>
+            </div>
+            <button type="submit">保存</button>
+          </form>
+        </div>
+        <div id="batchAddContainer" style="display: none">
           <h2>批量新增工作</h2>
           <form id="batchAddForm" autocomplete="off">
             <label for="batchAddJobName">工作名稱</label>
@@ -584,7 +601,10 @@
         const closeEditBtn = document.getElementById("closeEdit");
         const addForm = document.getElementById("addForm");
         const batchAddForm = document.getElementById("batchAddForm");
+        const singleAddToggle = document.getElementById("singleAddToggle");
         const batchAddToggle = document.getElementById("batchAddToggle");
+        const singleAddContainer =
+          document.getElementById("singleAddContainer");
         const batchAddContainer = document.getElementById("batchAddContainer");
         const editForm = document.getElementById("editForm");
         const jobNameInputAdd = document.getElementById("addJobName");
@@ -983,6 +1003,15 @@
           });
         }
 
+        function toggleAddMode() {
+          singleAddToggle.classList.toggle("active");
+          batchAddToggle.classList.toggle("active");
+          singleAddContainer.style.display =
+            singleAddContainer.style.display === "none" ? "block" : "none";
+          batchAddContainer.style.display =
+            batchAddContainer.style.display === "none" ? "block" : "none";
+        }
+
         addButton.addEventListener("click", () => {
           openAddModal();
         });
@@ -999,9 +1028,16 @@
           }
         });
 
+        singleAddToggle.addEventListener("click", () => {
+          if (!singleAddToggle.classList.contains("active")) {
+            toggleAddMode();
+          }
+        });
+
         batchAddToggle.addEventListener("click", () => {
-          batchAddContainer.style.display =
-            batchAddContainer.style.display === "none" ? "block" : "none";
+          if (!batchAddToggle.classList.contains("active")) {
+            toggleAddMode();
+          }
         });
 
         prevWeekBtn.addEventListener("click", () => updateWeek(-1));
