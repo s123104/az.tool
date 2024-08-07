@@ -247,6 +247,48 @@
         box-sizing: border-box;
       }
 
+      .batch-add-toggle {
+        background-color: #ff1493;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 12px;
+        margin-top: 10px;
+      }
+
+      .batch-add-toggle:hover {
+        background-color: #ff69b4;
+      }
+
+      .batch-add-container {
+        display: none;
+        margin-top: 20px;
+      }
+
+      .weekdays {
+        display: flex;
+        justify-content: space-between;
+        margin: 10px 0;
+      }
+
+      .weekday {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #ff1493;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+
+      .weekday.selected {
+        background-color: #ff69b4;
+      }
+
       button[type="submit"] {
         background-color: #ff1493;
         border: none;
@@ -422,6 +464,74 @@
           </div>
           <button type="submit">保存</button>
         </form>
+        <button class="batch-add-toggle" id="batchAddToggle">
+          批量新增工作
+        </button>
+        <div class="batch-add-container" id="batchAddContainer">
+          <h2>批量新增工作</h2>
+          <form id="batchAddForm" autocomplete="off">
+            <label for="batchAddJobName">工作名稱</label>
+            <input
+              type="text"
+              id="batchAddJobName"
+              name="batchAddJobName"
+              maxlength="4"
+              required
+            />
+            <label for="batchAddStartDate">開始日期</label>
+            <input
+              type="date"
+              id="batchAddStartDate"
+              name="batchAddStartDate"
+              required
+            />
+            <label for="batchAddEndDate">結束日期</label>
+            <input
+              type="date"
+              id="batchAddEndDate"
+              name="batchAddEndDate"
+              required
+            />
+            <label for="batchAddStartTime">開始時間</label>
+            <div class="time-input-wrapper">
+              <select
+                id="batchAddStartHour"
+                name="batchAddStartHour"
+                required
+              ></select>
+              :
+              <select
+                id="batchAddStartMinute"
+                name="batchAddStartMinute"
+                required
+              ></select>
+            </div>
+            <label for="batchAddEndTime">結束時間</label>
+            <div class="time-input-wrapper">
+              <select
+                id="batchAddEndHour"
+                name="batchAddEndHour"
+                required
+              ></select>
+              :
+              <select
+                id="batchAddEndMinute"
+                name="batchAddEndMinute"
+                required
+              ></select>
+            </div>
+            <div class="weekdays">
+              <div class="weekday" data-day="1">一</div>
+              <div class="weekday" data-day="2">二</div>
+              <div class="weekday" data-day="3">三</div>
+              <div class="weekday" data-day="4">四</div>
+              <div class="weekday" data-day="5">五</div>
+              <div class="weekday" data-day="6">六</div>
+              <div class="weekday" data-day="0">日</div>
+            </div>
+            <button type="submit">批量保存</button>
+          </form>
+        </div>
       </div>
     </div>
 
@@ -473,8 +583,12 @@
         const closeAddBtn = document.getElementById("closeAdd");
         const closeEditBtn = document.getElementById("closeEdit");
         const addForm = document.getElementById("addForm");
+        const batchAddForm = document.getElementById("batchAddForm");
+        const batchAddToggle = document.getElementById("batchAddToggle");
+        const batchAddContainer = document.getElementById("batchAddContainer");
         const editForm = document.getElementById("editForm");
         const jobNameInputAdd = document.getElementById("addJobName");
+        const jobNameInputBatchAdd = document.getElementById("batchAddJobName");
         const jobNameInputEdit = document.getElementById("editJobName");
         let schedules = JSON.parse(localStorage.getItem("schedules")) || {};
         let jobNames = JSON.parse(localStorage.getItem("jobNames")) || [];
@@ -710,6 +824,57 @@
           updateTotalHours();
         }
 
+        function saveBatchAddSchedule() {
+          const jobName = document.getElementById("batchAddJobName").value;
+          const startDate = new Date(
+            document.getElementById("batchAddStartDate").value
+          );
+          const endDate = new Date(
+            document.getElementById("batchAddEndDate").value
+          );
+          const startTime =
+            document
+              .getElementById("batchAddStartHour")
+              .value.padStart(2, "0") +
+            ":" +
+            document
+              .getElementById("batchAddStartMinute")
+              .value.padStart(2, "0");
+          const endTime =
+            document.getElementById("batchAddEndHour").value.padStart(2, "0") +
+            ":" +
+            document.getElementById("batchAddEndMinute").value.padStart(2, "0");
+          const selectedDays = Array.from(
+            document.querySelectorAll(".weekday.selected")
+          ).map((el) => parseInt(el.dataset.day));
+          const color = generateColor(jobName);
+
+          for (
+            let date = new Date(startDate);
+            date <= endDate;
+            date.setDate(date.getDate() + 1)
+          ) {
+            if (selectedDays.includes(date.getDay())) {
+              const dateKey = date.toISOString().split("T")[0];
+              schedules[dateKey] = {
+                jobName,
+                start: startTime,
+                end: endTime,
+                color,
+              };
+            }
+          }
+
+          localStorage.setItem("schedules", JSON.stringify(schedules));
+          if (!jobNames.includes(jobName)) {
+            jobNames.push(jobName);
+            localStorage.setItem("jobNames", JSON.stringify(jobNames));
+          }
+          closeAddModal();
+          updateSchedule();
+          updateTotalHours();
+        }
+
         function saveEditSchedule() {
           const jobName = document.getElementById("editJobName").value;
           const jobDate = document.getElementById("editJobDate").value;
@@ -738,6 +903,10 @@
           closeEditModal();
           updateSchedule();
           updateTotalHours();
+        }
+
+        function toggleWeekdaySelection(event) {
+          event.target.classList.toggle("selected");
         }
 
         function autocomplete(inp, arr) {
@@ -830,12 +999,22 @@
           }
         });
 
+        batchAddToggle.addEventListener("click", () => {
+          batchAddContainer.style.display =
+            batchAddContainer.style.display === "none" ? "block" : "none";
+        });
+
         prevWeekBtn.addEventListener("click", () => updateWeek(-1));
         nextWeekBtn.addEventListener("click", () => updateWeek(1));
 
         addForm.addEventListener("submit", (e) => {
           e.preventDefault();
           saveAddSchedule();
+        });
+
+        batchAddForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          saveBatchAddSchedule();
         });
 
         editForm.addEventListener("submit", (e) => {
@@ -881,6 +1060,8 @@
             "addEndHour",
             "editStartHour",
             "editEndHour",
+            "batchAddStartHour",
+            "batchAddEndHour",
           ].forEach((id) => {
             addOptions(document.getElementById(id), hours);
           });
@@ -890,6 +1071,8 @@
             "addEndMinute",
             "editStartMinute",
             "editEndMinute",
+            "batchAddStartMinute",
+            "batchAddEndMinute",
           ].forEach((id) => {
             addOptions(document.getElementById(id), minutes);
           });
@@ -901,8 +1084,13 @@
         updateTotalHours();
         updateTimeScale(); // 初始化時間刻度
         autocomplete(jobNameInputAdd, jobNames);
+        autocomplete(jobNameInputBatchAdd, jobNames);
         autocomplete(jobNameInputEdit, jobNames);
         populateTimeOptions();
+
+        document.querySelectorAll(".weekday").forEach((day) => {
+          day.addEventListener("click", toggleWeekdaySelection);
+        });
 
         // 禁止雙擊縮放
         document.addEventListener("gesturestart", function (e) {
