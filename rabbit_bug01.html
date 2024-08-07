@@ -29,6 +29,7 @@
         flex-direction: column;
         height: 100%;
         background-color: #ffebee;
+        overflow: hidden;
       }
 
       .header {
@@ -75,16 +76,21 @@
 
       .add-button {
         position: absolute;
-        top: 10px;
+        top: 5px;
         right: 10px;
         background-color: #ff1493;
         border: none;
         color: white;
-        padding: 5px 10px;
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
-        font-size: 20px;
-        line-height: 20px;
+        font-size: 16px;
+        line-height: 16px;
         cursor: pointer;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .add-button:hover {
@@ -94,35 +100,27 @@
       .week-view {
         display: flex;
         flex-grow: 1;
-        overflow-y: auto;
+        overflow: hidden;
       }
 
       .time-scale {
-        position: sticky;
-        top: 0;
-        left: 0;
+        position: relative;
         width: 50px;
         background-color: #ffd1dc;
         font-size: 8px;
         text-align: right;
-        border-right: 1px solid #ff69b4;
-        z-index: 1000;
         padding-top: 50px;
       }
 
       .time-slot {
-        position: absolute;
-        right: 2px;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        white-space: nowrap;
+        position: relative;
+        height: calc(100% / 17); /* 每個時間段佔1/17的高度 */
       }
 
       .week-grid {
         display: flex;
         flex-grow: 1;
-        overflow-x: auto;
+        overflow: hidden;
       }
 
       .day-column {
@@ -147,6 +145,7 @@
       .day-content {
         flex-grow: 1;
         position: relative;
+        overflow: hidden;
       }
 
       .schedule-item {
@@ -164,7 +163,6 @@
         padding: 2px;
         text-align: center;
         cursor: pointer;
-        position: relative;
       }
 
       .vertical-line {
@@ -226,8 +224,7 @@
       }
 
       input[type="text"],
-      input[type="date"],
-      input[type="time"] {
+      input[type="date"] {
         width: calc(100% - 10px);
         padding: 5px;
         margin: 5px 0;
@@ -293,15 +290,15 @@
       }
 
       .delete-btn {
-        background-color: #ff4c4c; /* 紅色背景 */
+        background-color: #ff4c4c;
         border: none;
         color: white;
-        font-size: 12px;
-        width: 18px;
-        height: 18px;
+        font-size: 10px;
+        width: 14px;
+        height: 14px;
         border-radius: 50%;
         cursor: pointer;
-        position: absolute; /* 右上角 */
+        position: absolute;
         top: 2px;
         right: 2px;
         display: flex;
@@ -311,12 +308,13 @@
       }
 
       .delete-btn:hover {
-        background-color: #ff0000; /* 懸停變更為深紅色 */
+        background-color: #ff0000;
       }
 
       @media only screen and (max-width: 600px) {
         .calendar-container {
-          padding: 5px;
+          padding: 0;
+          width: 100%;
         }
 
         .header {
@@ -331,6 +329,14 @@
         .add-button {
           padding: 3px 7px;
           font-size: 10px;
+        }
+
+        .add-button {
+          width: 25px;
+          height: 25px;
+          line-height: 25px;
+          font-size: 14px;
+          top: 5px;
         }
 
         .time-scale {
@@ -378,7 +384,7 @@
         </div>
       </div>
       <div class="week-view">
-        <div class="time-scale"></div>
+        <div class="time-scale" id="timeScale"></div>
         <div class="week-grid">
           <!-- 這些內容由JavaScript動態生成 -->
         </div>
@@ -404,79 +410,15 @@
           <input type="date" id="addJobDate" name="addJobDate" required />
           <label for="addStartTime">開始時間</label>
           <div class="time-input-wrapper">
-            <select id="addStartHour" name="addStartHour" required>
-              <option value="00">00</option>
-              <option value="01">01</option>
-              <option value="02">02</option>
-              <option value="03">03</option>
-              <option value="04">04</option>
-              <option value="05">05</option>
-              <option value="06">06</option>
-              <option value="07">07</option>
-              <option value="08">08</option>
-              <option value="09">09</option>
-              <option value="10">10</option>
-              <option value="11">11</option>
-              <option value="12">12</option>
-              <option value="13">13</option>
-              <option value="14">14</option>
-              <option value="15">15</option>
-              <option value="16">16</option>
-              <option value="17">17</option>
-              <option value="18">18</option>
-              <option value="19">19</option>
-              <option value="20">20</option>
-              <option value="21">21</option>
-              <option value="22">22</option>
-              <option value="23">23</option>
-            </select>
+            <select id="addStartHour" name="addStartHour" required></select>
             :
-            <select id="addStartMinute" name="addStartMinute" required>
-              <option value="00">00</option>
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="30">30</option>
-              <option value="40">40</option>
-              <option value="50">50</option>
-            </select>
+            <select id="addStartMinute" name="addStartMinute" required></select>
           </div>
           <label for="addEndTime">結束時間</label>
           <div class="time-input-wrapper">
-            <select id="addEndHour" name="addEndHour" required>
-              <option value="00">00</option>
-              <option value="01">01</option>
-              <option value="02">02</option>
-              <option value="03">03</option>
-              <option value="04">04</option>
-              <option value="05">05</option>
-              <option value="06">06</option>
-              <option value="07">07</option>
-              <option value="08">08</option>
-              <option value="09">09</option>
-              <option value="10">10</option>
-              <option value="11">11</option>
-              <option value="12">12</option>
-              <option value="13">13</option>
-              <option value="14">14</option>
-              <option value="15">15</option>
-              <option value="16">16</option>
-              <option value="17">17</option>
-              <option value="18">18</option>
-              <option value="19">19</option>
-              <option value="20">20</option>
-              <option value="21">21</option>
-              <option value="22">22</option>
-              <option value="23">23</option>
-            </select>
+            <select id="addEndHour" name="addEndHour" required></select>
             :
-            <select id="addEndMinute" name="addEndMinute" required>
-              <option value="00">00</option>
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="30">30</option>
-              <option value="40">40</option>
-              <option value="50">50</option>
-            </select>
+            <select id="addEndMinute" name="addEndMinute" required></select>
           </div>
           <button type="submit">保存</button>
         </form>
@@ -501,83 +443,22 @@
           <input type="date" id="editJobDate" name="editJobDate" required />
           <label for="editStartTime">開始時間</label>
           <div class="time-input-wrapper">
-            <select id="editStartHour" name="editStartHour" required>
-              <option value="00">00</option>
-              <option value="01">01</option>
-              <option value="02">02</option>
-              <option value="03">03</option>
-              <option value="04">04</option>
-              <option value="05">05</option>
-              <option value="06">06</option>
-              <option value="07">07</option>
-              <option value="08">08</option>
-              <option value="09">09</option>
-              <option value="10">10</option>
-              <option value="11">11</option>
-              <option value="12">12</option>
-              <option value="13">13</option>
-              <option value="14">14</option>
-              <option value="15">15</option>
-              <option value="16">16</option>
-              <option value="17">17</option>
-              <option value="18">18</option>
-              <option value="19">19</option>
-              <option value="20">20</option>
-              <option value="21">21</option>
-              <option value="22">22</option>
-              <option value="23">23</option>
-            </select>
+            <select id="editStartHour" name="editStartHour" required></select>
             :
-            <select id="editStartMinute" name="editStartMinute" required>
-              <option value="00">00</option>
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="30">30</option>
-              <option value="40">40</option>
-              <option value="50">50</option>
-            </select>
+            <select
+              id="editStartMinute"
+              name="editStartMinute"
+              required
+            ></select>
           </div>
           <label for="editEndTime">結束時間</label>
           <div class="time-input-wrapper">
-            <select id="editEndHour" name="editEndHour" required>
-              <option value="00">00</option>
-              <option value="01">01</option>
-              <option value="02">02</option>
-              <option value="03">03</option>
-              <option value="04">04</option>
-              <option value="05">05</option>
-              <option value="06">06</option>
-              <option value="07">07</option>
-              <option value="08">08</option>
-              <option value="09">09</option>
-              <option value="10">10</option>
-              <option value="11">11</option>
-              <option value="12">12</option>
-              <option value="13">13</option>
-              <option value="14">14</option>
-              <option value="15">15</option>
-              <option value="16">16</option>
-              <option value="17">17</option>
-              <option value="18">18</option>
-              <option value="19">19</option>
-              <option value="20">20</option>
-              <option value="21">21</option>
-              <option value="22">22</option>
-              <option value="23">23</option>
-            </select>
+            <select id="editEndHour" name="editEndHour" required></select>
             :
-            <select id="editEndMinute" name="editEndMinute" required>
-              <option value="00">00</option>
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="30">30</option>
-              <option value="40">40</option>
-              <option value="50">50</option>
-            </select>
+            <select id="editEndMinute" name="editEndMinute" required></select>
           </div>
           <button type="submit">保存</button>
         </form>
-        <button class="delete-btn" id="deleteBtn">X</button>
       </div>
     </div>
 
@@ -595,12 +476,11 @@
         const editForm = document.getElementById("editForm");
         const jobNameInputAdd = document.getElementById("addJobName");
         const jobNameInputEdit = document.getElementById("editJobName");
-        const deleteBtn = document.getElementById("deleteBtn");
-
-        let currentWeek = new Date();
         let schedules = JSON.parse(localStorage.getItem("schedules")) || {};
         let jobNames = JSON.parse(localStorage.getItem("jobNames")) || [];
         let currentEditKey = null;
+
+        let currentWeek = new Date();
 
         function updateWeek(direction) {
           currentWeek.setDate(currentWeek.getDate() + direction * 7);
@@ -666,13 +546,13 @@
               const dayIndex = (scheduleDate.getDay() + 6) % 7;
               const startTime = parseTime(start);
               const endTime = parseTime(end);
-              const duration = (endTime - startTime) / 3600000; // 轉換為小時
+              const duration = (endTime - startTime) / 60000; // 轉換為分鐘
               const topPosition =
                 (((startTime.getHours() - 7) * 60 + startTime.getMinutes()) /
                   totalMinutesInDay) *
                 firstDayContentHeight; // 假設早上7點開始
               const height =
-                ((duration * 60) / totalMinutesInDay) * firstDayContentHeight; // 17小時的一天
+                (duration / totalMinutesInDay) * firstDayContentHeight; // 17小時的一天
               const scheduleItem = document.createElement("div");
               scheduleItem.classList.add("schedule-item");
               scheduleItem.style.top = `${topPosition}px`;
@@ -767,7 +647,6 @@
           document.getElementById("editJobName").value = jobName;
           document.getElementById("editJobDate").value = dateKey;
 
-          // 確保時間值為數字並且顯示兩位數
           const startHour = String(
             parseInt(parseTime(start).getHours())
           ).padStart(2, "0");
@@ -968,40 +847,51 @@
           const timeScale = document.querySelector(".time-scale");
           timeScale.innerHTML = ""; // 清空原有內容
 
-          const firstDayContentHeight =
-            document.querySelector(".day-content").offsetHeight;
-          const totalMinutesInDay = 17 * 60; // 17 小時
-          const headerHeight =
-            document.querySelector(".day-header").offsetHeight; // 獲取 day-header 的高度
-          const timeIntervals = [
-            "早上7:00",
-            "早上8:00",
-            "早上9:00",
-            "上午10:00",
-            "上午11:00",
-            "中午12:00",
-            "下午1:00",
-            "下午2:00",
-            "下午3:00",
-            "下午4:00",
-            "下午5:00",
-            "晚上6:00",
-            "晚上7:00",
-            "晚上8:00",
-            "晚上9:00",
-            "晚上10:00",
-            "晚上11:00",
-            "晚上12:00",
-          ];
-          timeIntervals.forEach((time, index) => {
+          const totalHours = 17; // 7 AM to 12 AM (17 hours)
+
+          for (let i = 7; i <= 23; i++) {
             const timeSlot = document.createElement("div");
             timeSlot.classList.add("time-slot");
-            const topPosition =
-              (index / (timeIntervals.length - 1)) * firstDayContentHeight +
-              headerHeight;
-            timeSlot.style.top = `${topPosition}px`;
-            timeSlot.innerHTML = time;
+            timeSlot.innerHTML = `${
+              i < 12 ? "早上" : i < 18 ? "下午" : "晚上"
+            } ${i % 12 || 12}:00`;
             timeScale.appendChild(timeSlot);
+          }
+        }
+
+        function populateTimeOptions() {
+          const hours = [...Array(24).keys()].map((i) =>
+            String(i).padStart(2, "0")
+          );
+          const minutes = [...Array(6).keys()].map((i) =>
+            String(i * 10).padStart(2, "0")
+          );
+
+          function addOptions(select, options) {
+            options.forEach((option) => {
+              const opt = document.createElement("option");
+              opt.value = option;
+              opt.textContent = option;
+              select.appendChild(opt);
+            });
+          }
+
+          [
+            "addStartHour",
+            "addEndHour",
+            "editStartHour",
+            "editEndHour",
+          ].forEach((id) => {
+            addOptions(document.getElementById(id), hours);
+          });
+
+          [
+            "addStartMinute",
+            "addEndMinute",
+            "editStartMinute",
+            "editEndMinute",
+          ].forEach((id) => {
+            addOptions(document.getElementById(id), minutes);
           });
         }
 
@@ -1012,6 +902,12 @@
         updateTimeScale(); // 初始化時間刻度
         autocomplete(jobNameInputAdd, jobNames);
         autocomplete(jobNameInputEdit, jobNames);
+        populateTimeOptions();
+
+        // 禁止雙擊縮放
+        document.addEventListener("gesturestart", function (e) {
+          e.preventDefault();
+        });
       });
     </script>
   </body>
