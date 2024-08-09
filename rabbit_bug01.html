@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -105,11 +105,12 @@
 
       .time-scale {
         position: relative;
-        width: 50px;
+        width: 45px;
         background-color: #ffd1dc;
         font-size: 8px;
         text-align: right;
         padding-top: 50px;
+        padding-left: 2px;
       }
 
       .time-slot {
@@ -220,21 +221,21 @@
 
       .toggle-container {
         display: flex;
-        justify-content: center;
+        justify-content: space-around;
         margin-bottom: 20px;
       }
 
       .toggle-button {
-        flex: 1;
-        padding: 10px;
+        padding: 5px 15px;
         cursor: pointer;
         text-align: center;
-        border: 1px solid #ff69b4;
-        color: #fff;
+        border-radius: 15px;
+        color: white;
+        font-size: 14px;
       }
 
       .toggle-button.single {
-        background-color: #ff1493;
+        background-color: #ffb6c1;
       }
 
       .toggle-button.multi {
@@ -243,7 +244,6 @@
 
       .toggle-button.active {
         background-color: #ff1493;
-        color: #fff;
       }
 
       label {
@@ -285,16 +285,17 @@
         width: 30px;
         height: 30px;
         border-radius: 50%;
-        background-color: #ff1493;
+        background-color: #ffb6c1;
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
+        font-size: 14px;
       }
 
       .weekday.selected {
-        background-color: #ff69b4;
+        background-color: #ff1493;
       }
 
       button[type="submit"] {
@@ -391,6 +392,7 @@
 
         .time-scale {
           font-size: 7px;
+          width: 40px;
         }
 
         .total-hours {
