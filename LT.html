@@ -216,7 +216,7 @@
                 <div id="wheel"></div>
             </div>
             <div class="controls">
-                <button @click="spin" :disabled="spinning">
+                <button @click="spin" :disabled="spinning || participantList.length === 0">
                     <i class="fas fa-play"></i> {{ spinning ? '抽選中...' : '開始抽選' }}
                 </button>
                 <button @click="reset" :disabled="spinning">
@@ -266,7 +266,9 @@
             },
             mounted() {
                 this.initFireworks();
-                this.initWheel();
+                this.$nextTick(() => {
+                    this.initWheel();
+                });
             },
             methods: {
                 initFireworks() {
@@ -336,8 +338,13 @@
                 },
                 updateWheel() {
                     this.participantList = this.participants.split('\n').filter(p => p.trim());
-                    this.wheel.removeWheel();
-                    this.wheel.createWheel(this.participantList);
+                    if (this.participantList.length > 0) {
+                        this.wheel.removeWheel();
+                        this.wheel.createWheel(this.participantList);
+                    } else {
+                        this.wheel.removeWheel();
+                        this.wheel.createWheel(['新增參與者']);
+                    }
                 },
                 spin() {
                     if (this.spinning || this.participantList.length === 0) return;
@@ -345,7 +352,12 @@
                     this.winner = '';
                     const spinTimes = 5 + Math.floor(Math.random() * 5);
                     const degrees = 360 * spinTimes + Math.floor(Math.random() * 360);
-                    this.wheel.navigateWheel(degrees);
+                    
+                    const animationDuration = spinTimes * 1000;
+                    const animation = new AnimationPlaybackEvent(animationDuration);
+                    
+                    this.wheel.navigateWheel(degrees, animation);
+                    
                     setTimeout(() => {
                         this.spinning = false;
                         const winnerIndex = Math.floor(degrees % 360 / (360 / this.participantList.length));
@@ -359,7 +371,7 @@
                         }
                         
                         this.showFireworks();
-                    }, spinTimes * 1000);
+                    }, animationDuration);
                 },
                 reset() {
                     this.wheel.navigateWheel(0);
