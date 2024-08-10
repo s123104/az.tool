@@ -310,16 +310,16 @@
         'numSegments': participants.length,
         'outerRadius': 140,
         'segments': participants.map((participant) => ({
-          'text': participant, // 只顯示參與者名字
-          'fillStyle': getRandomColor() // 隨機顏色
+          'text': participant,
+          'fillStyle': getRandomColor()
         })),
-        'textFontSize': 16, // 文字大小
-        'textOrientation': 'curved', // 曲線文字
+        'textFontSize': 16,
+        'textOrientation': 'curved',
         'textAlignment': 'outer',
         'animation': {
           'type': 'spinToStop',
-          'duration': 10, // 持續時間
-          'spins': 5, // 最少旋轉圈數
+          'duration': 10,
+          'spins': 5,
           'callbackFinished': displayWinner,
         }
       });
