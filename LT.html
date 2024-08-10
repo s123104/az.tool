@@ -1,317 +1,176 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>精美輪盤抽籤</title>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fireworks-js@1.4.0/dist/fireworks.js"></script>
+    <title>高質感輪盤抽籤</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #1a1a2e;
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            min-height: 100vh;
-        }
-        #app {
-            max-width: 800px;
-            width: 100%;
-        }
-        .container {
-            background-color: #16213e;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        h1 {
-            text-align: center;
-            color: #e94560;
-            margin-bottom: 20px;
-        }
-        .settings {
-            margin-bottom: 20px;
-        }
-        .settings-toggle {
-            background-color: #0f3460;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            text-align: left;
-        }
-        .settings-content {
-            background-color: #0f3460;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            border: 1px solid #e94560;
-            background-color: #1a1a2e;
-            color: white;
-        }
-        button {
-            background-color: #e94560;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #ff6b6b;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
         }
         .wheel-container {
             position: relative;
             width: 300px;
             height: 300px;
-            margin: 20px auto;
+            margin-top: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
         .wheel {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            position: relative;
-            overflow: hidden;
-            transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
-        }
-        .wheel-slice {
+            border: 10px solid #fff;
             position: absolute;
-            width: 50%;
-            height: 50%;
-            transform-origin: 100% 100%;
-            left: 50%;
             top: 0;
-            border: 2px solid #1a1a2e;
-            box-sizing: border-box;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
+            left: 0;
+            background: conic-gradient(#ff5252 0deg 45deg, #42a5f5 45deg 90deg, #66bb6a 90deg 135deg, #ffa726 135deg 180deg, #ab47bc 180deg 225deg, #29b6f6 225deg 270deg, #ff7043 270deg 315deg, #7e57c2 315deg 360deg);
+            transition: transform 5s cubic-bezier(0.42, 0, 0.58, 1);
         }
-        .pointer {
+        .wheel:after {
+            content: "";
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #fff;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 10;
+        }
+        .spin-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #ff5252;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+        .spin-button:hover {
+            background-color: #ff1744;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 24px;
+        }
+        .fireworks {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 0;
-            height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-top: 20px solid #e94560;
             transform: translate(-50%, -50%);
-            z-index: 2;
+            z-index: 20;
+            display: none;
         }
-        .winner-display {
-            text-align: center;
-            font-size: 24px;
+        .settings {
             margin-top: 20px;
-            color: #e94560;
+            max-width: 300px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
         }
         .history {
             margin-top: 20px;
-            background-color: #0f3460;
-            padding: 15px;
-            border-radius: 5px;
-        }
-        .history h3 {
-            margin-top: 0;
-        }
-        .history ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .history li {
-            margin-bottom: 5px;
-        }
-        #fireworks-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 9999;
+            width: 300px;
+            max-height: 100px;
+            overflow-y: auto;
+            border: 1px solid #fff;
+            padding: 10px;
+            background-color: #333;
         }
     </style>
 </head>
 <body>
-    <div id="app">
-        <div class="container">
-            <h1>{{ title || '精美輪盤抽籤' }}</h1>
-            <div class="settings">
-                <button @click="toggleSettings" class="settings-toggle">
-                    {{ showSettings ? '隱藏設定' : '顯示設定' }}
-                </button>
-                <div v-if="showSettings" class="settings-content">
-                    <input v-model="title" placeholder="輸入標題">
-                    <textarea v-model="content" placeholder="輸入抽獎內容"></textarea>
-                    <textarea v-model="participants" placeholder="輸入抽籤對象（一行一個）" @input="updateWheel"></textarea>
-                    <label>
-                        <input type="checkbox" v-model="removeWinner"> 移除中獎者再抽籤
-                    </label>
-                </div>
-            </div>
-            <div class="wheel-container">
-                <div class="wheel" ref="wheel">
-                    <div v-for="(participant, index) in participantList" :key="index" class="wheel-slice"
-                        :style="getSliceStyle(index)">
-                        {{ index + 1 }}
-                    </div>
-                </div>
-                <div class="pointer"></div>
-            </div>
-            <button @click="spin" :disabled="spinning">{{ spinning ? '抽籤中...' : '開始抽籤' }}</button>
-            <div class="winner-display" v-if="winner">
-                恭喜中獎者：{{ winner }}
-            </div>
-            <div class="history">
-                <h3>歷史得獎紀錄</h3>
-                <ul>
-                    <li v-for="(record, index) in winningHistory" :key="index">
-                        {{ record }}
-                    </li>
-                </ul>
-            </div>
-        </div>
+
+    <div class="settings">
+        <textarea id="input-list" placeholder="輸入抽獎對象，一行一個..."></textarea>
+        <label>
+            <input type="checkbox" id="remove-winner">
+            移除中獎者後再抽一次
+        </label>
     </div>
-    <div id="fireworks-container"></div>
+
+    <div class="wheel-container">
+        <div id="wheel" class="wheel"></div>
+    </div>
+
+    <button id="spin-button" class="spin-button">開始抽獎</button>
+
+    <div id="result" class="result"></div>
+
+    <div id="fireworks" class="fireworks">
+        <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" alt="Fireworks">
+    </div>
+
+    <div class="history" id="history">
+        <h3>歷史得獎紀錄:</h3>
+    </div>
 
     <script>
-        new Vue({
-            el: '#app',
-            data: {
-                title: '',
-                content: '',
-                participants: '',
-                participantList: [],
-                winner: '',
-                winningHistory: [],
-                spinning: false,
-                removeWinner: false,
-                showSettings: false,
-                fireworks: null
-            },
-            mounted() {
-                this.fireworks = new Fireworks(document.getElementById('fireworks-container'), {
-                    autoresize: true,
-                    opacity: 0.5,
-                    acceleration: 1.05,
-                    friction: 0.97,
-                    gravity: 1.5,
-                    particles: 50,
-                    traceLength: 3,
-                    traceSpeed: 10,
-                    explosion: 5,
-                    intensity: 30,
-                    flickering: 50,
-                    lineStyle: 'round',
-                    hue: {
-                        min: 0,
-                        max: 360
-                    },
-                    delay: {
-                        min: 30,
-                        max: 60
-                    },
-                    rocketsPoint: {
-                        min: 50,
-                        max: 50
-                    },
-                    lineWidth: {
-                        explosion: {
-                            min: 1,
-                            max: 3
-                        },
-                        trace: {
-                            min: 1,
-                            max: 2
-                        }
-                    },
-                    brightness: {
-                        min: 50,
-                        max: 80
-                    },
-                    decay: {
-                        min: 0.015,
-                        max: 0.03
-                    },
-                    mouse: {
-                        click: false,
-                        move: false,
-                        max: 1
-                    }
-                });
-            },
-            methods: {
-                toggleSettings() {
-                    this.showSettings = !this.showSettings;
-                },
-                updateWheel() {
-                    this.participantList = this.participants.split('\n').filter(p => p.trim());
-                },
-                getSliceStyle(index) {
-                    const rotate = (index / this.participantList.length) * 360;
-                    const skew = 90 - (360 / this.participantList.length);
-                    return {
-                        transform: `rotate(${rotate}deg) skew(${skew}deg)`,
-                        background: this.getRandomColor()
-                    };
-                },
-                getRandomColor() {
-                    const hue = Math.floor(Math.random() * 360);
-                    return `hsl(${hue}, 70%, 50%)`;
-                },
-                spin() {
-                    if (this.spinning || this.participantList.length === 0) return;
-                    
-                    this.spinning = true;
-                    const wheel = this.$refs.wheel;
-                    const totalRotation = 1800 + Math.random() * 360;
-                    
-                    gsap.to(wheel, {
-                        rotation: totalRotation,
-                        duration: 5,
-                        ease: "power2.out",
-                        onComplete: () => {
-                            this.determineWinner(totalRotation % 360);
-                            this.spinning = false;
-                        }
-                    });
-                },
-                determineWinner(finalAngle) {
-                    const winnerIndex = Math.floor(this.participantList.length - (finalAngle / (360 / this.participantList.length)));
-                    this.winner = this.participantList[winnerIndex % this.participantList.length];
-                    this.winningHistory.unshift(`${this.winner} (${new Date().toLocaleString()})`);
-                    
-                    if (this.removeWinner) {
-                        this.participantList.splice(winnerIndex % this.participantList.length, 1);
-                        this.participants = this.participantList.join('\n');
-                    }
-                    
-                    this.showFireworks();
-                },
-                showFireworks() {
-                    this.fireworks.start();
-                    setTimeout(() => {
-                        this.fireworks.stop();
-                    }, 3000);
+        const wheel = document.getElementById('wheel');
+        const spinButton = document.getElementById('spin-button');
+        const resultDiv = document.getElementById('result');
+        const fireworks = document.getElementById('fireworks');
+        const inputList = document.getElementById('input-list');
+        const removeWinnerCheckbox = document.getElementById('remove-winner');
+        const historyDiv = document.getElementById('history');
+
+        let segments = [];
+        let isSpinning = false;
+
+        function updateWheel() {
+            const inputText = inputList.value.trim();
+            segments = inputText.split('\n').filter(line => line.trim() !== '');
+            const anglePerSegment = 360 / segments.length;
+
+            wheel.style.background = `conic-gradient(${segments.map((_, i) => `hsl(${i * 360 / segments.length}, 100%, 50%) ${i * anglePerSegment}deg ${(i + 1) * anglePerSegment}deg`).join(', ')})`;
+        }
+
+        inputList.addEventListener('input', updateWheel);
+
+        spinButton.addEventListener('click', () => {
+            if (isSpinning || segments.length === 0) return;
+            isSpinning = true;
+            const randomAngle = Math.floor(Math.random() * 360) + 1800;  // 1800 to ensure at least 5 full spins
+            wheel.style.transform = `rotate(${randomAngle}deg)`;
+
+            setTimeout(() => {
+                const selectedIndex = Math.floor(((randomAngle % 360) / 360) * segments.length);
+                const winner = segments[selectedIndex];
+                resultDiv.textContent = `恭喜中獎者: ${winner}`;
+                showFireworks();
+
+                if (removeWinnerCheckbox.checked) {
+                    segments.splice(selectedIndex, 1);
+                    inputList.value = segments.join('\n');
+                    updateWheel();
                 }
-            }
+
+                historyDiv.innerHTML += `<p>${winner}</p>`;
+                isSpinning = false;
+            }, 5000);
         });
+
+        function showFireworks() {
+            fireworks.style.display = 'block';
+            setTimeout(() => {
+                fireworks.style.display = 'none';
+            }, 2000);
+        }
+
+        updateWheel(); // Initial update
     </script>
 </body>
 </html>
