@@ -1,176 +1,394 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高質感輪盤抽籤</title>
+    <title>幸運轉盤</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Winwheel/1.0.1/Winwheel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fireworks-js@1.4.0/dist/fireworks.js"></script>
     <style>
+        :root {
+            --primary-color: #6200EA;
+            --secondary-color: #03DAC6;
+            --background-color: #121212;
+            --surface-color: #1E1E1E;
+            --on-surface-color: #FFFFFF;
+            --error-color: #CF6679;
+        }
         body {
-            font-family: Arial, sans-serif;
-            background-color: #1a1a1a;
-            color: #fff;
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--background-color);
+            color: var(--on-surface-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #app {
+            max-width: 1000px;
+            width: 100%;
+            padding: 20px;
+        }
+        .container {
+            background-color: var(--surface-color);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
+        }
+        h1 {
+            font-size: 3rem;
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+            text-align: center;
         }
         .wheel-container {
             position: relative;
-            width: 300px;
-            height: 300px;
-            margin-top: 20px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 400px;
+            height: 400px;
+            margin: 20px auto;
         }
-        .wheel {
-            width: 100%;
-            height: 100%;
+        canvas {
             border-radius: 50%;
-            border: 10px solid #fff;
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: conic-gradient(#ff5252 0deg 45deg, #42a5f5 45deg 90deg, #66bb6a 90deg 135deg, #ffa726 135deg 180deg, #ab47bc 180deg 225deg, #29b6f6 225deg 270deg, #ff7043 270deg 315deg, #7e57c2 315deg 360deg);
-            transition: transform 5s cubic-bezier(0.42, 0, 0.58, 1);
+            box-shadow: 0 0 20px rgba(3, 218, 198, 0.3);
         }
-        .wheel:after {
-            content: "";
+        .pointer {
             position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: #fff;
-            top: 50%;
+            top: -20px;
             left: 50%;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-            z-index: 10;
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid var(--secondary-color);
+            transform: translateX(-50%);
+            z-index: 2;
         }
-        .spin-button {
+        .controls {
+            display: flex;
+            justify-content: center;
             margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #ff5252;
+        }
+        button {
+            background-color: var(--primary-color);
+            color: white;
             border: none;
-            border-radius: 5px;
+            padding: 12px 24px;
+            border-radius: 50px;
             cursor: pointer;
-            font-size: 18px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, transform 0.3s;
+            font-size: 1.2rem;
+            margin: 0 10px;
         }
-        .spin-button:hover {
-            background-color: #ff1744;
+        button:hover {
+            background-color: #7C4DFF;
+            transform: translateY(-2px);
         }
-        .result {
-            margin-top: 20px;
-            font-size: 24px;
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
         }
-        .fireworks {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 20;
-            display: none;
+        .winner-display {
+            text-align: center;
+            font-size: 2rem;
+            margin-top: 30px;
+            color: var(--secondary-color);
+            min-height: 60px;
         }
-        .settings {
-            margin-top: 20px;
-            max-width: 300px;
+        .settings-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            transition: background-color 0.3s, transform 0.3s;
         }
-        textarea {
+        .settings-toggle:hover {
+            background-color: #7C4DFF;
+            transform: rotate(90deg);
+        }
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100vh;
+            background-color: var(--surface-color);
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+            transition: right 0.3s ease-in-out;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .settings-panel.open {
+            right: 0;
+        }
+        .settings-panel h3 {
+            color: var(--secondary-color);
+            margin-top: 0;
+        }
+        .settings-panel input, .settings-panel textarea {
             width: 100%;
-            height: 100px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid var(--primary-color);
+            background-color: var(--background-color);
+            color: white;
+        }
+        .settings-panel label {
+            display: flex;
+            align-items: center;
             margin-bottom: 10px;
         }
+        .settings-panel input[type="checkbox"] {
+            margin-right: 10px;
+            width: auto;
+        }
         .history {
-            margin-top: 20px;
-            width: 300px;
-            max-height: 100px;
+            margin-top: 30px;
+            background-color: var(--surface-color);
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 100%;
+        }
+        .history h3 {
+            margin-top: 0;
+            color: var(--secondary-color);
+        }
+        .history ul {
+            list-style-type: none;
+            padding: 0;
+            max-height: 200px;
             overflow-y: auto;
-            border: 1px solid #fff;
+        }
+        .history li {
+            margin-bottom: 10px;
             padding: 10px;
-            background-color: #333;
+            background-color: rgba(98, 0, 234, 0.1);
+            border-radius: 5px;
+        }
+        #fireworks-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
         }
     </style>
 </head>
 <body>
-
-    <div class="settings">
-        <textarea id="input-list" placeholder="輸入抽獎對象，一行一個..."></textarea>
-        <label>
-            <input type="checkbox" id="remove-winner">
-            移除中獎者後再抽一次
-        </label>
+    <div id="app">
+        <div class="container">
+            <h1>{{ title || '幸運轉盤' }}</h1>
+            <div class="wheel-container">
+                <canvas ref="canvas" width="400" height="400"></canvas>
+                <div class="pointer"></div>
+            </div>
+            <div class="controls">
+                <button @click="spin" :disabled="spinning">
+                    <i class="fas fa-play"></i> {{ spinning ? '抽選中...' : '開始抽選' }}
+                </button>
+                <button @click="reset" :disabled="spinning">
+                    <i class="fas fa-redo"></i> 重置
+                </button>
+            </div>
+            <div class="winner-display" v-if="winner">
+                <i class="fas fa-trophy"></i> {{ winner }}
+            </div>
+            <div class="history">
+                <h3><i class="fas fa-history"></i> 歷史紀錄</h3>
+                <ul>
+                    <li v-for="(record, index) in winningHistory" :key="index">
+                        {{ record }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <button class="settings-toggle" @click="toggleSettings">
+            <i class="fas fa-cog"></i>
+        </button>
+        <div class="settings-panel" :class="{ open: showSettings }">
+            <h3><i class="fas fa-sliders-h"></i> 設定</h3>
+            <input v-model="title" placeholder="輸入標題">
+            <textarea v-model="participants" placeholder="輸入參與者（一行一個）" @input="updateWheel"></textarea>
+            <label>
+                <input type="checkbox" v-model="removeWinner"> 移除中獎者再抽籤
+            </label>
+        </div>
     </div>
-
-    <div class="wheel-container">
-        <div id="wheel" class="wheel"></div>
-    </div>
-
-    <button id="spin-button" class="spin-button">開始抽獎</button>
-
-    <div id="result" class="result"></div>
-
-    <div id="fireworks" class="fireworks">
-        <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" alt="Fireworks">
-    </div>
-
-    <div class="history" id="history">
-        <h3>歷史得獎紀錄:</h3>
-    </div>
+    <div id="fireworks-container"></div>
 
     <script>
-        const wheel = document.getElementById('wheel');
-        const spinButton = document.getElementById('spin-button');
-        const resultDiv = document.getElementById('result');
-        const fireworks = document.getElementById('fireworks');
-        const inputList = document.getElementById('input-list');
-        const removeWinnerCheckbox = document.getElementById('remove-winner');
-        const historyDiv = document.getElementById('history');
+        new Vue({
+            el: '#app',
+            data: {
+                title: '',
+                participants: '',
+                participantList: [],
+                winner: '',
+                winningHistory: [],
+                spinning: false,
+                removeWinner: false,
+                showSettings: false,
+                fireworks: null,
+                wheel: null
+            },
+            mounted() {
+                this.initFireworks();
+                this.initWheel();
+            },
+            methods: {
+                initFireworks() {
+                    this.fireworks = new Fireworks(document.getElementById('fireworks-container'), {
+                        autoresize: true,
+                        opacity: 0.5,
+                        acceleration: 1.05,
+                        friction: 0.97,
+                        gravity: 1.5,
+                        particles: 50,
+                        traceLength: 3,
+                        traceSpeed: 10,
+                        explosion: 5,
+                        intensity: 30,
+                        flickering: 50,
+                        lineStyle: 'round',
+                        hue: {
+                            min: 0,
+                            max: 360
+                        },
+                        delay: {
+                            min: 30,
+                            max: 60
+                        },
+                        rocketsPoint: {
+                            min: 50,
+                            max: 50
+                        },
+                        lineWidth: {
+                            explosion: {
+                                min: 1,
+                                max: 3
+                            },
+                            trace: {
+                                min: 1,
+                                max: 2
+                            }
+                        },
+                        brightness: {
+                            min: 50,
+                            max: 80
+                        },
+                        decay: {
+                            min: 0.015,
+                            max: 0.03
+                        },
+                        mouse: {
+                            click: false,
+                            move: false,
+                            max: 1
+                        }
+                    });
+                },
+                initWheel() {
+                    this.wheel = new Winwheel({
+                        canvasId: this.$refs.canvas,
+                        numSegments: 1,
+                        segments: [{ fillStyle: '#ccc', text: '新增參與者' }],
+                        animation: {
+                            type: 'spinToStop',
+                            duration: 5,
+                            spins: 8,
+                            callbackFinished: this.alertPrize
+                        }
+                    });
+                },
+                updateWheel() {
+                    this.participantList = this.participants.split('\n').filter(p => p.trim());
+                    const segments = this.participantList.map((participant, index) => ({
+                        fillStyle: this.getRandomColor(),
+                        text: participant,
+                        textFontFamily: 'Noto Sans TC',
+                        textFontSize: 16,
+                        textOrientation: 'horizontal',
+                        textAlignment: 'outer'
+                    }));
 
-        let segments = [];
-        let isSpinning = false;
-
-        function updateWheel() {
-            const inputText = inputList.value.trim();
-            segments = inputText.split('\n').filter(line => line.trim() !== '');
-            const anglePerSegment = 360 / segments.length;
-
-            wheel.style.background = `conic-gradient(${segments.map((_, i) => `hsl(${i * 360 / segments.length}, 100%, 50%) ${i * anglePerSegment}deg ${(i + 1) * anglePerSegment}deg`).join(', ')})`;
-        }
-
-        inputList.addEventListener('input', updateWheel);
-
-        spinButton.addEventListener('click', () => {
-            if (isSpinning || segments.length === 0) return;
-            isSpinning = true;
-            const randomAngle = Math.floor(Math.random() * 360) + 1800;  // 1800 to ensure at least 5 full spins
-            wheel.style.transform = `rotate(${randomAngle}deg)`;
-
-            setTimeout(() => {
-                const selectedIndex = Math.floor(((randomAngle % 360) / 360) * segments.length);
-                const winner = segments[selectedIndex];
-                resultDiv.textContent = `恭喜中獎者: ${winner}`;
-                showFireworks();
-
-                if (removeWinnerCheckbox.checked) {
-                    segments.splice(selectedIndex, 1);
-                    inputList.value = segments.join('\n');
-                    updateWheel();
+                    this.wheel = new Winwheel({
+                        canvasId: this.$refs.canvas,
+                        numSegments: segments.length,
+                        segments: segments,
+                        animation: {
+                            type: 'spinToStop',
+                            duration: 5,
+                            spins: 8,
+                            callbackFinished: this.alertPrize
+                        }
+                    });
+                },
+                getRandomColor() {
+                    const hue = Math.floor(Math.random() * 360);
+                    return `hsl(${hue}, 70%, 50%)`;
+                },
+                spin() {
+                    if (this.spinning || this.participantList.length === 0) return;
+                    this.spinning = true;
+                    this.winner = '';
+                    this.wheel.startAnimation();
+                },
+                alertPrize(indicatedSegment) {
+                    this.spinning = false;
+                    this.winner = indicatedSegment.text;
+                    this.winningHistory.unshift(`${this.winner} (${new Date().toLocaleString()})`);
+                    
+                    if (this.removeWinner) {
+                        const index = this.participantList.indexOf(this.winner);
+                        if (index > -1) {
+                            this.participantList.splice(index, 1);
+                            this.participants = this.participantList.join('\n');
+                            this.updateWheel();
+                        }
+                    }
+                    
+                    this.showFireworks();
+                },
+                reset() {
+                    this.wheel.stopAnimation(false);
+                    this.wheel.rotationAngle = 0;
+                    this.wheel.draw();
+                    this.winner = '';
+                },
+                toggleSettings() {
+                    this.showSettings = !this.showSettings;
+                },
+                showFireworks() {
+                    this.fireworks.start();
+                    setTimeout(() => {
+                        this.fireworks.stop();
+                    }, 3000);
                 }
-
-                historyDiv.innerHTML += `<p>${winner}</p>`;
-                isSpinning = false;
-            }, 5000);
+            }
         });
-
-        function showFireworks() {
-            fireworks.style.display = 'block';
-            setTimeout(() => {
-                fireworks.style.display = 'none';
-            }, 2000);
-        }
-
-        updateWheel(); // Initial update
     </script>
 </body>
 </html>
