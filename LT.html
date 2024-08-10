@@ -12,6 +12,7 @@
     --primary-color: #4fc3dc;
     --background-color: #1a1a2e;
     --text-color: #ffffff;
+    --accent-color: #f72585;
   }
 
   body {
@@ -43,7 +44,7 @@
     text-align: center;
     color: var(--primary-color);
     text-shadow: 0 0 10px rgba(79, 195, 220, 0.8);
-    font-size: 24px;
+    font-size: 28px;
     margin-bottom: 20px;
   }
 
@@ -61,72 +62,86 @@
     background: var(--primary-color);
     color: var(--background-color);
     border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
+    padding: 15px 30px;
+    border-radius: 50px;
     cursor: pointer;
     transition: all 0.3s ease;
     margin-bottom: 20px;
     width: 100%;
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
   .toggle-settings:hover {
-    background: #3a95a8;
+    background: var(--accent-color);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(79, 195, 220, 0.4);
+    box-shadow: 0 5px 15px rgba(247, 37, 133, 0.4);
   }
 
   .input-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
   }
 
   label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     color: var(--primary-color);
+    font-size: 16px;
+    font-weight: bold;
   }
 
   input[type="text"], textarea {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border: none;
     background: rgba(255, 255, 255, 0.1);
     color: var(--text-color);
-    border-radius: 5px;
+    border-radius: 8px;
     font-size: 16px;
+    transition: all 0.3s ease;
+  }
+
+  input[type="text"]:focus, textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--primary-color);
   }
 
   textarea {
-    height: 100px;
+    height: 120px;
     resize: vertical;
   }
 
   .wheel-container {
     position: relative;
-    width: 280px;
-    height: 280px;
+    width: 300px;
+    height: 300px;
     margin: 30px auto;
   }
 
   .wheel-pointer {
     position: absolute;
-    top: -20px;
+    top: -30px;
     left: 50%;
     transform: translateX(-50%);
     width: 0;
     height: 0;
-    border-left: 20px solid transparent;
-    border-right: 20px solid transparent;
-    border-top: 40px solid var(--primary-color);
+    border-left: 30px solid transparent;
+    border-right: 30px solid transparent;
+    border-top: 60px solid var(--accent-color);
     z-index: 10;
+    filter: drop-shadow(0 0 10px rgba(247, 37, 133, 0.8));
   }
 
   .result {
     text-align: center;
-    font-size: 20px;
+    font-size: 24px;
     margin-top: 20px;
-    color: var(--primary-color);
-    text-shadow: 0 0 10px rgba(79, 195, 220, 0.8);
-    min-height: 30px;
+    color: var(--accent-color);
+    text-shadow: 0 0 10px rgba(247, 37, 133, 0.8);
+    min-height: 36px;
+    font-weight: bold;
   }
 
   .history {
@@ -140,8 +155,8 @@
 
   .history h2 {
     color: var(--primary-color);
-    margin-bottom: 10px;
-    font-size: 20px;
+    margin-bottom: 15px;
+    font-size: 22px;
   }
 
   .history ul {
@@ -152,9 +167,15 @@
   }
 
   .history li {
-    padding: 5px 0;
+    padding: 10px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    font-size: 14px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+  }
+
+  .history li:hover {
+    background: rgba(255, 255, 255, 0.1);
+    padding-left: 10px;
   }
 
   .checkbox-wrapper {
@@ -165,23 +186,28 @@
 
   .checkbox-wrapper input[type="checkbox"] {
     margin-right: 10px;
+    width: 20px;
+    height: 20px;
   }
 
   #startBtn {
-    background: var(--primary-color);
-    color: var(--background-color);
+    background: var(--accent-color);
+    color: var(--text-color);
     border: none;
     padding: 15px 30px;
-    border-radius: 5px;
+    border-radius: 50px;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 18px;
+    font-size: 20px;
+    font-weight: bold;
     margin-top: 20px;
     width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
   #startBtn:hover {
-    background: #3a95a8;
+    background: var(--primary-color);
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(79, 195, 220, 0.4);
   }
@@ -202,16 +228,16 @@
     }
 
     h1 {
-      font-size: 20px;
+      font-size: 24px;
     }
 
     .wheel-container {
-      width: 240px;
-      height: 240px;
+      width: 260px;
+      height: 260px;
     }
 
     #startBtn {
-      font-size: 16px;
+      font-size: 18px;
       padding: 12px 24px;
     }
   }
@@ -243,7 +269,7 @@
     <button id="startBtn">開始抽獎</button>
     
     <div class="wheel-container">
-      <canvas id="wheelCanvas" width="280" height="280"></canvas>
+      <canvas id="wheelCanvas" width="300" height="300"></canvas>
       <div class="wheel-pointer"></div>
     </div>
     
@@ -273,6 +299,7 @@
     let participants = [];
     let isSpinning = false;
     let myWheel;
+    let audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-slot-machine-spin-1925.mp3');
 
     toggleSettings.addEventListener('click', () => {
       settings.classList.toggle('open');
@@ -301,6 +328,7 @@
       }
 
       result.textContent = '輪盤旋轉中...';
+      audio.play();
       myWheel.startAnimation();
     }
 
@@ -308,7 +336,7 @@
       myWheel = new Winwheel({
         'canvasId': 'wheelCanvas',
         'numSegments': participants.length,
-        'outerRadius': 140,
+        'outerRadius': 145,
         'segments': participants.map((participant) => ({
           'text': participant,
           'fillStyle': getRandomColor()
@@ -319,19 +347,15 @@
         'animation': {
           'type': 'spinToStop',
           'duration': 10,
-          'spins': 5,
+          'spins': 8,
           'callbackFinished': displayWinner,
         }
       });
     }
 
     function getRandomColor() {
-      const letters = '0123456789ABCDEF';
-      let color = '#';
-      for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-      }
-      return color;
+      const hue = Math.floor(Math.random() * 360);
+      return `hsl(${hue}, 70%, 60%)`;
     }
 
     function displayWinner(indicatedSegment) {
@@ -369,7 +393,7 @@
         acceleration: 1.05,
         friction: 0.97,
         gravity: 1.5,
-        particles: 50,
+        particles: 80,
         traceLength: 3,
         traceSpeed: 10,
         explosion: 5,
