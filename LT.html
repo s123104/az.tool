@@ -1,448 +1,317 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>現代感遊戲風格輪盤抽獎</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.x/dist/index.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/zarocknz/javascript-winwheel/Winwheel.min.js"></script>
-<style>
-  :root {
-    --primary-color: #4fc3dc;
-    --background-color: #1a1a2e;
-    --text-color: #ffffff;
-    --accent-color: #f72585;
-  }
-
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, var(--background-color), #16213e);
-    color: var(--text-color);
-    margin: 0;
-    padding: 20px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .container {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    max-width: 100%;
-    width: 90%;
-    margin-bottom: 20px;
-    transition: all 0.3s ease;
-  }
-
-  h1 {
-    text-align: center;
-    color: var(--primary-color);
-    text-shadow: 0 0 10px rgba(79, 195, 220, 0.8);
-    font-size: 28px;
-    margin-bottom: 20px;
-  }
-
-  .settings {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-  }
-
-  .settings.open {
-    max-height: 1000px;
-  }
-
-  .toggle-settings {
-    background: var(--primary-color);
-    color: var(--background-color);
-    border: none;
-    padding: 15px 30px;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-bottom: 20px;
-    width: 100%;
-    font-size: 18px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .toggle-settings:hover {
-    background: var(--accent-color);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(247, 37, 133, 0.4);
-  }
-
-  .input-group {
-    margin-bottom: 20px;
-  }
-
-  label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--primary-color);
-    font-size: 16px;
-    font-weight: bold;
-  }
-
-  input[type="text"], textarea {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-color);
-    border-radius: 8px;
-    font-size: 16px;
-    transition: all 0.3s ease;
-  }
-
-  input[type="text"]:focus, textarea:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px var(--primary-color);
-  }
-
-  textarea {
-    height: 120px;
-    resize: vertical;
-  }
-
-  .wheel-container {
-    position: relative;
-    width: 300px;
-    height: 300px;
-    margin: 30px auto;
-  }
-
-  .wheel-pointer {
-    position: absolute;
-    top: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 30px solid transparent;
-    border-right: 30px solid transparent;
-    border-top: 60px solid var(--accent-color);
-    z-index: 10;
-    filter: drop-shadow(0 0 10px rgba(247, 37, 133, 0.8));
-  }
-
-  .result {
-    text-align: center;
-    font-size: 24px;
-    margin-top: 20px;
-    color: var(--accent-color);
-    text-shadow: 0 0 10px rgba(247, 37, 133, 0.8);
-    min-height: 36px;
-    font-weight: bold;
-  }
-
-  .history {
-    margin-top: 30px;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    width: 90%;
-    max-width: 100%;
-  }
-
-  .history h2 {
-    color: var(--primary-color);
-    margin-bottom: 15px;
-    font-size: 22px;
-  }
-
-  .history ul {
-    list-style-type: none;
-    padding: 0;
-    max-height: 200px;
-    overflow-y: auto;
-  }
-
-  .history li {
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    font-size: 16px;
-    transition: all 0.3s ease;
-  }
-
-  .history li:hover {
-    background: rgba(255, 255, 255, 0.1);
-    padding-left: 10px;
-  }
-
-  .checkbox-wrapper {
-    display: flex;
-    align-items: center;
-    margin-top: 20px;
-  }
-
-  .checkbox-wrapper input[type="checkbox"] {
-    margin-right: 10px;
-    width: 20px;
-    height: 20px;
-  }
-
-  #startBtn {
-    background: var(--accent-color);
-    color: var(--text-color);
-    border: none;
-    padding: 15px 30px;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 20px;
-    font-weight: bold;
-    margin-top: 20px;
-    width: 100%;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  #startBtn:hover {
-    background: var(--primary-color);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(79, 195, 220, 0.4);
-  }
-
-  #fireworks {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 9999;
-  }
-
-  @media (max-width: 480px) {
-    .container {
-      padding: 15px;
-    }
-
-    h1 {
-      font-size: 24px;
-    }
-
-    .wheel-container {
-      width: 260px;
-      height: 260px;
-    }
-
-    #startBtn {
-      font-size: 18px;
-      padding: 12px 24px;
-    }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>精美輪盤抽籤</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fireworks-js@1.4.0/dist/fireworks.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1a1a2e;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #app {
+            max-width: 800px;
+            width: 100%;
+        }
+        .container {
+            background-color: #16213e;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #e94560;
+            margin-bottom: 20px;
+        }
+        .settings {
+            margin-bottom: 20px;
+        }
+        .settings-toggle {
+            background-color: #0f3460;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+        }
+        .settings-content {
+            background-color: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #e94560;
+            background-color: #1a1a2e;
+            color: white;
+        }
+        button {
+            background-color: #e94560;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #ff6b6b;
+        }
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+        }
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        .wheel-slice {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%;
+            left: 50%;
+            top: 0;
+            border: 2px solid #1a1a2e;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .pointer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 20px solid #e94560;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+        .winner-display {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 20px;
+            color: #e94560;
+        }
+        .history {
+            margin-top: 20px;
+            background-color: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .history h3 {
+            margin-top: 0;
+        }
+        .history ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .history li {
+            margin-bottom: 5px;
+        }
+        #fireworks-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>現代感遊戲風格輪盤抽獎</h1>
-    
-    <button class="toggle-settings" id="toggleSettings">顯示/隱藏設定</button>
-    
-    <div class="settings" id="settings">
-      <div class="input-group">
-        <label for="title">抽獎標題：</label>
-        <input type="text" id="title" placeholder="輸入抽獎標題">
-      </div>
-      
-      <div class="input-group">
-        <label for="content">抽獎內容：</label>
-        <input type="text" id="content" placeholder="輸入抽獎內容">
-      </div>
-      
-      <div class="input-group">
-        <label for="participants">抽獎對象（每行一個）：</label>
-        <textarea id="participants" placeholder="輸入抽獎對象，每行一個"></textarea>
-      </div>
+    <div id="app">
+        <div class="container">
+            <h1>{{ title || '精美輪盤抽籤' }}</h1>
+            <div class="settings">
+                <button @click="toggleSettings" class="settings-toggle">
+                    {{ showSettings ? '隱藏設定' : '顯示設定' }}
+                </button>
+                <div v-if="showSettings" class="settings-content">
+                    <input v-model="title" placeholder="輸入標題">
+                    <textarea v-model="content" placeholder="輸入抽獎內容"></textarea>
+                    <textarea v-model="participants" placeholder="輸入抽籤對象（一行一個）" @input="updateWheel"></textarea>
+                    <label>
+                        <input type="checkbox" v-model="removeWinner"> 移除中獎者再抽籤
+                    </label>
+                </div>
+            </div>
+            <div class="wheel-container">
+                <div class="wheel" ref="wheel">
+                    <div v-for="(participant, index) in participantList" :key="index" class="wheel-slice"
+                        :style="getSliceStyle(index)">
+                        {{ index + 1 }}
+                    </div>
+                </div>
+                <div class="pointer"></div>
+            </div>
+            <button @click="spin" :disabled="spinning">{{ spinning ? '抽籤中...' : '開始抽籤' }}</button>
+            <div class="winner-display" v-if="winner">
+                恭喜中獎者：{{ winner }}
+            </div>
+            <div class="history">
+                <h3>歷史得獎紀錄</h3>
+                <ul>
+                    <li v-for="(record, index) in winningHistory" :key="index">
+                        {{ record }}
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
-    
-    <button id="startBtn">開始抽獎</button>
-    
-    <div class="wheel-container">
-      <canvas id="wheelCanvas" width="300" height="300"></canvas>
-      <div class="wheel-pointer"></div>
-    </div>
-    
-    <div class="result" id="result"></div>
-    
-    <div class="checkbox-wrapper">
-      <input type="checkbox" id="removeWinner">
-      <label for="removeWinner">移除中獎者再抽一次</label>
-    </div>
-  </div>
+    <div id="fireworks-container"></div>
 
-  <div class="history">
-    <h2>歷史得獎紀錄</h2>
-    <ul id="historyList"></ul>
-  </div>
-
-  <div id="fireworks"></div>
-
-  <script>
-    const startBtn = document.getElementById('startBtn');
-    const result = document.getElementById('result');
-    const removeWinner = document.getElementById('removeWinner');
-    const historyList = document.getElementById('historyList');
-    const toggleSettings = document.getElementById('toggleSettings');
-    const settings = document.getElementById('settings');
-    const participantsTextarea = document.getElementById('participants');
-    let participants = [];
-    let isSpinning = false;
-    let myWheel;
-    let audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-slot-machine-spin-1925.mp3');
-
-    toggleSettings.addEventListener('click', () => {
-      settings.classList.toggle('open');
-    });
-
-    startBtn.addEventListener('click', startLottery);
-
-    participantsTextarea.addEventListener('input', updateParticipants);
-
-    function updateParticipants() {
-      participants = participantsTextarea.value.split('\n').filter(p => p.trim() !== '');
-      updateWheel();
-    }
-
-    function startLottery() {
-      if (isSpinning) return;
-      isSpinning = true;
-
-      const title = document.getElementById('title').value;
-      const content = document.getElementById('content').value;
-      
-      if (participants.length === 0) {
-        alert('請輸入抽獎對象！');
-        isSpinning = false;
-        return;
-      }
-
-      result.textContent = '輪盤旋轉中...';
-      audio.play();
-      myWheel.startAnimation();
-    }
-
-    function updateWheel() {
-      myWheel = new Winwheel({
-        'canvasId': 'wheelCanvas',
-        'numSegments': participants.length,
-        'outerRadius': 145,
-        'segments': participants.map((participant) => ({
-          'text': participant,
-          'fillStyle': getRandomColor()
-        })),
-        'textFontSize': 16,
-        'textOrientation': 'curved',
-        'textAlignment': 'outer',
-        'animation': {
-          'type': 'spinToStop',
-          'duration': 10,
-          'spins': 8,
-          'callbackFinished': displayWinner,
-        }
-      });
-    }
-
-    function getRandomColor() {
-      const hue = Math.floor(Math.random() * 360);
-      return `hsl(${hue}, 70%, 60%)`;
-    }
-
-    function displayWinner(indicatedSegment) {
-      const winner = indicatedSegment.text;
-      result.textContent = `恭喜中獎者：${winner}`;
-      launchFireworks();
-      addToHistory(document.getElementById('title').value, document.getElementById('content').value, winner);
-
-      if (removeWinner.checked) {
-        const winnerIndex = participants.indexOf(winner);
-        participants.splice(winnerIndex, 1);
-        participantsTextarea.value = participants.join('\n');
-        updateWheel();
-      }
-
-      isSpinning = false;
-    }
-
-    function addToHistory(title, content, winner) {
-      const listItem = document.createElement('li');
-      listItem.textContent = `${title} - ${content}: ${winner}`;
-      historyList.prepend(listItem);
-      
-      gsap.from(listItem, {
-        opacity: 0,
-        y: -20,
-        duration: 0.5,
-        ease: "power2.out"
-      });
-    }
-
-    function launchFireworks() {
-      const fireworks = new Fireworks(document.getElementById('fireworks'), {
-        opacity: 0.5,
-        acceleration: 1.05,
-        friction: 0.97,
-        gravity: 1.5,
-        particles: 80,
-        traceLength: 3,
-        traceSpeed: 10,
-        explosion: 5,
-        intensity: 30,
-        flickering: 50,
-        lineStyle: 'round',
-        hue: {
-          min: 0,
-          max: 360
-        },
-        delay: {
-          min: 30,
-          max: 60
-        },
-        rocketsPoint: {
-          min: 50,
-          max: 50
-        },
-        lineWidth: {
-          explosion: {
-            min: 1,
-            max: 3
-          },
-          trace: {
-            min: 1,
-            max: 2
-          }
-        },
-        brightness: {
-          min: 50,
-          max: 80
-        },
-        decay: {
-          min: 0.015,
-          max: 0.03
-        },
-        mouse: {
-          click: false,
-          move: false,
-          max: 1
-        }
-      });
-      
-      fireworks.start();
-      setTimeout(() => fireworks.stop(), 3000);
-    }
-
-    // 初始化輪盤
-    updateWheel();
-  </script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                title: '',
+                content: '',
+                participants: '',
+                participantList: [],
+                winner: '',
+                winningHistory: [],
+                spinning: false,
+                removeWinner: false,
+                showSettings: false,
+                fireworks: null
+            },
+            mounted() {
+                this.fireworks = new Fireworks(document.getElementById('fireworks-container'), {
+                    autoresize: true,
+                    opacity: 0.5,
+                    acceleration: 1.05,
+                    friction: 0.97,
+                    gravity: 1.5,
+                    particles: 50,
+                    traceLength: 3,
+                    traceSpeed: 10,
+                    explosion: 5,
+                    intensity: 30,
+                    flickering: 50,
+                    lineStyle: 'round',
+                    hue: {
+                        min: 0,
+                        max: 360
+                    },
+                    delay: {
+                        min: 30,
+                        max: 60
+                    },
+                    rocketsPoint: {
+                        min: 50,
+                        max: 50
+                    },
+                    lineWidth: {
+                        explosion: {
+                            min: 1,
+                            max: 3
+                        },
+                        trace: {
+                            min: 1,
+                            max: 2
+                        }
+                    },
+                    brightness: {
+                        min: 50,
+                        max: 80
+                    },
+                    decay: {
+                        min: 0.015,
+                        max: 0.03
+                    },
+                    mouse: {
+                        click: false,
+                        move: false,
+                        max: 1
+                    }
+                });
+            },
+            methods: {
+                toggleSettings() {
+                    this.showSettings = !this.showSettings;
+                },
+                updateWheel() {
+                    this.participantList = this.participants.split('\n').filter(p => p.trim());
+                },
+                getSliceStyle(index) {
+                    const rotate = (index / this.participantList.length) * 360;
+                    const skew = 90 - (360 / this.participantList.length);
+                    return {
+                        transform: `rotate(${rotate}deg) skew(${skew}deg)`,
+                        background: this.getRandomColor()
+                    };
+                },
+                getRandomColor() {
+                    const hue = Math.floor(Math.random() * 360);
+                    return `hsl(${hue}, 70%, 50%)`;
+                },
+                spin() {
+                    if (this.spinning || this.participantList.length === 0) return;
+                    
+                    this.spinning = true;
+                    const wheel = this.$refs.wheel;
+                    const totalRotation = 1800 + Math.random() * 360;
+                    
+                    gsap.to(wheel, {
+                        rotation: totalRotation,
+                        duration: 5,
+                        ease: "power2.out",
+                        onComplete: () => {
+                            this.determineWinner(totalRotation % 360);
+                            this.spinning = false;
+                        }
+                    });
+                },
+                determineWinner(finalAngle) {
+                    const winnerIndex = Math.floor(this.participantList.length - (finalAngle / (360 / this.participantList.length)));
+                    this.winner = this.participantList[winnerIndex % this.participantList.length];
+                    this.winningHistory.unshift(`${this.winner} (${new Date().toLocaleString()})`);
+                    
+                    if (this.removeWinner) {
+                        this.participantList.splice(winnerIndex % this.participantList.length, 1);
+                        this.participants = this.participantList.join('\n');
+                    }
+                    
+                    this.showFireworks();
+                },
+                showFireworks() {
+                    this.fireworks.start();
+                    setTimeout(() => {
+                        this.fireworks.stop();
+                    }, 3000);
+                }
+            }
+        });
+    </script>
 </body>
 </html>
