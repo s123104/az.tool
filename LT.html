@@ -309,9 +309,13 @@
         'canvasId': 'wheelCanvas',
         'numSegments': participants.length,
         'outerRadius': 140,
-        'segments': participants.map((participant, index) => ({
-          'text': `#${index + 1} ${participant}`,
+        'segments': participants.map((participant) => ({
+          'text': participant, // 只顯示參與者名字
+          'fillStyle': getRandomColor() // 隨機顏色
         })),
+        'textFontSize': 16, // 文字大小
+        'textOrientation': 'curved', // 曲線文字
+        'textAlignment': 'outer',
         'animation': {
           'type': 'spinToStop',
           'duration': 10, // 持續時間
@@ -321,6 +325,15 @@
       });
     }
 
+    function getRandomColor() {
+      const letters = '0123456789ABCDEF';
+      let color = '#';
+      for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
+
     function displayWinner(indicatedSegment) {
       const winner = indicatedSegment.text;
       result.textContent = `恭喜中獎者：${winner}`;
@@ -328,7 +341,7 @@
       addToHistory(document.getElementById('title').value, document.getElementById('content').value, winner);
 
       if (removeWinner.checked) {
-        const winnerIndex = participants.findIndex(p => `#${participants.indexOf(p) + 1} ${p}` === winner);
+        const winnerIndex = participants.indexOf(winner);
         participants.splice(winnerIndex, 1);
         participantsTextarea.value = participants.join('\n');
         updateWheel();
