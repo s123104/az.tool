@@ -1,393 +1,188 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>幸運轉盤</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/wheelnav@1.7.1/js/dist/raphael.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/wheelnav@1.7.1/js/dist/wheelnav.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fireworks-js@1.4.0/dist/fireworks.js"></script>
-    <style>
-        :root {
-            --primary-color: #FFB900;
-            --secondary-color: #FF8C00;
-            --background-color: #FFF9C4;
-            --surface-color: #FFFFFF;
-            --text-color: #333333;
-            --accent-color: #FF6D00;
-        }
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        #app {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-        .container {
-            background-color: var(--surface-color);
-            border-radius: 24px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 500px;
-            box-sizing: border-box;
-        }
-        h1 {
-            font-size: 2rem;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .wheel-container {
-            position: relative;
-            width: 100%;
-            padding-bottom: 100%;
-            margin: 0 auto;
-        }
-        #wheel {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        .controls {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        button {
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s;
-            font-size: 1rem;
-            margin: 0 10px;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-2px);
-        }
-        button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-        .winner-display {
-            text-align: center;
-            font-size: 1.5rem;
-            margin-top: 20px;
-            color: var(--accent-color);
-            min-height: 40px;
-        }
-        .settings-toggle {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5rem;
-            transition: background-color 0.3s, transform 0.3s;
-            z-index: 1000;
-        }
-        .settings-toggle:hover {
-            background-color: var(--secondary-color);
-            transform: rotate(90deg);
-        }
-        .settings-panel {
-            position: fixed;
-            bottom: -100%;
-            left: 0;
-            width: 100%;
-            background-color: var(--surface-color);
-            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
-            transition: bottom 0.3s ease-in-out;
-            padding: 20px;
-            box-sizing: border-box;
-            z-index: 999;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-        }
-        .settings-panel.open {
-            bottom: 0;
-        }
-        .settings-panel h3 {
-            color: var(--primary-color);
-            margin-top: 0;
-        }
-        .settings-panel input, .settings-panel textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            border: 1px solid var(--primary-color);
-            background-color: var(--background-color);
-            color: var(--text-color);
-        }
-        .settings-panel label {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .settings-panel input[type="checkbox"] {
-            margin-right: 10px;
-            width: auto;
-        }
-        .history {
-            margin-top: 20px;
-            background-color: var(--background-color);
-            padding: 15px;
-            border-radius: 15px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .history h3 {
-            margin-top: 0;
-            color: var(--primary-color);
-        }
-        .history ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .history li {
-            margin-bottom: 10px;
-            padding: 10px;
-            background-color: var(--surface-color);
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        #fireworks-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 9999;
-        }
-        @media (max-width: 600px) {
-            .container {
-                padding: 15px;
-            }
-            h1 {
-                font-size: 1.5rem;
-            }
-            .controls {
-                flex-direction: column;
-                align-items: center;
-            }
-            button {
-                margin: 10px 0;
-                width: 100%;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>高質感現代風格輪盤抽獎</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <style>
+    .background {
+      background: linear-gradient(135deg, #F9E5D1, #E74C00);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .roulette-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 20px auto;
+    }
+
+    .roulette {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: #f0f0f0;
+      position: relative;
+      overflow: hidden;
+      transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+
+    .roulette-item {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 50%;
+      transform-origin: 0% 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .roulette-item-number {
+      font-size: 24px;
+      color: #333;
+      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+      font-weight: bold;
+      transform: rotate(90deg);
+    }
+
+    .roulette-pointer {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-top: 30px solid #333;
+      transform: translate(-50%, -50%);
+    }
+
+    .spin-btn {
+      font-size: 1.5rem;
+      height: 60px;
+      padding: 10px 20px;
+      background-color: #3f51b5;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) {
+      .roulette-container {
+        width: 250px;
+        height: 250px;
+      }
+
+      .roulette-item-number {
+        font-size: 18px;
+      }
+
+      .spin-btn {
+        font-size: 1.2rem;
+        height: 50px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div id="app">
-        <div class="container">
-            <h1>{{ title || '幸運轉盤' }}</h1>
-            <div class="wheel-container">
-                <div id="wheel"></div>
-            </div>
-            <div class="controls">
-                <button @click="spin" :disabled="spinning || participantList.length === 0">
-                    <i class="fas fa-play"></i> {{ spinning ? '抽選中...' : '開始抽選' }}
-                </button>
-                <button @click="reset" :disabled="spinning">
-                    <i class="fas fa-redo"></i> 重置
-                </button>
-            </div>
-            <div class="winner-display" v-if="winner">
-                <i class="fas fa-trophy"></i> {{ winner }}
-            </div>
-            <div class="history">
-                <h3><i class="fas fa-history"></i> 歷史紀錄</h3>
-                <ul>
-                    <li v-for="(record, index) in winningHistory" :key="index">
-                        {{ record }}
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <button class="settings-toggle" @click="toggleSettings">
-            <i class="fas fa-cog"></i>
-        </button>
-        <div class="settings-panel" :class="{ open: showSettings }">
-            <h3><i class="fas fa-sliders-h"></i> 設定</h3>
-            <input v-model="title" placeholder="輸入標題">
-            <textarea v-model="participants" placeholder="輸入參與者（一行一個）" @input="updateWheel"></textarea>
-            <label>
-                <input type="checkbox" v-model="removeWinner"> 移除中獎者再抽籤
-            </label>
-        </div>
+  <div class="background">
+    <h1 class="text-h3 mb-6 text-center">高質感現代風格輪盤抽獎</h1>
+    <div class="roulette-container">
+      <div class="roulette" id="roulette">
+        <!-- Items will be dynamically added here -->
+      </div>
+      <div class="roulette-pointer"></div>
     </div>
-    <div id="fireworks-container"></div>
+    <button class="spin-btn" id="spinBtn">開始抽獎</button>
+    <textarea id="itemsInput" placeholder="請輸入抽獎對象（每行一個）" rows="5"></textarea>
+    <button class="spin-btn" id="updateBtn">更新抽獎對象</button>
+  </div>
 
-    <script>
-        new Vue({
-            el: '#app',
-            data: {
-                title: '',
-                participants: '',
-                participantList: [],
-                winner: '',
-                winningHistory: [],
-                spinning: false,
-                removeWinner:false,
-showSettings: false,
-fireworks: null,
-wheel: null
-},
-mounted() {
-this.$nextTick(() => {
-this.initFireworks();
-this.initWheel();
-});
-},
-methods: {
-initFireworks() {
-this.fireworks = new Fireworks(document.getElementById(‘fireworks-container’), {
-autoresize: true,
-opacity: 0.5,
-acceleration: 1.05,
-friction: 0.97,
-gravity: 1.5,
-particles: 50,
-traceLength: 3,
-traceSpeed: 10,
-explosion: 5,
-intensity: 30,
-flickering: 50,
-lineStyle: ‘round’,
-hue: {
-min: 0,
-max: 360
-},
-delay: {
-min: 30,
-max: 60
-},
-rocketsPoint: {
-min: 50,
-max: 50
-},
-lineWidth: {
-explosion: {
-min: 1,
-max: 3
-},
-trace: {
-min: 1,
-max: 2
-}
-},
-brightness: {
-min: 50,
-max: 80
-},
-decay: {
-min: 0.015,
-max: 0.03
-},
-mouse: {
-click: false,
-move: false,
-max: 1
-}
-});
-},
-initWheel() {
-this.wheel = new wheelnav(‘wheel’);
-this.wheel.spreaderEnable = false;
-this.wheel.clockwise = false;
-this.wheel.slicePathFunction = slicePath().DonutSlice;
-this.wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-this.wheel.slicePathCustom.minRadiusPercent = 0.3;
-this.wheel.slicePathCustom.maxRadiusPercent = 0.9;
-this.wheel.sliceSelectedPathCustom = this.wheel.slicePathCustom;
-this.wheel.sliceInitPathCustom = this.wheel.slicePathCustom;
-this.wheel.clickModeRotate = false;
-this.wheel.colors = [’#FFB900’, ‘#FF8C00’, ‘#FF6D00’, ‘#FFA000’];
-this.updateWheel(); // 初始化時調用更新方法
-},
-updateWheel() {
-this.participantList = this.participants.split(’\n’).filter(p => p.trim());
-this.wheel.removeWheel();  // 移除原先的輪盤
-if (this.participantList.length > 0) {
-this.wheel.createWheel(this.participantList); // 重新生成輪盤
-} else {
-this.wheel.createWheel([‘新增參與者’]);
-}
-},
-spin() {
-if (this.spinning || this.participantList.length === 0) return;
-this.spinning = true;
-this.winner = ‘’;
-const spinTimes = 5 + Math.floor(Math.random() * 5);
-const degrees = 360 * spinTimes + Math.floor(Math.random() * 360);
+  <script>
+    const roulette = document.getElementById('roulette');
+    const spinBtn = document.getElementById('spinBtn');
+    const itemsInput = document.getElementById('itemsInput');
+    const updateBtn = document.getElementById('updateBtn');
+    let items = [];
+    let isSpinning = false;
 
-                const animationDuration = spinTimes * 1000;
-                const animation = new AnimationPlaybackEvent(animationDuration);
-                
-                this.wheel.navigateWheel(degrees, animation);
-                
-                setTimeout(() => {
-                    this.spinning = false;
-                    const winnerIndex = Math.floor(degrees % 360 / (360 / this.participantList.length));
-                    this.winner = this.participantList[winnerIndex];
-                    this.winningHistory.unshift(`${this.winner} (${new Date().toLocaleString()})`);
-                    
-                    if (this.removeWinner) {
-                        this.participantList.splice(winnerIndex, 1);
-                        this.participants = this.participantList.join('\n');
-                        this.updateWheel();
-                    }
-                    
-                    this.showFireworks();
-                }, animationDuration);
-            },
-            reset() {
-                this.wheel.navigateWheel(0);
-                this.winner = '';
-            },
-            toggleSettings() {
-                this.showSettings = !this.showSettings;
-            },
-            showFireworks() {
-                this.fireworks.start();
-                setTimeout(() => {
-                    this.fireworks.stop();
-                }, 3000);
-            }
+    const morandiColors = [
+      '#F9E5D1', '#F7D4B5', '#F5C39A', '#F3B280', '#F1A165',
+      '#EF904B', '#ED7F31', '#EB6E17', '#E95D00', '#E74C00'
+    ];
+
+    const updateItems = () => {
+      const itemTexts = itemsInput.value.split('\n').filter(item => item.trim());
+      items = itemTexts.map((text, index) => ({
+        text: text.trim(),
+        number: (index + 1).toString().padStart(2, '0')
+      }));
+      renderRoulette();
+    };
+
+    const renderRoulette = () => {
+      roulette.innerHTML = '';
+      const angle = 360 / items.length;
+      items.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'roulette-item';
+        itemDiv.style.transform = `rotate(${index * angle}deg) translate(150px) rotate(-${index * angle}deg)`;
+        itemDiv.style.backgroundColor = morandiColors[index % morandiColors.length];
+
+        const itemNumber = document.createElement('span');
+        itemNumber.className = 'roulette-item-number';
+        itemNumber.textContent = item.number;
+
+        itemDiv.appendChild(itemNumber);
+        roulette.appendChild(itemDiv);
+      });
+    };
+
+    const startRoulette = () => {
+      if (isSpinning || items.length < 2) return;
+      isSpinning = true;
+      const minRotations = 5;
+      const randomAngle = Math.floor(Math.random() * 360) + (360 * minRotations);
+      gsap.to(roulette, {
+        rotation: `+=${randomAngle}`,
+        duration: 5,
+        ease: 'power2.out',
+        onComplete: () => {
+          isSpinning = false;
+          const winnerIndex = Math.floor((randomAngle % 360) / (360 / items.length));
+          const winner = items[winnerIndex];
+          alert(`恭喜中獎者：${winner.text} (編號: ${winner.number})`);
+          showConfetti();
         }
-    });
-</script>
+      });
+    };
 
+    const showConfetti = () => {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    };
+
+    spinBtn.addEventListener('click', startRoulette);
+    updateBtn.addEventListener('click', updateItems);
+
+    // Initialize with default items
+    itemsInput.value = "項目一\n項目二\n項目三\n項目四";
+    updateItems();
+  </script>
 </body>
 </html>
