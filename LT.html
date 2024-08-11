@@ -1,188 +1,544 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>高質感現代風格輪盤抽獎</title>
-  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-  <style>
-    .background {
-      background: linear-gradient(135deg, #F9E5D1, #E74C00);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>豪華輪盤抽籤動畫</title>
+<style>
+:root {
+  --primary: #f9d5a7;
+  --secondary: #fac886;
+  --accent: #f8b35e;
+  --text: #4a4a4a;
+  --background: #fff9f2;
+}
 
-    .roulette-container {
-      position: relative;
-      width: 300px;
-      height: 300px;
-      margin: 20px auto;
-    }
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background-color: var(--background);
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
 
-    .roulette {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background-color: #f0f0f0;
-      position: relative;
-      overflow: hidden;
-      transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
-    }
+.container {
+  max-width: 1200px;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
 
-    .roulette-item {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 50%;
-      height: 50%;
-      transform-origin: 0% 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+h1 {
+  text-align: center;
+  color: var(--accent);
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
 
-    .roulette-item-number {
-      font-size: 24px;
-      color: #333;
-      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
-      font-weight: bold;
-      transform: rotate(90deg);
-    }
+.wheel-container {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
 
-    .roulette-pointer {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-left: 15px solid transparent;
-      border-right: 15px solid transparent;
-      border-top: 30px solid #333;
-      transform: translate(-50%, -50%);
-    }
+.wheel-outer-border {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  border: 10px solid var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 10px var(--secondary), 0 0 20px rgba(0,0,0,0.2);
+}
 
-    .spin-btn {
-      font-size: 1.5rem;
-      height: 60px;
-      padding: 10px 20px;
-      background-color: #3f51b5;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+.wheel {
+  width: 100%;
+  padding-bottom: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  position: relative;
+}
 
-    @media (max-width: 600px) {
-      .roulette-container {
-        width: 250px;
-        height: 250px;
-      }
+.wheel-section {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  transform-origin: 100% 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
 
-      .roulette-item-number {
-        font-size: 18px;
-      }
+.wheel-section:hover {
+  filter: brightness(1.1);
+}
 
-      .spin-btn {
-        font-size: 1.2rem;
-        height: 50px;
-      }
-    }
-  </style>
+.wheel-section span {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  transform-origin: center;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.spin-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.spin-button:hover {
+  background-color: var(--secondary);
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.settings {
+  background-color: var(--primary);
+  border-radius: 15px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.settings h2 {
+  margin-top: 0;
+  color: var(--accent);
+}
+
+textarea, input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid var(--secondary);
+  border-radius: 5px;
+  background-color: var(--background);
+  transition: all 0.3s ease;
+}
+
+textarea:focus, input[type="text"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.checkbox-container input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.history {
+  margin-top: 20px;
+  background-color: var(--primary);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.history h2 {
+  margin-top: 0;
+  color: var(--accent);
+}
+
+.history ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.history li {
+  margin-bottom: 5px;
+  padding: 5px;
+  background-color: var(--background);
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.history li:hover {
+  transform: translateX(5px);
+}
+
+.settings-toggle {
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+
+.settings-toggle:hover {
+  background-color: var(--secondary);
+  transform: scale(1.05);
+}
+
+.hidden {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .wheel-container {
+    max-width: 300px;
+  }
+
+  .spin-button {
+    width: 60px;
+    height: 60px;
+    font-size: 16px;
+  }
+}
+
+.gear-icon {
+  width: 40px;
+  height: 40px;
+  fill: var(--accent);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.gear-icon:hover {
+  transform: rotate(90deg);
+}
+
+.gear-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+}
+
+.fireworks {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.firework {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.wheel-pointer {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-top: 40px solid var(--accent);
+  z-index: 20;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1001;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: var(--background);
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid var(--secondary);
+  width: 80%;
+  max-width: 500px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  animation: modalAppear 0.4s ease-out;
+}
+
+@keyframes modalAppear {
+  from {opacity: 0; transform: translateY(-50px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.close:hover,
+.close:focus {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.winner-text {
+  font-size: 24px;
+  color: var(--accent);
+  margin: 20px 0;
+}
+
+</style>
 </head>
 <body>
-  <div class="background">
-    <h1 class="text-h3 mb-6 text-center">高質感現代風格輪盤抽獎</h1>
-    <div class="roulette-container">
-      <div class="roulette" id="roulette">
-        <!-- Items will be dynamically added here -->
-      </div>
-      <div class="roulette-pointer"></div>
-    </div>
-    <button class="spin-btn" id="spinBtn">開始抽獎</button>
-    <textarea id="itemsInput" placeholder="請輸入抽獎對象（每行一個）" rows="5"></textarea>
-    <button class="spin-btn" id="updateBtn">更新抽獎對象</button>
+<div class="container">
+  <h1>豪華輪盤抽籤動畫</h1>
+  
+  <div class="wheel-container">
+    <div class="wheel-outer-border"></div>
+    <div class="wheel-pointer"></div>
+    <div class="wheel" id="wheel"></div>
+    <button class="spin-button" id="spinBtn">抽籤</button>
   </div>
 
-  <script>
-    const roulette = document.getElementById('roulette');
-    const spinBtn = document.getElementById('spinBtn');
-    const itemsInput = document.getElementById('itemsInput');
-    const updateBtn = document.getElementById('updateBtn');
-    let items = [];
-    let isSpinning = false;
+  <div class="gear-container">
+    <svg class="gear-icon" id="settingsToggle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+      <path d="M11.078 5.63c.781-1.354 2.5-1.823 3.854-1.042 1.354.78 1.823 2.5 1.042 3.854-.078.136-.167.265-.265.385l4.147 7.187a1 1 0 01-1.732 1l-4.147-7.187a3.001 3.001 0 01-3.833-1.858 3 3 0 01.934-3.339zm-6.156 0c-.781-1.354-2.5-1.823-3.854-1.042-1.354.78-1.823 2.5-1.042 3.854.078.136.167.265.265.385L.144 15.814a1 1 0 001.732 1l4.147-7.187a3.001 3.001 0 013.833-1.858 3 3 0 01-.934-3.339z"></path>
+    </svg>
+  </div>
 
-    const morandiColors = [
-      '#F9E5D1', '#F7D4B5', '#F5C39A', '#F3B280', '#F1A165',
-      '#EF904B', '#ED7F31', '#EB6E17', '#E95D00', '#E74C00'
-    ];
+  <div id="settingsPanel" class="settings hidden">
+    <h2>設定</h2>
+    <input type="text" id="title" placeholder="輸入標題">
+    <textarea id="items" rows="5" placeholder="輸入抽籤項目（每行一個）"></textarea>
+    <div class="checkbox-container">
+      <input type="checkbox" id="removeWinner">
+      <label for="removeWinner">移除中獎者再抽一次</label>
+    </div>
+  </div>
 
-    const updateItems = () => {
-      const itemTexts = itemsInput.value.split('\n').filter(item => item.trim());
-      items = itemTexts.map((text, index) => ({
-        text: text.trim(),
-        number: (index + 1).toString().padStart(2, '0')
-      }));
-      renderRoulette();
-    };
+  <div class="history">
+    <h2>歷史得獎紀錄</h2>
+    <ul id="historyList"></ul>
+  </div>
+</div>
 
-    const renderRoulette = () => {
-      roulette.innerHTML = '';
-      const angle = 360 / items.length;
-      items.forEach((item, index) => {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'roulette-item';
-        itemDiv.style.transform = `rotate(${index * angle}deg) translate(150px) rotate(-${index * angle}deg)`;
-        itemDiv.style.backgroundColor = morandiColors[index % morandiColors.length];
+<div id="winnerModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>恭喜中獎！</h2>
+    <p class="winner-text" id="winnerText"></p>
+  </div>
+</div>
 
-        const itemNumber = document.createElement('span');
-        itemNumber.className = 'roulette-item-number';
-        itemNumber.textContent = item.number;
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+<script>
+const wheel = document.getElementById('wheel');
+const spinBtn = document.getElementById('spinBtn');
+const settingsToggle = document.getElementById('settingsToggle');
+const settingsPanel = document.getElementById('settingsPanel');
+const titleInput = document.getElementById('title');
+const itemsInput = document.getElementById('items');
+const removeWinnerCheckbox = document.getElementById('removeWinner');
+const historyList = document.getElementById('historyList');
+const winnerModal = document.getElementById('winnerModal');
+const winnerText = document.getElementById('winnerText');
+const closeModal = document.getElementsByClassName('close')[0];
 
-        itemDiv.appendChild(itemNumber);
-        roulette.appendChild(itemDiv);
-      });
-    };
+let items = [];
+let angles = [];
+let colors = ['#ffd700', '#ff9900', '#ff6600', '#ff3300', '#ff0099', '#cc00ff', '#9900ff', '#6600ff', '#3300ff', '#0066ff'];
 
-    const startRoulette = () => {
-      if (isSpinning || items.length < 2) return;
-      isSpinning = true;
-      const minRotations = 5;
-      const randomAngle = Math.floor(Math.random() * 360) + (360 * minRotations);
-      gsap.to(roulette, {
-        rotation: `+=${randomAngle}`,
-        duration: 5,
-        ease: 'power2.out',
-        onComplete: () => {
-          isSpinning = false;
-          const winnerIndex = Math.floor((randomAngle % 360) / (360 / items.length));
-          const winner = items[winnerIndex];
-          alert(`恭喜中獎者：${winner.text} (編號: ${winner.number})`);
-          showConfetti();
-        }
-      });
-    };
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
 
-    const showConfetti = () => {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
-    };
+function createWheel() {
+  wheel.innerHTML = '';
+  items = itemsInput.value.split('\n').filter(item => item.trim() !== '');
+  
+  if (items.length === 0) {
+    items = Array.from({length: 10}, (_, i) => `項目 ${i + 1}`);
+  }
+  
+  const anglePerItem = 360 / items.length;
+  angles = [];
+  
+  let shuffledColors = shuffleArray([...colors]);
+  
+  items.forEach((item, index) => {
+    const section = document.createElement('div');
+    section.className = 'wheel-section';
+    section.style.transform = `rotate(${index * anglePerItem}deg) skewY(${90 - anglePerItem}deg)`;
+    section.style.backgroundColor = shuffledColors[index % shuffledColors.length];
+    
+    const span = document.createElement('span');
+    span.textContent = item;
+    span.style.transform = `skewY(-${90 - anglePerItem}deg) rotate(${anglePerItem / 2}deg)`;
+    section.appendChild(span);
+    
+    wheel.appendChild(section);
+    angles.push(360 - (index * anglePerItem));
+  });
+}
 
-    spinBtn.addEventListener('click', startRoulette);
-    updateBtn.addEventListener('click', updateItems);
+function spin() {
+  if (items.length === 0) return;
 
-    // Initialize with default items
-    itemsInput.value = "項目一\n項目二\n項目三\n項目四";
-    updateItems();
-  </script>
+  spinBtn.disabled = true;
+  const randomIndex = Math.floor(Math.random() * items.length);
+  const minRotations = 5; // 至少旋轉5圈
+  const extraRotations = (minRotations + Math.random() * 3) * 360; // 額外旋轉0-3圈
+  const targetAngle = angles[randomIndex] + extraRotations;
+  
+  gsap.to(wheel, {
+    rotation: targetAngle,
+    duration: 8,
+    ease: "power2.out",
+    onComplete: () => {
+      announceWinner(randomIndex);
+      spinBtn.disabled = false;
+    }
+  });
+}
+
+function announceWinner(index) {
+  const winner = items[index];
+  showFireworks();
+  winnerText.textContent = winner;
+  winnerModal.style.display = "block";
+  addToHistory(winner);
+
+  if (removeWinnerCheckbox.checked) {
+    items.splice(index, 1);
+    createWheel();
+  }
+}
+
+function addToHistory(winner) {
+  const li = document.createElement('li');
+  li.textContent = `${titleInput.value || '抽籤'}: ${winner}`;
+  historyList.prepend(li);
+  
+  gsap.from(li, {
+    opacity: 0,
+    y: -20,
+    duration: 0.5,
+    ease: "power2.out"
+  });
+}
+
+function showFireworks() {
+  const fireworks = document.createElement('div');
+  fireworks.className = 'fireworks';
+  document.body.appendChild(fireworks);
+
+  for (let i = 0; i < 100; i++) {
+    const firework = document.createElement('div');
+    firework.className = 'firework';
+    firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    fireworks.appendChild(firework);
+
+    gsap.to(firework, {
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      opacity: 0,
+      scale: 0,
+      duration: 2,
+      delay: Math.random() * 2,
+      ease: "power2.out",
+      onComplete: () => fireworks.removeChild(firework)
+    });
+  }
+
+  setTimeout(() => document.body.removeChild(fireworks), 4000);
+}
+
+spinBtn.addEventListener('click', spin);
+settingsToggle.addEventListener('click', () => {
+  settingsPanel.classList.toggle('hidden');
+});
+
+itemsInput.addEventListener('input', () => {
+  createWheel();
+  if (itemsInput.value.trim() !== '') {
+    itemsInput.placeholder = '';
+  } else {
+    itemsInput.placeholder = '輸入抽籤項目（每行一個）';
+  }
+});
+
+closeModal.onclick = function() {
+  winnerModal.style.display = "none";
+}
+
+window.onclick = function(event) {
+  if (event.target == winnerModal) {
+    winnerModal.style.display = "none";
+  }
+}
+
+createWheel();
+
+// 清空預設值
+itemsInput.value = '';
+itemsInput.placeholder = '輸入抽籤項目（每行一個）';
+</script>
+
 </body>
 </html>
+```
+
+這段程式碼實現了以下功能：
+- 輪盤至少旋轉 5 圈以上。
+- 更改了輪盤的外框，使其看起來更加現代化。
+- 文字在區塊中正中央顯示，並隨著區塊的角度自動調整。
+- 設置了再抽一次和移除中獎者再抽一次的選項。
