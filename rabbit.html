@@ -1,306 +1,1140 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="https://s123104.github.io/az.tool/img/magician-hat.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
     <title>可愛兔兔排班表</title>
+    <link
+      rel="icon"
+      href="https://s123104.github.io/az.tool/img/magician-hat.png"
+    />
     <style>
-        body, html {
-            font-family: 'Arial', sans-serif;
-            background-color: #fff0f5;
-            color: #ff69b4;
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-size: 12px;
-            overflow: hidden;
-        }
+      body,
+      html {
+        font-family: "Arial", sans-serif;
+        background-color: #fff0f5;
+        color: #ff69b4;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-size: 12px;
+        overflow: hidden;
+      }
 
+      .calendar-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        background-color: #ffebee;
+        overflow: hidden;
+      }
+
+      .header {
+        text-align: center;
+        padding: 10px;
+        background-color: #ff69b4;
+        color: white;
+        position: relative;
+      }
+
+      .title {
+        font-size: 18px;
+        font-weight: bold;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .title img {
+        margin-right: 8px;
+        height: 24px;
+      }
+
+      .navigation {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 5px;
+      }
+
+      .nav-button {
+        background-color: #ff1493;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .nav-button:hover {
+        background-color: #ff69b4;
+      }
+
+      .add-button {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        background-color: #ff1493;
+        border: none;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        font-size: 16px;
+        line-height: 16px;
+        cursor: pointer;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .add-button:hover {
+        background-color: #ff69b4;
+      }
+
+      .week-view {
+        display: flex;
+        flex-grow: 1;
+        overflow: hidden;
+      }
+
+      .time-scale {
+        position: relative;
+        width: 45px;
+        background-color: #ffd1dc;
+        font-size: 8px;
+        text-align: right;
+        padding-top: 50px;
+        padding-left: 2px;
+      }
+
+      .time-slot {
+        position: relative;
+        height: calc(100% / 17); /* 每個時間段佔1/17的高度 */
+      }
+
+      .week-grid {
+        display: flex;
+        flex-grow: 1;
+        overflow: hidden;
+      }
+
+      .day-column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid #ff69b4;
+      }
+
+      .day-column:last-child {
+        border-right: none;
+      }
+
+      .day-header {
+        text-align: center;
+        padding: 5px 0;
+        font-weight: bold;
+        background-color: #ffd1dc;
+        border-bottom: 1px solid #ff69b4;
+      }
+
+      .day-content {
+        flex-grow: 1;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .schedule-item {
+        position: absolute;
+        left: 2px;
+        right: 2px;
+        background-color: #ff69b4;
+        color: white;
+        font-size: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        border-radius: 3px;
+        padding: 2px;
+        text-align: center;
+        cursor: pointer;
+      }
+
+      .vertical-line {
+        display: inline-block;
+        width: 1px;
+        height: 8px;
+        background-color: white;
+        margin: 2px 0;
+      }
+
+      .total-hours {
+        text-align: center;
+        padding: 10px;
+        font-weight: bold;
+        background-color: #ff69b4;
+        color: white;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+        padding-top: 60px;
+      }
+
+      .modal-content {
+        background-color: #fff;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 400px;
+        border-radius: 10px;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .toggle-container {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 20px;
+      }
+
+      .toggle-button {
+        padding: 5px 15px;
+        cursor: pointer;
+        text-align: center;
+        border-radius: 15px;
+        color: white;
+        font-size: 14px;
+      }
+
+      .toggle-button.single {
+        background-color: #ffb6c1;
+      }
+
+      .toggle-button.multi {
+        background-color: #ffb6c1;
+      }
+
+      .toggle-button.active {
+        background-color: #ff1493;
+      }
+
+      label {
+        display: block;
+        margin: 10px 0 5px;
+      }
+
+      input[type="text"],
+      input[type="date"] {
+        width: calc(100% - 10px);
+        padding: 5px;
+        margin: 5px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+      }
+
+      .time-input-wrapper {
+        display: flex;
+        align-items: center;
+      }
+
+      .time-input-wrapper select {
+        width: 45%;
+        margin: 5px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+      }
+
+      .weekdays {
+        display: flex;
+        justify-content: space-between;
+        margin: 10px 0;
+      }
+
+      .weekday {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #ffb6c1;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .weekday.selected {
+        background-color: #ff1493;
+      }
+
+      button[type="submit"] {
+        background-color: #ff1493;
+        border: none;
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+      }
+
+      button[type="submit"]:hover {
+        background-color: #ff69b4;
+      }
+
+      .autocomplete-items {
+        position: absolute;
+        border: 1px solid #d4d4d4;
+        border-bottom: none;
+        border-top: none;
+        z-index: 99;
+        top: 100%;
+        left: 0;
+        right: 0;
+      }
+
+      .autocomplete-items div {
+        padding: 10px;
+        cursor: pointer;
+        background-color: #fff;
+        border-bottom: 1px solid #d4d4d4;
+      }
+
+      .autocomplete-items div:hover {
+        background-color: #e9e9e9;
+      }
+
+      .autocomplete-active {
+        background-color: DodgerBlue !important;
+        color: #ffffff;
+      }
+
+      .delete-btn {
+        background-color: #ff4c4c;
+        border: none;
+        color: white;
+        font-size: 10px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        cursor: pointer;
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+      }
+
+      .delete-btn:hover {
+        background-color: #ff0000;
+      }
+
+      @media only screen and (max-width: 600px) {
         .calendar-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            background-color: #ffebee;
+          padding: 0;
+          width: 100%;
         }
 
         .header {
-            text-align: center;
-            padding: 10px;
-            background-color: #ff69b4;
-            color: white;
+          padding: 5px;
         }
 
         .title {
-            font-size: 18px;
-            font-weight: bold;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+          font-size: 16px;
         }
 
-        .title img {
-            margin-right: 5px; /* 添加間距 */
-            height: 24px; /* 調整圖片高度 */
+        .nav-button,
+        .add-button {
+          padding: 3px 7px;
+          font-size: 10px;
         }
 
-        .navigation {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 5px;
-        }
-
-        .nav-button {
-            background-color: #ff1493;
-            border: none;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-        }
-
-        .week-view {
-            display: flex;
-            flex-grow: 1;
+        .add-button {
+          width: 25px;
+          height: 25px;
+          line-height: 25px;
+          font-size: 14px;
+          top: 5px;
         }
 
         .time-scale {
-            position: relative;
-            width: 50px;
-            background-color: #ffd1dc;
-            font-size: 8px;
-            text-align: right;
-            border-right: 1px solid #ff69b4;
-            padding-top: 50px; /* 確保時間刻度的初始位置與 day-header 的下邊緣對齊 */
-        }
-
-        .time-slot {
-            position: absolute;
-            right: 2px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            white-space: nowrap;
-        }
-
-        .week-grid {
-            display: flex;
-            flex-grow: 1;
-        }
-
-        .day-column {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            border-right: 1px solid #ff69b4;
-        }
-
-        .day-column:last-child {
-            border-right: none;
-        }
-
-        .day-header {
-            text-align: center;
-            padding: 5px 0;
-            font-weight: bold;
-            background-color: #ffd1dc;
-            border-bottom: 1px solid #ff69b4;
-        }
-
-        .day-content {
-            flex-grow: 1;
-            position: relative;
-        }
-
-        .schedule-item {
-            position: absolute;
-            left: 2px;
-            right: 2px;
-            background-color: #ff69b4;
-            color: white;
-            font-size: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-around;
-            border-radius: 3px;
-            padding: 2px;
-            text-align: center;
-        }
-
-        .vertical-line {
-            display: inline-block;
-            width: 1px;
-            height: 8px;
-            background-color: white;
-            margin: 2px 0;
+          font-size: 7px;
+          width: 40px;
         }
 
         .total-hours {
-            text-align: center;
-            padding: 10px;
-            font-weight: bold;
-            background-color: #ff69b4;
-            color: white;
+          padding: 5px;
+          font-size: 10px;
         }
-    </style>
-</head>
-<body>
-<div class="calendar-container">
-    <div class="header">
-        <h1 class="title">
-            <img src="https://s123104.github.io/az.tool/img/magician-hat.png" alt="magician hat">
-            可愛兔兔排班表
-        </h1>
-        <div class="navigation">
-            <button class="nav-button" id="prevWeek">上一週</button>
-            <button class="nav-button" id="nextWeek">下一週</button>
-        </div>
-    </div>
-    <div class="week-view">
-        <div class="time-scale"></div>
-        <div class="week-grid">
-            <div class="day-column">
-                <div class="day-header">一<br>7/22</div>
-                <div class="day-content"></div>
-            </div>
-            <div class="day-column">
-                <div class="day-header">二<br>7/16</div>
-                <div class="day-content"></div>
-            </div>
-            <div class="day-column">
-                <div class="day-header">三<br>7/23</div>
-                <div class="day-content"></div>
-            </div>
-            <div class="day-column">
-                <div class="day-header">四<br>7/18</div>
-                <div class="day-content"></div>
-            </div>
-            <div class="day-column">
-                <div class="day-header">五<br>7/20</div>
-                <div class="day-content"></div>
-            </div>
-            <div class="day-column">
-                <div class="day-header">六<br>7/24</div>
-                <div class="day-content"></div>
-            </div>
-            <div class="day-column">
-                <div class="day-header">日<br>7/27</div>
-                <div class="day-content"></div>
-            </div>
-        </div>
-    </div>
-    <div class="total-hours" id="totalHours">本週總工時：0小時</div>
-</div>
-<script>
-document.addEventListener('DOMContentLoaded', (event) => {
-    const prevWeekBtn = document.getElementById('prevWeek');
-    const nextWeekBtn = document.getElementById('nextWeek');
-    const totalHoursElement = document.getElementById('totalHours');
-    let currentWeek = new Date();
 
-    function updateWeek(direction) {
-        currentWeek.setDate(currentWeek.getDate() + direction * 7);
+        .modal-content {
+          width: 90%;
+          max-width: 300px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        button[type="submit"] {
+          padding: 7px;
+          margin: 3px 0;
+        }
+
+        button[type="submit"] {
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="calendar-container">
+      <div class="header">
+        <h1 class="title">
+          <img
+            src="https://s123104.github.io/az.tool/img/magician-hat.png"
+            alt="magician hat"
+          />
+          可愛兔兔排班表
+        </h1>
+        <button class="add-button" id="addButton">+</button>
+        <div class="navigation">
+          <button class="nav-button" id="prevWeek">上一週</button>
+          <button class="nav-button" id="nextWeek">下一週</button>
+        </div>
+      </div>
+      <div class="week-view">
+        <div class="time-scale" id="timeScale"></div>
+        <div class="week-grid">
+          <!-- 這些內容由JavaScript動態生成 -->
+        </div>
+      </div>
+      <div class="total-hours" id="totalHours">本週總工時：0小時</div>
+    </div>
+
+    <!-- 新增工作模態框 -->
+    <div id="modal-add" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeAdd">&times;</span>
+        <div class="toggle-container">
+          <div class="toggle-button single active" id="singleAddToggle">
+            單次
+          </div>
+          <div class="toggle-button multi" id="batchAddToggle">批量</div>
+        </div>
+        <div id="singleAddContainer">
+          <h2>新增工作</h2>
+          <form id="addForm" autocomplete="off">
+            <label for="addJobName">工作名稱</label>
+            <input
+              type="text"
+              id="addJobName"
+              name="addJobName"
+              maxlength="4"
+              required
+            />
+            <label for="addJobDate">日期</label>
+            <input type="date" id="addJobDate" name="addJobDate" required />
+            <label for="addStartTime">開始時間</label>
+            <div class="time-input-wrapper">
+              <select id="addStartHour" name="addStartHour" required></select>
+              :
+              <select
+                id="addStartMinute"
+                name="addStartMinute"
+                required
+              ></select>
+            </div>
+            <label for="addEndTime">結束時間</label>
+            <div class="time-input-wrapper">
+              <select id="addEndHour" name="addEndHour" required></select>
+              :
+              <select id="addEndMinute" name="addEndMinute" required></select>
+            </div>
+            <button type="submit">保存</button>
+          </form>
+        </div>
+        <div id="batchAddContainer" style="display: none">
+          <h2>批量新增工作</h2>
+          <form id="batchAddForm" autocomplete="off">
+            <label for="batchAddJobName">工作名稱</label>
+            <input
+              type="text"
+              id="batchAddJobName"
+              name="batchAddJobName"
+              maxlength="4"
+              required
+            />
+            <label for="batchAddStartDate">開始日期</label>
+            <input
+              type="date"
+              id="batchAddStartDate"
+              name="batchAddStartDate"
+              required
+            />
+            <label for="batchAddEndDate">結束日期</label>
+            <input
+              type="date"
+              id="batchAddEndDate"
+              name="batchAddEndDate"
+              required
+            />
+            <label for="batchAddStartTime">開始時間</label>
+            <div class="time-input-wrapper">
+              <select
+                id="batchAddStartHour"
+                name="batchAddStartHour"
+                required
+              ></select>
+              :
+              <select
+                id="batchAddStartMinute"
+                name="batchAddStartMinute"
+                required
+              ></select>
+            </div>
+            <label for="batchAddEndTime">結束時間</label>
+            <div class="time-input-wrapper">
+              <select
+                id="batchAddEndHour"
+                name="batchAddEndHour"
+                required
+              ></select>
+              :
+              <select
+                id="batchAddEndMinute"
+                name="batchAddEndMinute"
+                required
+              ></select>
+            </div>
+            <div class="weekdays">
+              <div class="weekday" data-day="1">一</div>
+              <div class="weekday" data-day="2">二</div>
+              <div class="weekday" data-day="3">三</div>
+              <div class="weekday" data-day="4">四</div>
+              <div class="weekday" data-day="5">五</div>
+              <div class="weekday" data-day="6">六</div>
+              <div class="weekday" data-day="0">日</div>
+            </div>
+            <button type="submit">批量保存</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 修改工作模態框 -->
+    <div id="modal-edit" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeEdit">&times;</span>
+        <h2>修改工作</h2>
+        <form id="editForm" autocomplete="off">
+          <label for="editJobName">工作名稱</label>
+          <input
+            type="text"
+            id="editJobName"
+            name="editJobName"
+            maxlength="4"
+            required
+          />
+          <label for="editJobDate">日期</label>
+          <input type="date" id="editJobDate" name="editJobDate" required />
+          <label for="editStartTime">開始時間</label>
+          <div class="time-input-wrapper">
+            <select id="editStartHour" name="editStartHour" required></select>
+            :
+            <select
+              id="editStartMinute"
+              name="editStartMinute"
+              required
+            ></select>
+          </div>
+          <label for="editEndTime">結束時間</label>
+          <div class="time-input-wrapper">
+            <select id="editEndHour" name="editEndHour" required></select>
+            :
+            <select id="editEndMinute" name="editEndMinute" required></select>
+          </div>
+          <button type="submit">保存</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+        const prevWeekBtn = document.getElementById("prevWeek");
+        const nextWeekBtn = document.getElementById("nextWeek");
+        const totalHoursElement = document.getElementById("totalHours");
+        const addButton = document.getElementById("addButton");
+        const modalAdd = document.getElementById("modal-add");
+        const modalEdit = document.getElementById("modal-edit");
+        const closeAddBtn = document.getElementById("closeAdd");
+        const closeEditBtn = document.getElementById("closeEdit");
+        const addForm = document.getElementById("addForm");
+        const batchAddForm = document.getElementById("batchAddForm");
+        const singleAddToggle = document.getElementById("singleAddToggle");
+        const batchAddToggle = document.getElementById("batchAddToggle");
+        const singleAddContainer =
+          document.getElementById("singleAddContainer");
+        const batchAddContainer = document.getElementById("batchAddContainer");
+        const editForm = document.getElementById("editForm");
+        const jobNameInputAdd = document.getElementById("addJobName");
+        const jobNameInputBatchAdd = document.getElementById("batchAddJobName");
+        const jobNameInputEdit = document.getElementById("editJobName");
+        let schedules = JSON.parse(localStorage.getItem("schedules")) || {};
+        let jobNames = JSON.parse(localStorage.getItem("jobNames")) || [];
+        let currentEditKey = null;
+
+        let currentWeek = new Date();
+
+        function updateWeek(direction) {
+          currentWeek.setDate(currentWeek.getDate() + direction * 7);
+          generateWeekGrid();
+          updateDates();
+          updateSchedule();
+          updateTotalHours();
+          updateTimeScale(); // 更新時間刻度
+        }
+
+        function generateWeekGrid() {
+          const weekGrid = document.querySelector(".week-grid");
+          weekGrid.innerHTML = ""; // 清空原有內容
+          for (let i = 0; i < 7; i++) {
+            const dayColumn = document.createElement("div");
+            dayColumn.classList.add("day-column");
+
+            const dayHeader = document.createElement("div");
+            dayHeader.classList.add("day-header");
+            dayHeader.innerHTML =
+              ["一", "二", "三", "四", "五", "六", "日"][i] + "<br>";
+            dayColumn.appendChild(dayHeader);
+
+            const dayContent = document.createElement("div");
+            dayContent.classList.add("day-content");
+            dayColumn.appendChild(dayContent);
+
+            weekGrid.appendChild(dayColumn);
+          }
+        }
+
+        function updateDates() {
+          const dayHeaders = document.querySelectorAll(".day-header");
+          for (let i = 0; i < 7; i++) {
+            const date = new Date(currentWeek);
+            date.setDate(date.getDate() - date.getDay() + i + 1);
+            dayHeaders[i].innerHTML += `${
+              date.getMonth() + 1
+            }/${date.getDate()}`;
+          }
+        }
+
+        function updateSchedule() {
+          const dayContents = document.querySelectorAll(".day-content");
+          dayContents.forEach((content) => (content.innerHTML = "")); // 清空原有內容
+
+          const firstDayContentHeight = dayContents[0].offsetHeight;
+          const totalMinutesInDay = 17 * 60; // 17 小時
+
+          Object.keys(schedules).forEach((dateKey) => {
+            const { jobName, start, end, color } = schedules[dateKey];
+            const scheduleDate = new Date(dateKey);
+            const weekStartDate = new Date(currentWeek);
+            weekStartDate.setDate(
+              weekStartDate.getDate() - weekStartDate.getDay() + 1
+            );
+
+            if (
+              scheduleDate >= weekStartDate &&
+              scheduleDate <
+                new Date(weekStartDate.getTime() + 7 * 24 * 60 * 60 * 1000)
+            ) {
+              const dayIndex = (scheduleDate.getDay() + 6) % 7;
+              const startTime = parseTime(start);
+              const endTime = parseTime(end);
+              const duration = (endTime - startTime) / 60000; // 轉換為分鐘
+              const topPosition =
+                (((startTime.getHours() - 7) * 60 + startTime.getMinutes()) /
+                  totalMinutesInDay) *
+                firstDayContentHeight; // 假設早上7點開始
+              const height =
+                (duration / totalMinutesInDay) * firstDayContentHeight; // 17小時的一天
+              const scheduleItem = document.createElement("div");
+              scheduleItem.classList.add("schedule-item");
+              scheduleItem.style.top = `${topPosition}px`;
+              scheduleItem.style.height = `${height}px`;
+              scheduleItem.style.backgroundColor = color;
+              scheduleItem.innerHTML = `🐰<br>${jobName}<br>${formatTime(
+                start
+              )}<br><span class="vertical-line"></span><br>${formatTime(end)}`;
+
+              const content = dayContents[dayIndex];
+              content.appendChild(scheduleItem);
+
+              // 新增刪除按鈕
+              const deleteButton = document.createElement("button");
+              deleteButton.classList.add("delete-btn");
+              deleteButton.innerHTML = "X";
+              deleteButton.addEventListener("click", (event) => {
+                event.stopPropagation(); // 防止觸發 scheduleItem 的 click 事件
+                deleteSchedule(dateKey);
+              });
+              scheduleItem.appendChild(deleteButton);
+
+              scheduleItem.addEventListener("click", () =>
+                openEditModal(dateKey)
+              );
+            }
+          });
+        }
+
+        function updateTotalHours() {
+          let totalHours = 0;
+          const weekStartDate = new Date(currentWeek);
+          weekStartDate.setDate(
+            weekStartDate.getDate() - weekStartDate.getDay() + 1
+          );
+          const weekEndDate = new Date(
+            weekStartDate.getTime() + 7 * 24 * 60 * 60 * 1000
+          );
+
+          Object.keys(schedules).forEach((dateKey) => {
+            const scheduleDate = new Date(dateKey);
+            if (scheduleDate >= weekStartDate && scheduleDate < weekEndDate) {
+              const { start, end } = schedules[dateKey];
+              totalHours += (parseTime(end) - parseTime(start)) / 3600000; // 轉換為小時
+            }
+          });
+          totalHoursElement.textContent = `本週總工時：${totalHours.toFixed(
+            1
+          )}小時`;
+        }
+
+        function parseTime(timeStr) {
+          const [hours, minutes] = timeStr.split(":").map(Number);
+          return new Date(0, 0, 0, hours, minutes);
+        }
+
+        function formatTime(timeStr) {
+          const [hours, minutes] = timeStr.split(":").map(Number);
+          const period = hours < 12 ? "早上" : hours < 18 ? "下午" : "晚上";
+          const formattedHours = hours % 12 || 12;
+          return `${period} ${formattedHours}:${minutes
+            .toString()
+            .padStart(2, "0")}`;
+        }
+
+        function generateColor(jobName) {
+          const colors = [
+            "#ffc0cb",
+            "#ffb6c1",
+            "#ff69b4",
+            "#ff1493",
+            "#db7093",
+            "#ff8c69",
+            "#ff6347",
+            "#ff4500",
+          ];
+          const jobType = jobName.charCodeAt(0) % colors.length;
+          return colors[jobType];
+        }
+
+        function openAddModal() {
+          modalAdd.style.display = "block";
+        }
+
+        function closeAddModal() {
+          modalAdd.style.display = "none";
+        }
+
+        function openEditModal(dateKey) {
+          const { jobName, start, end } = schedules[dateKey];
+          currentEditKey = dateKey;
+          document.getElementById("editJobName").value = jobName;
+          document.getElementById("editJobDate").value = dateKey;
+
+          const startHour = String(
+            parseInt(parseTime(start).getHours())
+          ).padStart(2, "0");
+          const startMinute = String(
+            parseInt(parseTime(start).getMinutes())
+          ).padStart(2, "0");
+          const endHour = String(parseInt(parseTime(end).getHours())).padStart(
+            2,
+            "0"
+          );
+          const endMinute = String(
+            parseInt(parseTime(end).getMinutes())
+          ).padStart(2, "0");
+
+          document.getElementById("editStartHour").value = startHour;
+          document.getElementById("editStartMinute").value = startMinute;
+          document.getElementById("editEndHour").value = endHour;
+          document.getElementById("editEndMinute").value = endMinute;
+
+          modalEdit.style.display = "block";
+        }
+
+        function closeEditModal() {
+          modalEdit.style.display = "none";
+        }
+
+        function deleteSchedule(dateKey) {
+          delete schedules[dateKey];
+          localStorage.setItem("schedules", JSON.stringify(schedules));
+          closeEditModal();
+          updateSchedule();
+          updateTotalHours();
+        }
+
+        function saveAddSchedule() {
+          const jobName = document.getElementById("addJobName").value;
+          const jobDate = document.getElementById("addJobDate").value;
+          const startTime =
+            document.getElementById("addStartHour").value.padStart(2, "0") +
+            ":" +
+            document.getElementById("addStartMinute").value.padStart(2, "0");
+          const endTime =
+            document.getElementById("addEndHour").value.padStart(2, "0") +
+            ":" +
+            document.getElementById("addEndMinute").value.padStart(2, "0");
+          const color = generateColor(jobName);
+
+          schedules[jobDate] = {
+            jobName,
+            start: startTime,
+            end: endTime,
+            color,
+          };
+          localStorage.setItem("schedules", JSON.stringify(schedules));
+          if (!jobNames.includes(jobName)) {
+            jobNames.push(jobName);
+            localStorage.setItem("jobNames", JSON.stringify(jobNames));
+          }
+          closeAddModal();
+          updateSchedule();
+          updateTotalHours();
+        }
+
+        function saveBatchAddSchedule() {
+          const jobName = document.getElementById("batchAddJobName").value;
+          const startDate = new Date(
+            document.getElementById("batchAddStartDate").value
+          );
+          const endDate = new Date(
+            document.getElementById("batchAddEndDate").value
+          );
+          const startTime =
+            document
+              .getElementById("batchAddStartHour")
+              .value.padStart(2, "0") +
+            ":" +
+            document
+              .getElementById("batchAddStartMinute")
+              .value.padStart(2, "0");
+          const endTime =
+            document.getElementById("batchAddEndHour").value.padStart(2, "0") +
+            ":" +
+            document.getElementById("batchAddEndMinute").value.padStart(2, "0");
+          const selectedDays = Array.from(
+            document.querySelectorAll(".weekday.selected")
+          ).map((el) => parseInt(el.dataset.day));
+          const color = generateColor(jobName);
+
+          for (
+            let date = new Date(startDate);
+            date <= endDate;
+            date.setDate(date.getDate() + 1)
+          ) {
+            if (selectedDays.includes(date.getDay())) {
+              const dateKey = date.toISOString().split("T")[0];
+              schedules[dateKey] = {
+                jobName,
+                start: startTime,
+                end: endTime,
+                color,
+              };
+            }
+          }
+
+          localStorage.setItem("schedules", JSON.stringify(schedules));
+          if (!jobNames.includes(jobName)) {
+            jobNames.push(jobName);
+            localStorage.setItem("jobNames", JSON.stringify(jobNames));
+          }
+          closeAddModal();
+          updateSchedule();
+          updateTotalHours();
+        }
+
+        function saveEditSchedule() {
+          const jobName = document.getElementById("editJobName").value;
+          const jobDate = document.getElementById("editJobDate").value;
+          const startTime =
+            document.getElementById("editStartHour").value.padStart(2, "0") +
+            ":" +
+            document.getElementById("editStartMinute").value.padStart(2, "0");
+          const endTime =
+            document.getElementById("editEndHour").value.padStart(2, "0") +
+            ":" +
+            document.getElementById("editEndMinute").value.padStart(2, "0");
+          const color = generateColor(jobName);
+
+          delete schedules[currentEditKey];
+          schedules[jobDate] = {
+            jobName,
+            start: startTime,
+            end: endTime,
+            color,
+          };
+          localStorage.setItem("schedules", JSON.stringify(schedules));
+          if (!jobNames.includes(jobName)) {
+            jobNames.push(jobName);
+            localStorage.setItem("jobNames", JSON.stringify(jobNames));
+          }
+          closeEditModal();
+          updateSchedule();
+          updateTotalHours();
+        }
+
+        function toggleWeekdaySelection(event) {
+          event.target.classList.toggle("selected");
+        }
+
+        function autocomplete(inp, arr) {
+          let currentFocus;
+          inp.addEventListener("input", function (e) {
+            let a,
+              b,
+              i,
+              val = this.value;
+            closeAllLists();
+            if (!val) {
+              return false;
+            }
+            currentFocus = -1;
+            a = document.createElement("DIV");
+            a.setAttribute("id", this.id + "autocomplete-list");
+            a.setAttribute("class", "autocomplete-items");
+            this.parentNode.appendChild(a);
+            for (i = 0; i < arr.length; i++) {
+              if (
+                arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()
+              ) {
+                b = document.createElement("DIV");
+                b.innerHTML =
+                  "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+                b.innerHTML += arr[i].substr(val.length);
+                b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                b.addEventListener("click", function (e) {
+                  inp.value = this.getElementsByTagName("input")[0].value;
+                  closeAllLists();
+                });
+                a.appendChild(b);
+              }
+            }
+          });
+          inp.addEventListener("keydown", function (e) {
+            let x = document.getElementById(this.id + "autocomplete-list");
+            if (x) x = x.getElementsByTagName("div");
+            if (e.keyCode == 40) {
+              currentFocus++;
+              addActive(x);
+            } else if (e.keyCode == 38) {
+              currentFocus--;
+              addActive(x);
+            } else if (e.keyCode == 13) {
+              e.preventDefault();
+              if (currentFocus > -1) {
+                if (x) x[currentFocus].click();
+              }
+            }
+          });
+          function addActive(x) {
+            if (!x) return false;
+            removeActive(x);
+            if (currentFocus >= x.length) currentFocus = 0;
+            if (currentFocus < 0) currentFocus = x.length - 1;
+            x[currentFocus].classList.add("autocomplete-active");
+          }
+          function removeActive(x) {
+            for (let i = 0; i < x.length; i++) {
+              x[i].classList.remove("autocomplete-active");
+            }
+          }
+          function closeAllLists(elmnt) {
+            let x = document.getElementsByClassName("autocomplete-items");
+            for (let i = 0; i < x.length; i++) {
+              if (elmnt != x[i] && elmnt != inp) {
+                x[i].parentNode.removeChild(x[i]);
+              }
+            }
+          }
+          document.addEventListener("click", function (e) {
+            closeAllLists(e.target);
+          });
+        }
+
+        function toggleAddMode() {
+          singleAddToggle.classList.toggle("active");
+          batchAddToggle.classList.toggle("active");
+          singleAddContainer.style.display =
+            singleAddContainer.style.display === "none" ? "block" : "none";
+          batchAddContainer.style.display =
+            batchAddContainer.style.display === "none" ? "block" : "none";
+        }
+
+        addButton.addEventListener("click", () => {
+          openAddModal();
+        });
+
+        closeAddBtn.addEventListener("click", closeAddModal);
+        closeEditBtn.addEventListener("click", closeEditModal);
+
+        window.addEventListener("click", (event) => {
+          if (event.target == modalAdd) {
+            closeAddModal();
+          }
+          if (event.target == modalEdit) {
+            closeEditModal();
+          }
+        });
+
+        singleAddToggle.addEventListener("click", () => {
+          if (!singleAddToggle.classList.contains("active")) {
+            toggleAddMode();
+          }
+        });
+
+        batchAddToggle.addEventListener("click", () => {
+          if (!batchAddToggle.classList.contains("active")) {
+            toggleAddMode();
+          }
+        });
+
+        prevWeekBtn.addEventListener("click", () => updateWeek(-1));
+        nextWeekBtn.addEventListener("click", () => updateWeek(1));
+
+        addForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          saveAddSchedule();
+        });
+
+        batchAddForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          saveBatchAddSchedule();
+        });
+
+        editForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          saveEditSchedule();
+        });
+
+        function updateTimeScale() {
+          const timeScale = document.querySelector(".time-scale");
+          timeScale.innerHTML = ""; // 清空原有內容
+
+          const totalHours = 17; // 7 AM to 12 AM (17 hours)
+
+          for (let i = 7; i <= 23; i++) {
+            const timeSlot = document.createElement("div");
+            timeSlot.classList.add("time-slot");
+            timeSlot.innerHTML = `${
+              i < 12 ? "早上" : i < 18 ? "下午" : "晚上"
+            } ${i % 12 || 12}:00`;
+            timeScale.appendChild(timeSlot);
+          }
+        }
+
+        function populateTimeOptions() {
+          const hours = [...Array(24).keys()].map((i) =>
+            String(i).padStart(2, "0")
+          );
+          const minutes = [...Array(6).keys()].map((i) =>
+            String(i * 10).padStart(2, "0")
+          );
+
+          function addOptions(select, options) {
+            options.forEach((option) => {
+              const opt = document.createElement("option");
+              opt.value = option;
+              opt.textContent = option;
+              select.appendChild(opt);
+            });
+          }
+
+          [
+            "addStartHour",
+            "addEndHour",
+            "editStartHour",
+            "editEndHour",
+            "batchAddStartHour",
+            "batchAddEndHour",
+          ].forEach((id) => {
+            addOptions(document.getElementById(id), hours);
+          });
+
+          [
+            "addStartMinute",
+            "addEndMinute",
+            "editStartMinute",
+            "editEndMinute",
+            "batchAddStartMinute",
+            "batchAddEndMinute",
+          ].forEach((id) => {
+            addOptions(document.getElementById(id), minutes);
+          });
+        }
+
+        generateWeekGrid();
         updateDates();
         updateSchedule();
         updateTotalHours();
-        updateTimeScale(); // 更新時間刻度
-    }
+        updateTimeScale(); // 初始化時間刻度
+        autocomplete(jobNameInputAdd, jobNames);
+        autocomplete(jobNameInputBatchAdd, jobNames);
+        autocomplete(jobNameInputEdit, jobNames);
+        populateTimeOptions();
 
-    function updateDates() {
-        const dayHeaders = document.querySelectorAll('.day-header');
-        for (let i = 0; i < 7; i++) {
-            const date = new Date(currentWeek);
-            date.setDate(date.getDate() - date.getDay() + i + 1);
-            dayHeaders[i].innerHTML = `${['一','二','三','四','五','六','日'][i]}<br>${date.getMonth() + 1}/${date.getDate()}`;
-        }
-    }
-
-    function updateSchedule() {
-        const schedule = {
-            "7/16": { start: "16:00", end: "22:00" },
-            "7/18": { start: "16:00", end: "22:00" },
-            "7/20": { start: "14:30", end: "22:00" },
-            "7/22": { start: "10:30", end: "16:30" },
-            "7/23": { start: "10:30", end: "16:30" },
-            "7/24": { start: "14:30", end: "20:30" }
-        };
-
-        const dayContents = document.querySelectorAll('.day-content');
-        dayContents.forEach(content => content.innerHTML = ''); // 清空原有內容
-
-        const firstDayContentHeight = dayContents[0].offsetHeight;
-        const totalMinutesInDay = 17 * 60; // 17 小時
-
-        dayContents.forEach((content, index) => {
-            const header = content.parentElement.querySelector('.day-header').innerHTML.split('<br>')[1];
-            if (schedule[header]) {
-                const { start, end } = schedule[header];
-                const startTime = parseTime(start);
-                const endTime = parseTime(end);
-                const duration = (endTime - startTime) / 3600000; // 轉換為小時
-                const topPosition = ((startTime.getHours() - 7) * 60 + startTime.getMinutes()) / totalMinutesInDay * firstDayContentHeight; // 假設早上7點開始
-                const height = (duration * 60) / totalMinutesInDay * firstDayContentHeight; // 17小時的一天
-                const scheduleItem = document.createElement('div');
-                scheduleItem.classList.add('schedule-item');
-                scheduleItem.style.top = `${topPosition}px`;
-                scheduleItem.style.height = `${height}px`;
-                scheduleItem.innerHTML = `🐰<br>${start}<br><span class="vertical-line"></span><br>${end}`;
-
-                content.appendChild(scheduleItem);
-            }
+        document.querySelectorAll(".weekday").forEach((day) => {
+          day.addEventListener("click", toggleWeekdaySelection);
         });
-    }
 
-    function updateTotalHours() {
-        let totalHours = 0;
-        const scheduleItems = document.querySelectorAll('.schedule-item');
-        scheduleItems.forEach(item => {
-            const start = parseTime(item.innerHTML.split('<br>')[1]);
-            const end = parseTime(item.innerHTML.split('<br>')[3]);
-            totalHours += (end - start) / 3600000; // 轉換為小時
+        // 禁止雙擊縮放
+        document.addEventListener("gesturestart", function (e) {
+          e.preventDefault();
         });
-        totalHoursElement.textContent = `本週總工時：${totalHours.toFixed(1)}小時`;
-    }
-
-    function parseTime(timeStr) {
-        const [hours, minutes] = timeStr.split(':').map(Number);
-        return new Date(0, 0, 0, hours, minutes);
-    }
-
-    function updateTimeScale() {
-        const timeScale = document.querySelector('.time-scale');
-        timeScale.innerHTML = ''; // 清空原有內容
-
-        const firstDayContentHeight = document.querySelector('.day-content').offsetHeight;
-        const totalMinutesInDay = 17 * 60; // 17 小時
-        const headerHeight = document.querySelector('.day-header').offsetHeight; // 獲取 day-header 的高度
-        const timeIntervals = [
-            "早上7:00", "早上8:00", "早上9:00", "上午10:00", "上午11:00", "中午12:00",
-            "下午1:00", "下午2:00", "下午3:00", "下午4:00", "下午5:00", "晚上6:00",
-            "晚上7:00", "晚上8:00", "晚上9:00", "晚上10:00", "晚上11:00", "晚上12:00"
-        ];
-
-        timeIntervals.forEach((time, index) => {
-            const timeSlot = document.createElement('div');
-            timeSlot.classList.add('time-slot');
-            const topPosition = (index / (timeIntervals.length - 1)) * (firstDayContentHeight) + headerHeight;
-            timeSlot.style.top = `${topPosition}px`;
-            timeSlot.innerHTML = time;
-            timeScale.appendChild(timeSlot);
-        });
-    }
-
-    prevWeekBtn.addEventListener('click', () => updateWeek(-1));
-    nextWeekBtn.addEventListener('click', () => updateWeek(1));
-
-    updateDates();
-    updateSchedule();
-    updateTotalHours();
-    updateTimeScale(); // 初始化時間刻度
-});
-</script>
-
-</body>
+      });
+    </script>
+  </body>
 </html>
