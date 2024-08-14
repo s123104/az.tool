@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -242,6 +242,10 @@
         background-color: #ffb6c1;
       }
 
+      .toggle-button.command {
+        background-color: #ffb6c1;
+      }
+
       .toggle-button.active {
         background-color: #ff1493;
       }
@@ -453,6 +457,7 @@
             單次
           </div>
           <div class="toggle-button multi" id="batchAddToggle">批量</div>
+          <div class="toggle-button command" id="commandToggle">指令</div>
         </div>
         <div id="singleAddContainer">
           <h2>新增工作</h2>
@@ -551,6 +556,22 @@
             <button type="submit">批量保存</button>
           </form>
         </div>
+        <div id="commandContainer" style="display: none">
+          <h2>指令快速新增</h2>
+          <form id="commandForm" autocomplete="off">
+            <label for="commandInput">輸入指令:</label>
+            <textarea
+              id="commandInput"
+              name="commandInput"
+              rows="5"
+              required
+            ></textarea>
+            <p>格式說明: 月/日-月/日 時間-時間 (星期)</p>
+            <p>例如: 8/15-8/20 12:00-20:00 (一,三,五)</p>
+            <p>特殊規則: -~為區間符號, 12.為12:00簡寫, 12.5為12:30簡寫</p>
+            <button type="submit">執行指令</button>
+          </form>
+        </div>
       </div>
     </div>
 
@@ -603,11 +624,14 @@
         const closeEditBtn = document.getElementById("closeEdit");
         const addForm = document.getElementById("addForm");
         const batchAddForm = document.getElementById("batchAddForm");
+        const commandForm = document.getElementById("commandForm");
         const singleAddToggle = document.getElementById("singleAddToggle");
         const batchAddToggle = document.getElementById("batchAddToggle");
+        const commandToggle = document.getElementById("commandToggle");
         const singleAddContainer =
           document.getElementById("singleAddContainer");
         const batchAddContainer = document.getElementById("batchAddContainer");
+        const commandContainer = document.getElementById("commandContainer");
         const editForm = document.getElementById("editForm");
         const jobNameInputAdd = document.getElementById("addJobName");
         const jobNameInputBatchAdd = document.getElementById("batchAddJobName");
@@ -897,34 +921,92 @@
           updateTotalHours();
         }
 
-        function saveEditSchedule() {
-          const jobName = document.getElementById("editJobName").value;
-          const jobDate = document.getElementById("editJobDate").value;
-          const startTime =
-            document.getElementById("editStartHour").value.padStart(2, "0") +
-            ":" +
-            document.getElementById("editStartMinute").value.padStart(2, "0");
-          const endTime =
-            document.getElementById("editEndHour").value.padStart(2, "0") +
-            ":" +
-            document.getElementById("editEndMinute").value.padStart(2, "0");
-          const color = generateColor(jobName);
+        function saveCommandSchedule() {
+          const commandInput = document.getElementById("commandInput").value;
+          const commands = commandInput
+            .split("\n")
+            .map((cmd) => cmd.trim())
+            .filter((cmd) => cmd !== "");
 
-          delete schedules[currentEditKey];
-          schedules[jobDate] = {
-            jobName,
-            start: startTime,
-            end: endTime,
-            color,
-          };
+          commands.forEach((command) => {
+            const parsedCommand = parseCommand(command);
+            if (parsedCommand) {
+              const { startDate, endDate, startTime, endTime, weekdays } =
+                parsedCommand;
+              const jobName = "指令新增"; // 可以讓使用者指定名稱
+
+              for (
+                let date = new Date(startDate);
+                date <= endDate;
+                date.setDate(date.getDate() + 1)
+              ) {
+                if (weekdays.length === 0 || weekdays.includes(date.getDay())) {
+                  const dateKey = date.toISOString().split("T")[0];
+                  schedules[dateKey] = {
+                    jobName,
+                    start: startTime,
+                    end: endTime,
+                    color: generateColor(jobName),
+                  };
+                }
+              }
+            }
+          });
+
           localStorage.setItem("schedules", JSON.stringify(schedules));
-          if (!jobNames.includes(jobName)) {
-            jobNames.push(jobName);
-            localStorage.setItem("jobNames", JSON.stringify(jobNames));
-          }
-          closeEditModal();
+          closeAddModal();
           updateSchedule();
           updateTotalHours();
+        }
+
+        function parseCommand(command) {
+          const commandRegex =
+            /(\d{1,2}\/\d{1,2})[-~](\d{1,2}\/\d{1,2})\s+([\d.]{1,5})[-~]([\d.]{1,5})\s*(?:\(([^)]+)\))?/;
+          const match = command.match(commandRegex);
+
+          if (!match) return null;
+
+          const startDateParts = match[1].split("/");
+          const endDateParts = match[2].split("/");
+          const startTimeParts = match[3].split(".");
+          const endTimeParts = match[4].split(".");
+          const weekdays = match[5]
+            ? match[5].split(",").map((day) => "日一二三四五六".indexOf(day))
+            : [];
+
+          const currentYear = new Date().getFullYear();
+
+          const startDate = new Date(
+            currentYear,
+            parseInt(startDateParts[0]) - 1,
+            parseInt(startDateParts[1])
+          );
+          const endDate = new Date(
+            currentYear,
+            parseInt(endDateParts[0]) - 1,
+            parseInt(endDateParts[1])
+          );
+
+          const startTime =
+            startTimeParts.length === 1
+              ? `${startTimeParts[0].padStart(2, "0")}:00`
+              : `${startTimeParts[0].padStart(2, "0")}:${startTimeParts[1]
+                  .padStart(2, "0")
+                  .replace(/50$/, "30")}`;
+          const endTime =
+            endTimeParts.length === 1
+              ? `${endTimeParts[0].padStart(2, "0")}:00`
+              : `${endTimeParts[0].padStart(2, "0")}:${endTimeParts[1]
+                  .padStart(2, "0")
+                  .replace(/50$/, "30")}`;
+
+          return {
+            startDate,
+            endDate,
+            startTime,
+            endTime,
+            weekdays,
+          };
         }
 
         function toggleWeekdaySelection(event) {
@@ -1008,10 +1090,14 @@
         function toggleAddMode() {
           singleAddToggle.classList.toggle("active");
           batchAddToggle.classList.toggle("active");
+          commandToggle.classList.toggle("active");
+
           singleAddContainer.style.display =
             singleAddContainer.style.display === "none" ? "block" : "none";
           batchAddContainer.style.display =
             batchAddContainer.style.display === "none" ? "block" : "none";
+          commandContainer.style.display =
+            commandContainer.style.display === "none" ? "block" : "none";
         }
 
         addButton.addEventListener("click", () => {
@@ -1042,6 +1128,12 @@
           }
         });
 
+        commandToggle.addEventListener("click", () => {
+          if (!commandToggle.classList.contains("active")) {
+            toggleAddMode();
+          }
+        });
+
         prevWeekBtn.addEventListener("click", () => updateWeek(-1));
         nextWeekBtn.addEventListener("click", () => updateWeek(1));
 
@@ -1053,6 +1145,11 @@
         batchAddForm.addEventListener("submit", (e) => {
           e.preventDefault();
           saveBatchAddSchedule();
+        });
+
+        commandForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          saveCommandSchedule();
         });
 
         editForm.addEventListener("submit", (e) => {
