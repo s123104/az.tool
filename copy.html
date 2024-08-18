@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
   <head>
     <meta charset="UTF-8" />
     <title>楓之谷銀河懶人包</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
+      /* 原始CSS內容保持不變 */
       :root {
         --primary-color: #2c3e50;
         --secondary-color: #3498db;
@@ -245,22 +246,6 @@
         margin-top: 20px;
       }
 
-      .language-switcher {
-        text-align: center;
-        margin-bottom: 20px;
-      }
-
-      .language-switcher select {
-        padding: 10px 20px;
-        border-radius: 25px;
-        border: none;
-        background-color: var(--secondary-color);
-        color: white;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      }
-
       @media (min-width: 769px) {
         .btn {
           padding: 14px 24px;
@@ -317,180 +302,111 @@
   </head>
   <body>
     <div class="container">
-      <div class="language-switcher">
-        <select onchange="switchLanguage(this.value)">
-          <option value="zh">繁體中文</option>
-          <option value="zh-CN">简体中文</option>
-          <option value="en">English</option>
-        </select>
-      </div>
-      <h1 data-lang="title">楓之谷銀河懶人包</h1>
+      <h1>楓之谷銀河懶人包</h1>
 
       <div class="section">
-        <h2 data-lang="taskLinksTitle">任務連結</h2>
+        <h2>任務連結</h2>
         <div id="task-links" class="grid-container"></div>
       </div>
 
       <div class="section">
-        <h2 data-lang="liveAnswersTitle">直播答案</h2>
+        <h2>直播答案</h2>
         <div id="live-answers" class="grid-container"></div>
       </div>
 
       <div class="section">
-        <h2 data-lang="quizTimeTitle">MSU QUIZ TIME</h2>
+        <h2 class="notranslate">MSU QUIZ TIME</h2>
         <div id="quiz-time" class="grid-container"></div>
       </div>
 
       <div class="section">
-        <h2 data-lang="questsTitle">QA任務成就與獎勵</h2>
+        <h2>QA任務成就與獎勵</h2>
         <div id="quests" class="grid-container"></div>
       </div>
 
       <div class="search-section">
-        <h2 data-lang="searchSectionTitle">
-          還沒等到@azmusk更新答案嗎？試試搜尋功能吧！
-        </h2>
-        <p data-lang="searchExample">
-          搜尋範例：Reach 5,000 Medium Followers 或 5,000 Medium Followers
-        </p>
+        <h2>還沒等到@azmusk更新答案嗎？試試搜尋功能吧！</h2>
+        <p>搜尋範例：Reach 5,000 Medium Followers 或 5,000 Medium Followers</p>
         <div class="search-input-wrapper">
           <input
             type="text"
             id="search-input"
             class="search-input"
             placeholder="輸入搜尋內容..."
-            data-lang-placeholder="searchPlaceholder"
           />
           <span class="search-clear" onclick="clearSearch()">×</span>
         </div>
-        <button
-          class="search-button"
-          onclick="searchQuery()"
-          data-lang="searchButtonText"
-        >
-          搜尋
-        </button>
-        <p class="warning" data-lang="searchWarning">
-          請勿隨意點擊陌生人連結!!
-        </p>
+        <button class="search-button" onclick="searchQuery()">搜尋</button>
+        <p class="warning">請勿隨意點擊陌生人連結!!</p>
       </div>
     </div>
 
     <script>
-      const translations = {
-        zh: {
-          title: "楓之谷銀河懶人包",
-          taskLinksTitle: "任務連結",
-          liveAnswersTitle: "直播答案",
-          quizTimeTitle: "MSU QUIZ TIME",
-          questsTitle: "QA任務成就與獎勵",
-          searchSectionTitle: "還沒等到@azmusk更新答案嗎？試試搜尋功能吧！",
-          searchExample:
-            "搜尋範例：Reach 5,000 Medium Followers 或 5,000 Medium Followers",
-          searchPlaceholder: "輸入搜尋內容...",
-          searchButtonText: "搜尋",
-          searchWarning: "請勿隨意點擊陌生人連結!!",
+      const config = {
+        taskLinks: {
+          gridColumns: "repeat(auto-fit, minmax(250px, 1fr))",
         },
-        "zh-CN": {
-          title: "枫之谷银河懒人包",
-          taskLinksTitle: "任务链接",
-          liveAnswersTitle: "直播答案",
-          quizTimeTitle: "MSU QUIZ TIME",
-          questsTitle: "QA任务成就与奖励",
-          searchSectionTitle: "还没等到@azmusk更新答案吗？试试搜索功能吧！",
-          searchExample:
-            "搜索示例：Reach 5,000 Medium Followers 或 5,000 Medium Followers",
-          searchPlaceholder: "输入搜索内容...",
-          searchButtonText: "搜索",
-          searchWarning: "请勿随意点击陌生人链接!!",
+        liveAnswers: {
+          gridColumns: "repeat(auto-fit, minmax(250px, 1fr))",
         },
-        en: {
-          title: "MapleStory Universe Guide",
-          taskLinksTitle: "Task Links",
-          liveAnswersTitle: "Live Answers",
-          quizTimeTitle: "MSU QUIZ TIME",
-          questsTitle: "QA Tasks and Rewards",
-          searchSectionTitle:
-            "Still waiting for @azmusk to update answers? Try the search function!",
-          searchExample:
-            "Search example: Reach 5,000 Medium Followers or 5,000 Medium Followers",
-          searchPlaceholder: "Enter your search...",
-          searchButtonText: "Search",
-          searchWarning: "Do not click on links from strangers!!",
+        quizTime: {
+          gridColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+        },
+        quests: {
+          gridColumns: "repeat(auto-fit, minmax(300px, 1fr))",
         },
       };
 
-      function switchLanguage(lang) {
-        const translation = translations[lang];
-
-        document.querySelectorAll("[data-lang]").forEach((element) => {
-          const key = element.getAttribute("data-lang");
-          element.textContent = translation[key];
-        });
-
-        document
-          .querySelectorAll("[data-lang-placeholder]")
-          .forEach((element) => {
-            const key = element.getAttribute("data-lang-placeholder");
-            element.placeholder = translation[key];
-          });
-      }
+      const data = {
+        taskLinks: [
+          { text: "官方網站", link: "https://msu.io" },
+          {
+            text: "每日簽到",
+            link: "https://app.galxe.com/quest/MapleStoryUniverse/GCQDrtksgJ",
+          },
+          {
+            text: "直播、社交任務",
+            link: "https://app.galxe.com/quest/MapleStoryUniverse/GCRN1tvjea",
+          },
+          {
+            text: "<span class='notranslate'>MSU QUIZ TIME 4</span>",
+            link: "https://app.galxe.com/quest/MapleStoryUniverse/GCtFptvHj7",
+          },
+          {
+            text: "<span class='notranslate'>MSU QUIZ TIME 5</span>",
+            link: "https://app.galxe.com/quest/MapleStoryUniverse/GCfYHtvMD7",
+          },
+          {
+            text: "檢查銀河有無漏任務 <span class='notranslate'>(Status-Active)</span>",
+            link: "https://app.galxe.com/quest/MapleStoryUniverse",
+          },
+        ],
+        liveAnswers: [
+          { question: "Round 1", answer: "SEE YOU NEXT TIME" },
+          { question: "Round 2", answer: "AUGUST LETS GO" },
+        ],
+        quests: [],
+        quizTime: [
+          { question: "[ Season 4 ]", answer: "ABABD AADCB" },
+          { question: "[ Season 5 ]", answer: "BDACB BBCAA" },
+        ],
+      };
 
       document.addEventListener("DOMContentLoaded", () => {
-        // 預設為繁體中文
-        switchLanguage("zh");
+        const userLang = navigator.language || navigator.userLanguage;
+        if (userLang.includes("zh-CN")) {
+          switchLanguage("zh-CN");
+        } else if (userLang.includes("en")) {
+          switchLanguage("en");
+        } else {
+          switchLanguage("zh-TW");
+        }
 
-        // 以下為您原本的 JavaScript 處理邏輯
-        const config = {
-          taskLinks: {
-            gridColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-          },
-          liveAnswers: {
-            gridColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-          },
-          quizTime: {
-            gridColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          },
-          quests: {
-            gridColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          },
-        };
+        // 渲染內容
+        renderContent();
+      });
 
-        const data = {
-          taskLinks: [
-            { text: "官方網站", link: "https://msu.io" },
-            {
-              text: "每日簽到",
-              link: "https://app.galxe.com/quest/MapleStoryUniverse/GCQDrtksgJ",
-            },
-            {
-              text: "直播、社交任務",
-              link: "https://app.galxe.com/quest/MapleStoryUniverse/GCRN1tvjea",
-            },
-            {
-              text: "MSU QUIZ TIME 4",
-              link: "https://app.galxe.com/quest/MapleStoryUniverse/GCtFptvHj7",
-            },
-            {
-              text: "MSU QUIZ TIME 5",
-              link: "https://app.galxe.com/quest/MapleStoryUniverse/GCfYHtvMD7",
-            },
-            {
-              text: "檢查銀河有無漏任務 (Status-Active)",
-              link: "https://app.galxe.com/quest/MapleStoryUniverse",
-            },
-          ],
-          liveAnswers: [
-            { question: "Round 1", answer: "SEE YOU NEXT TIME" },
-            { question: "Round 2", answer: "AUGUST LETS GO" },
-          ],
-          quests: [],
-          quizTime: [
-            { question: "[ Season 4 ]", answer: "ABABD AADCB" },
-            { question: "[ Season 5 ]", answer: "BDACB BBCAA" },
-          ],
-        };
-
+      function renderContent() {
         const taskLinksContainer = document.getElementById("task-links");
         taskLinksContainer.style.gridTemplateColumns =
           config.taskLinks.gridColumns;
@@ -503,7 +419,7 @@
           linkElement.href = item.link;
           linkElement.target = "_blank";
           linkElement.className = "link-text";
-          linkElement.textContent = item.text;
+          linkElement.innerHTML = item.text; // Use innerHTML to render raw HTML
 
           const buttonElement = document.createElement("button");
           buttonElement.className = "btn";
@@ -524,11 +440,11 @@
           liveAnswerDiv.className = "item";
 
           const questionElement = document.createElement("strong");
-          questionElement.className = "question";
+          questionElement.className = "question notranslate";
           questionElement.textContent = item.question;
 
           const answerElement = document.createElement("span");
-          answerElement.className = "answer";
+          answerElement.className = "answer notranslate";
           answerElement.textContent = item.answer || "尚未公佈";
           if (!item.answer) {
             answerElement.classList.add("incomplete");
@@ -558,11 +474,11 @@
           quizDiv.className = "quiz-item";
 
           const questionElement = document.createElement("div");
-          questionElement.className = "question";
+          questionElement.className = "question notranslate";
           questionElement.textContent = item.question;
 
           const answerElement = document.createElement("div");
-          answerElement.className = "answer";
+          answerElement.className = "answer notranslate";
           answerElement.textContent = item.answer;
 
           quizDiv.appendChild(questionElement);
@@ -578,11 +494,11 @@
           questDiv.className = "item";
 
           const questionElement = document.createElement("span");
-          questionElement.className = "question";
+          questionElement.className = "question notranslate";
           questionElement.textContent = item.question;
 
           const answerElement = document.createElement("span");
-          answerElement.className = "answer";
+          answerElement.className = "answer notranslate";
           answerElement.textContent = item.answer || "尚未公佈";
           if (!item.answer) {
             answerElement.classList.add("incomplete");
@@ -618,7 +534,33 @@
             });
           });
         });
-      });
+      }
+
+      function switchLanguage(lang) {
+        const translateElement = document.createElement("script");
+        translateElement.type = "text/javascript";
+        translateElement.src = `//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit`;
+        document.body.appendChild(translateElement);
+
+        window.googleTranslateElementInit = function () {
+          new google.translate.TranslateElement(
+            {
+              pageLanguage: "zh-TW",
+              includedLanguages: "zh-TW,zh-CN,en",
+              layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+              autoDisplay: false,
+            },
+            "google_translate_element"
+          );
+        };
+
+        setTimeout(() => {
+          document.querySelector(".goog-te-combo").value = lang;
+          document
+            .querySelector(".goog-te-combo")
+            .dispatchEvent(new Event("change"));
+        }, 1000);
+      }
 
       function searchQuery() {
         const query = document.getElementById("search-input").value;
