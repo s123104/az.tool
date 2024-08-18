@@ -245,6 +245,22 @@
         margin-top: 20px;
       }
 
+      .language-switcher {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .language-switcher select {
+        padding: 10px 20px;
+        border-radius: 25px;
+        border: none;
+        background-color: var(--secondary-color);
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
       @media (min-width: 769px) {
         .btn {
           padding: 14px 24px;
@@ -301,97 +317,180 @@
   </head>
   <body>
     <div class="container">
-      <h1>楓之谷銀河懶人包</h1>
+      <div class="language-switcher">
+        <select onchange="switchLanguage(this.value)">
+          <option value="zh">繁體中文</option>
+          <option value="zh-CN">简体中文</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+      <h1 data-lang="title">楓之谷銀河懶人包</h1>
 
       <div class="section">
-        <h2>任務連結</h2>
+        <h2 data-lang="taskLinksTitle">任務連結</h2>
         <div id="task-links" class="grid-container"></div>
       </div>
 
       <div class="section">
-        <h2>直播答案</h2>
+        <h2 data-lang="liveAnswersTitle">直播答案</h2>
         <div id="live-answers" class="grid-container"></div>
       </div>
 
       <div class="section">
-        <h2>MSU QUIZ TIME</h2>
+        <h2 data-lang="quizTimeTitle">MSU QUIZ TIME</h2>
         <div id="quiz-time" class="grid-container"></div>
       </div>
 
       <div class="section">
-        <h2>QA任務成就與獎勵</h2>
+        <h2 data-lang="questsTitle">QA任務成就與獎勵</h2>
         <div id="quests" class="grid-container"></div>
       </div>
 
       <div class="search-section">
-        <h2>還沒等到@azmusk更新答案嗎？試試搜尋功能吧！</h2>
-        <p>搜尋範例：Reach 5,000 Medium Followers 或 5,000 Medium Followers</p>
+        <h2 data-lang="searchSectionTitle">
+          還沒等到@azmusk更新答案嗎？試試搜尋功能吧！
+        </h2>
+        <p data-lang="searchExample">
+          搜尋範例：Reach 5,000 Medium Followers 或 5,000 Medium Followers
+        </p>
         <div class="search-input-wrapper">
           <input
             type="text"
             id="search-input"
             class="search-input"
             placeholder="輸入搜尋內容..."
+            data-lang-placeholder="searchPlaceholder"
           />
           <span class="search-clear" onclick="clearSearch()">×</span>
         </div>
-        <button class="search-button" onclick="searchQuery()">搜尋</button>
-        <p class="warning">請勿隨意點擊陌生人連結!!</p>
+        <button
+          class="search-button"
+          onclick="searchQuery()"
+          data-lang="searchButtonText"
+        >
+          搜尋
+        </button>
+        <p class="warning" data-lang="searchWarning">
+          請勿隨意點擊陌生人連結!!
+        </p>
       </div>
     </div>
 
     <script>
-      const config = {
-        taskLinks: {
-          gridColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+      const translations = {
+        zh: {
+          title: "楓之谷銀河懶人包",
+          taskLinksTitle: "任務連結",
+          liveAnswersTitle: "直播答案",
+          quizTimeTitle: "MSU QUIZ TIME",
+          questsTitle: "QA任務成就與獎勵",
+          searchSectionTitle: "還沒等到@azmusk更新答案嗎？試試搜尋功能吧！",
+          searchExample:
+            "搜尋範例：Reach 5,000 Medium Followers 或 5,000 Medium Followers",
+          searchPlaceholder: "輸入搜尋內容...",
+          searchButtonText: "搜尋",
+          searchWarning: "請勿隨意點擊陌生人連結!!",
         },
-        liveAnswers: {
-          gridColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+        "zh-CN": {
+          title: "枫之谷银河懒人包",
+          taskLinksTitle: "任务链接",
+          liveAnswersTitle: "直播答案",
+          quizTimeTitle: "MSU QUIZ TIME",
+          questsTitle: "QA任务成就与奖励",
+          searchSectionTitle: "还没等到@azmusk更新答案吗？试试搜索功能吧！",
+          searchExample:
+            "搜索示例：Reach 5,000 Medium Followers 或 5,000 Medium Followers",
+          searchPlaceholder: "输入搜索内容...",
+          searchButtonText: "搜索",
+          searchWarning: "请勿随意点击陌生人链接!!",
         },
-        quizTime: {
-          gridColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-        },
-        quests: {
-          gridColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+        en: {
+          title: "MapleStory Universe Guide",
+          taskLinksTitle: "Task Links",
+          liveAnswersTitle: "Live Answers",
+          quizTimeTitle: "MSU QUIZ TIME",
+          questsTitle: "QA Tasks and Rewards",
+          searchSectionTitle:
+            "Still waiting for @azmusk to update answers? Try the search function!",
+          searchExample:
+            "Search example: Reach 5,000 Medium Followers or 5,000 Medium Followers",
+          searchPlaceholder: "Enter your search...",
+          searchButtonText: "Search",
+          searchWarning: "Do not click on links from strangers!!",
         },
       };
 
-      const data = {
-        taskLinks: [
-          { text: "官方網站", link: "https://msu.io" },
-          {
-            text: "每日簽到",
-            link: "https://app.galxe.com/quest/MapleStoryUniverse/GCQDrtksgJ",
-          },
-          {
-            text: "直播、社交任務",
-            link: "https://app.galxe.com/quest/MapleStoryUniverse/GCRN1tvjea",
-          },
-          {
-            text: "MSU QUIZ TIME 4",
-            link: "https://app.galxe.com/quest/MapleStoryUniverse/GCtFptvHj7",
-          },
-          {
-            text: "MSU QUIZ TIME 5",
-            link: "https://app.galxe.com/quest/MapleStoryUniverse/GCfYHtvMD7",
-          },
-          {
-            text: "檢查銀河有無漏任務 (Status-Active)",
-            link: "https://app.galxe.com/quest/MapleStoryUniverse",
-          },
-        ],
-        liveAnswers: [
-          { question: "Round 1", answer: "SEE YOU NEXT TIME" },
-          { question: "Round 2", answer: "AUGUST LETS GO" },
-        ],
-        quests: [],
-        quizTime: [
-          { question: "[ Season 4 ]", answer: "ABABD AADCB" },
-          { question: "[ Season 5 ]", answer: "BDACB BBCAA" },
-        ],
-      };
+      function switchLanguage(lang) {
+        const translation = translations[lang];
+
+        document.querySelectorAll("[data-lang]").forEach((element) => {
+          const key = element.getAttribute("data-lang");
+          element.textContent = translation[key];
+        });
+
+        document
+          .querySelectorAll("[data-lang-placeholder]")
+          .forEach((element) => {
+            const key = element.getAttribute("data-lang-placeholder");
+            element.placeholder = translation[key];
+          });
+      }
 
       document.addEventListener("DOMContentLoaded", () => {
+        // 預設為繁體中文
+        switchLanguage("zh");
+
+        // 以下為您原本的 JavaScript 處理邏輯
+        const config = {
+          taskLinks: {
+            gridColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+          },
+          liveAnswers: {
+            gridColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+          },
+          quizTime: {
+            gridColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          },
+          quests: {
+            gridColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          },
+        };
+
+        const data = {
+          taskLinks: [
+            { text: "官方網站", link: "https://msu.io" },
+            {
+              text: "每日簽到",
+              link: "https://app.galxe.com/quest/MapleStoryUniverse/GCQDrtksgJ",
+            },
+            {
+              text: "直播、社交任務",
+              link: "https://app.galxe.com/quest/MapleStoryUniverse/GCRN1tvjea",
+            },
+            {
+              text: "MSU QUIZ TIME 4",
+              link: "https://app.galxe.com/quest/MapleStoryUniverse/GCtFptvHj7",
+            },
+            {
+              text: "MSU QUIZ TIME 5",
+              link: "https://app.galxe.com/quest/MapleStoryUniverse/GCfYHtvMD7",
+            },
+            {
+              text: "檢查銀河有無漏任務 (Status-Active)",
+              link: "https://app.galxe.com/quest/MapleStoryUniverse",
+            },
+          ],
+          liveAnswers: [
+            { question: "Round 1", answer: "SEE YOU NEXT TIME" },
+            { question: "Round 2", answer: "AUGUST LETS GO" },
+          ],
+          quests: [],
+          quizTime: [
+            { question: "[ Season 4 ]", answer: "ABABD AADCB" },
+            { question: "[ Season 5 ]", answer: "BDACB BBCAA" },
+          ],
+        };
+
         const taskLinksContainer = document.getElementById("task-links");
         taskLinksContainer.style.gridTemplateColumns =
           config.taskLinks.gridColumns;
@@ -515,7 +614,7 @@
               setTimeout(() => {
                 button.textContent = originalText;
                 button.style.backgroundColor = originalColor;
-              }, 20000);
+              }, 2000);
             });
           });
         });
