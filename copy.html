@@ -394,12 +394,8 @@
 
       document.addEventListener("DOMContentLoaded", () => {
         const userLang = navigator.language || navigator.userLanguage;
-        if (userLang.includes("zh-CN")) {
-          switchLanguage("zh-CN");
-        } else if (userLang.includes("en")) {
-          switchLanguage("en");
-        } else {
-          switchLanguage("zh-TW");
+        if (!userLang.includes("zh-TW")) {
+          switchLanguage();
         }
 
         // 渲染內容
@@ -419,7 +415,7 @@
           linkElement.href = item.link;
           linkElement.target = "_blank";
           linkElement.className = "link-text";
-          linkElement.innerHTML = item.text; // Use innerHTML to render raw HTML
+          linkElement.innerHTML = item.text; // 使用innerHTML來渲染原始HTML
 
           const buttonElement = document.createElement("button");
           buttonElement.className = "btn";
@@ -536,7 +532,7 @@
         });
       }
 
-      function switchLanguage(lang) {
+      function switchLanguage() {
         const translateElement = document.createElement("script");
         translateElement.type = "text/javascript";
         translateElement.src = `//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit`;
@@ -546,19 +542,19 @@
           new google.translate.TranslateElement(
             {
               pageLanguage: "zh-TW",
-              includedLanguages: "zh-TW,zh-CN,en",
-              layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
               autoDisplay: false,
             },
             "google_translate_element"
           );
         };
 
+        // 自動選擇語言
         setTimeout(() => {
-          document.querySelector(".goog-te-combo").value = lang;
-          document
-            .querySelector(".goog-te-combo")
-            .dispatchEvent(new Event("change"));
+          const langSelect = document.querySelector(".goog-te-combo");
+          if (langSelect) {
+            langSelect.value = navigator.language;
+            langSelect.dispatchEvent(new Event("change"));
+          }
         }, 1000);
       }
 
