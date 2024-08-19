@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美聯儲升息週期分析</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', 'Heiti TC', 'Arial', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .header {
+            background-color: #0056b3;
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        .cycle-card {
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        .cycle-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 60vh;
+            width: 80vw;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 50vh;
+                width: 95vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="text-center">美聯儲升息週期分析</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 mb-4">
+                <h2 class="text-center mb-4">利率變化圖表</h2>
+                <div class="chart-container">
+                    <canvas id="rateChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" id="cycleCards">
+            <!-- 週期卡片將在這裡動態生成 -->
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const cycleData = [
+            { period: '1958-1959', startRate: 1.75, endRate: 4.00, duration: '約1年', type: '經濟增長期', description: '戰後經濟快速增長，Fed通過升息來穩定物價。' },
+            { period: '1965-1966', startRate: 4.00, endRate: 5.50, duration: '約1年', type: '軍費開支增加期', description: '越南戰爭期間，經濟過熱導致通脹壓力上升。' },
+            { period: '1972-1974', startRate: 3.25, endRate: 13.00, duration: '約2年', type: '能源危機期', description: '第一次石油危機導致全球能源價格飆升，推動通脹大幅上升。' },
+            { period: '1977-1981', startRate: 6.00, endRate: 20.00, duration: '約4年', type: '高通脹期', description: '第二次石油危機期間，Fed採取了激進的加息政策來遏制高通脹。' },
+            { period: '1983-1984', startRate: 8.50, endRate: 11.50, duration: '約1年', type: '經濟復甦期', description: '經濟從衰退中復甦後，Fed為防止通脹反彈而升息。' },
+            { period: '1987-1989', startRate: 6.75, endRate: 9.75, duration: '約2年', type: '股市動盪期', description: '1987年股市崩盤後，Fed繼續升息以應對持續的通脹壓力。' },
+            { period: '1994-1995', startRate: 3.00, endRate: 6.00, duration: '約1年', type: '預防性升息期', description: '經濟增長加速，Fed升息防止經濟過熱。' },
+            { period: '1999-2000', startRate: 4.75, endRate: 6.50, duration: '約1年', type: '科技泡沫期', description: '互聯網泡沫期間市場過熱，Fed升息冷卻市場。' },
+            { period: '2004-2006', startRate: 1.00, endRate: 5.25, duration: '約2年', type: '房地產泡沫期', description: '經濟強勁復甦，Fed升息防止經濟過熱，但未能阻止房地產泡沫。' },
+            { period: '2015-2018', startRate: 0.25, endRate: 2.50, duration: '約3年', type: '金融危機後恢復期', description: '全球金融危機後，經濟逐漸復甦，Fed開始升息以恢復正常利率水平。' },
+            { period: '2022-2024', startRate: 0.25, endRate: 5.50, duration: '約2年', type: '後疫情高通脹期', description: 'COVID-19大流行後的供應鏈問題和需求激增導致通脹，Fed採取快速升息來抑制通脹。' }
+        ];
+
+        // 生成週期卡片
+        function generateCycleCards() {
+            const cardContainer = document.getElementById('cycleCards');
+            cycleData.forEach(cycle => {
+                const card = `
+                    <div class="col-md-4">
+                        <div class="card cycle-card">
+                            <div class="card-body">
+                                <h5 class="card-title">${cycle.period} 升息週期</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">${cycle.type}</h6>
+                                <p class="card-text">起始利率: ${cycle.startRate}%</p>
+                                <p class="card-text">結束利率: ${cycle.endRate}%</p>
+                                <p class="card-text">持續時間: ${cycle.duration}</p>
+                                <p class="card-text">${cycle.description}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                cardContainer.innerHTML += card;
+            });
+        }
+
+        // 創建圖表
+        function createChart() {
+            const ctx = document.getElementById('rateChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: cycleData.map(cycle => cycle.period),
+                    datasets: [{
+                        label: '起始利率',
+                        data: cycleData.map(cycle => cycle.startRate),
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }, {
+                        label: '結束利率',
+                        data: cycleData.map(cycle => cycle.endRate),
+                        borderColor: 'rgb(255, 99, 132)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '利率 (%)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '升息週期'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: '美聯儲歷史升息週期利率變化'
+                        }
+                    }
+                }
+            });
+        }
+
+        // 頁面加載完成後執行
+        document.addEventListener('DOMContentLoaded', function() {
+            generateCycleCards();
+            createChart();
+        });
+    </script>
+</body>
+</html>
