@@ -166,6 +166,8 @@
         padding: 10px 20px;
         border-radius: 8px;
         text-decoration: none;
+        font-size: 18px;
+        margin: 5px;
       }
       .summary-section {
         background-color: #003366;
@@ -181,6 +183,35 @@
       }
       .summary-body {
         line-height: 1.6;
+      }
+      .btn-toggle {
+        display: block;
+        width: 100%;
+        text-align: left;
+        background-color: #003366;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: none;
+        margin-bottom: 10px;
+        font-size: 18px;
+        cursor: pointer;
+      }
+      .btn-toggle:hover {
+        background-color: #002244;
+      }
+      .toggle-content {
+        display: none;
+        padding: 15px;
+        border: 1px solid #003366;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+      }
+      .chart-legend {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 16px;
+        color: #003366;
       }
     </style>
   </head>
@@ -199,9 +230,9 @@
             <div class="analysis-header">利率變化趨勢圖</div>
             <div class="chart-container">
               <canvas id="rateChart"></canvas>
-            </div>
-            <div class="nav-btn">
-              <a href="#eventTimeline">查看重大事件時間線</a>
+              <div class="chart-legend">
+                <span>每個升息週期開始和結束的利率標註在圖中。</span>
+              </div>
             </div>
           </div>
         </div>
@@ -213,9 +244,9 @@
             <div class="analysis-header">S&P 500指數變化趨勢圖</div>
             <div class="chart-container">
               <canvas id="sp500Chart"></canvas>
-            </div>
-            <div class="nav-btn">
-              <a href="#eventTimeline">查看重大事件時間線</a>
+              <div class="chart-legend">
+                <span>每個升息週期開始和結束的S&P 500指數標註在圖中。</span>
+              </div>
             </div>
           </div>
         </div>
@@ -260,8 +291,7 @@
               </p>
               <h4>客觀分析</h4>
               <p>
-                根據歷史數據，當前的升息週期顯示出美聯儲在面對全球通脹壓力時，採取了快速而
-                大幅度的升息策略，這在短期內對股市造成了一定的壓力。然而，隨著通脹率逐漸回落，美聯儲在2024年6月暫停升息，顯示出可能已經接近本輪緊縮週期的尾聲。未來的經濟走勢仍需密切觀察，特別是市場對高利率環境的長期反應。
+                根據歷史數據，當前的升息週期顯示出美聯儲在面對全球通脹壓力時，採取了快速而大幅度的升息策略，這在短期內對股市造成了一定的壓力。然而，隨著通脹率逐漸回落，美聯儲在2024年6月暫停升息，顯示出可能已經接近本輪緊縮週期的尾聲。未來的經濟走勢仍需密切觀察，特別是市場對高利率環境的長期反應。
               </p>
             </div>
           </div>
@@ -287,14 +317,14 @@
           cpiEnd: 1.5,
           description: "戰後經濟快速增長，Fed通過升息來穩定物價。",
           detailedAnalysis: `
-                          <div><strong>升息週期:</strong> 1958-1959 年</div>
-                          <div><strong>持續時間:</strong> 約 1 年</div>
-                          <div><strong>利率起點:</strong> 1.75%</div>
-                          <div><strong>最高利率:</strong> 4.00%</div>
-                          <div><strong>CPI 變化:</strong> 2.7% -> 1.5%</div>
-                          <div><strong>主要原因:</strong> 戰後經濟增長帶來的需求增加導致通脹壓力，美聯儲通過升息來穩定物價。</div>
-                          <div><strong>重大事件:</strong> 戰後美國經濟的快速增長和通脹壓力上升，推動了首次大規模的加息。</div>
-                      `,
+                    <div><strong>升息週期:</strong> 1958-1959 年</div>
+                    <div><strong>持續時間:</strong> 約 1 年</div>
+                    <div><strong>利率起點:</strong> 1.75%</div>
+                    <div><strong>最高利率:</strong> 4.00%</div>
+                    <div><strong>CPI 變化:</strong> 2.7% -> 1.5%</div>
+                    <div><strong>主要原因:</strong> 戰後經濟增長帶來的需求增加導致通脹壓力，美聯儲通過升息來穩定物價。</div>
+                    <div><strong>重大事件:</strong> 戰後美國經濟的快速增長和通脹壓力上升，推動了首次大規模的加息。</div>
+                `,
           events: [
             {
               date: "1958年1月",
@@ -339,14 +369,14 @@
           description:
             "越南戰爭期間經濟過熱，特別是軍費開支增加，加劇了通脹壓力。",
           detailedAnalysis: `
-                          <div><strong>升息週期:</strong> 1965-1966 年</div>
-                          <div><strong>持續時間:</strong> 約 1 年</div>
-                          <div><strong>利率起點:</strong> 4.00%</div>
-                          <div><strong>最高利率:</strong> 5.50%</div>
-                          <div><strong>CPI 變化:</strong> 1.6% -> 3.2%</div>
-                          <div><strong>主要原因:</strong> 經濟過熱，特別是越南戰爭帶來的軍費開支增加，加劇了通脹壓力。</div>
-                          <div><strong>重大事件:</strong> 越南戰爭期間美國經濟顯現出滯脹現象，即經濟增長放緩但通脹依然高企。</div>
-                      `,
+                    <div><strong>升息週期:</strong> 1965-1966 年</div>
+                    <div><strong>持續時間:</strong> 約 1 年</div>
+                    <div><strong>利率起點:</strong> 4.00%</div>
+                    <div><strong>最高利率:</strong> 5.50%</div>
+                    <div><strong>CPI 變化:</strong> 1.6% -> 3.2%</div>
+                    <div><strong>主要原因:</strong> 經濟過熱，特別是越南戰爭帶來的軍費開支增加，加劇了通脹壓力。</div>
+                    <div><strong>重大事件:</strong> 越南戰爭期間美國經濟顯現出滯脹現象，即經濟增長放緩但通脹依然高企。</div>
+                `,
           events: [
             {
               date: "1965年1月",
@@ -386,14 +416,14 @@
           cpiEnd: 12.3,
           description: "第一次石油危機導致全球能源價格飆升，推動通脹大幅上升。",
           detailedAnalysis: `
-              <div><strong>升息週期:</strong> 1972-1974 年</div>
-              <div><strong>持續時間:</strong> 約 2 年</div>
-              <div><strong>利率起點:</strong> 3.25%</div>
-              <div><strong>最高利率:</strong> 13.00%</div>
-              <div><strong>CPI 變化:</strong> 3.4% -> 12.3%</div>
-              <div><strong>主要原因:</strong> 第一次石油危機導致全球能源價格飆升，推動通脹大幅上升。</div>
-              <div><strong>重大事件:</strong> 1973年石油危機導致全球經濟動盪，並引發美國的經濟衰退。</div>
-          `,
+        <div><strong>升息週期:</strong> 1972-1974 年</div>
+        <div><strong>持續時間:</strong> 約 2 年</div>
+        <div><strong>利率起點:</strong> 3.25%</div>
+        <div><strong>最高利率:</strong> 13.00%</div>
+        <div><strong>CPI 變化:</strong> 3.4% -> 12.3%</div>
+        <div><strong>主要原因:</strong> 第一次石油危機導致全球能源價格飆升，推動通脹大幅上升。</div>
+        <div><strong>重大事件:</strong> 1973年石油危機導致全球經濟動盪，並引發美國的經濟衰退。</div>
+    `,
           events: [
             {
               date: "1972年1月",
@@ -433,14 +463,14 @@
           description:
             "第二次石油危機期間，物價上漲速度加快，Fed 採取了激進的加息政策。",
           detailedAnalysis: `
-              <div><strong>升息週期:</strong> 1977-1981 年</div>
-              <div><strong>持續時間:</strong> 約 4 年</div>
-              <div><strong>利率起點:</strong> 6.00%</div>
-              <div><strong>最高利率:</strong> 20.00%</div>
-              <div><strong>CPI 變化:</strong> 6.7% -> 10.3%</div>
-              <div><strong>主要原因:</strong> 第二次石油危機期間，物價上漲速度加快，Fed 採取了激進的加息政策。</div>
-              <div><strong>重大事件:</strong> 保羅·沃爾克的激進加息策略最終成功遏制了高通脹，但導致經濟衰退。</div>
-          `,
+        <div><strong>升息週期:</strong> 1977-1981 年</div>
+        <div><strong>持續時間:</strong> 約 4 年</div>
+        <div><strong>利率起點:</strong> 6.00%</div>
+        <div><strong>最高利率:</strong> 20.00%</div>
+        <div><strong>CPI 變化:</strong> 6.7% -> 10.3%</div>
+        <div><strong>主要原因:</strong> 第二次石油危機期間，物價上漲速度加快，Fed 採取了激進的加息政策。</div>
+        <div><strong>重大事件:</strong> 保羅·沃爾克的激進加息策略最終成功遏制了高通脹，但導致經濟衰退。</div>
+    `,
           events: [
             {
               date: "1977年1月",
@@ -479,14 +509,14 @@
           cpiEnd: 4.2,
           description: "經濟從衰退中復甦後，美聯儲為防止通脹反彈而升息。",
           detailedAnalysis: `
-              <div><strong>升息週期:</strong> 1983-1984 年</div>
-              <div><strong>持續時間:</strong> 約 1 年</div>
-              <div><strong>利率起點:</strong> 8.50%</div>
-              <div><strong>最高利率:</strong> 11.50%</div>
-              <div><strong>CPI 變化:</strong> 3.8% -> 4.2%</div>
-              <div><strong>主要原因:</strong> 經濟從衰退中復甦後，美聯儲為防止通脹反彈而升息。</div>
-              <div><strong>重大事件:</strong> 這次升息穩定了通脹預期，並為隨後的經濟增長奠定了基礎。</div>
-          `,
+        <div><strong>升息週期:</strong> 1983-1984 年</div>
+        <div><strong>持續時間:</strong> 約 1 年</div>
+        <div><strong>利率起點:</strong> 8.50%</div>
+        <div><strong>最高利率:</strong> 11.50%</div>
+        <div><strong>CPI 變化:</strong> 3.8% -> 4.2%</div>
+        <div><strong>主要原因:</strong> 經濟從衰退中復甦後，美聯儲為防止通脹反彈而升息。</div>
+        <div><strong>重大事件:</strong> 這次升息穩定了通脹預期，並為隨後的經濟增長奠定了基礎。</div>
+    `,
           events: [
             {
               date: "1983年1月",
@@ -525,14 +555,14 @@
           cpiEnd: 5.2,
           description: "在股市暴跌後，通脹壓力依然存在，美聯儲繼續升息。",
           detailedAnalysis: `
-              <div><strong>升息週期:</strong> 1987-1989 年</div>
-              <div><strong>持續時間:</strong> 約 2 年</div>
-              <div><strong>利率起點:</strong> 6.75%</div>
-              <div><strong>最高利率:</strong> 9.75%</div>
-              <div><strong>CPI 變化:</strong> 4.4% -> 5.2%</div>
-              <div><strong>主要原因:</strong> 在股市暴跌後，通脹壓力依然存在，美聯儲繼續升息。</div>
-              <div><strong>重大事件:</strong> 1987年的"黑色星期一"全球股市崩盤，隨後市場逐步恢復。</div>
-          `,
+        <div><strong>升息週期:</strong> 1987-1989 年</div>
+        <div><strong>持續時間:</strong> 約 2 年</div>
+        <div><strong>利率起點:</strong> 6.75%</div>
+        <div><strong>最高利率:</strong> 9.75%</div>
+        <div><strong>CPI 變化:</strong> 4.4% -> 5.2%</div>
+        <div><strong>主要原因:</strong> 在股市暴跌後，通脹壓力依然存在，美聯儲繼續升息。</div>
+        <div><strong>重大事件:</strong> 1987年的"黑色星期一"全球股市崩盤，隨後市場逐步恢復。</div>
+    `,
           events: [
             {
               date: "1987年1月",
@@ -571,14 +601,14 @@
           cpiEnd: 2.5,
           description: "經濟增長加速，Fed 升息防止經濟過熱。",
           detailedAnalysis: `
-              <div><strong>升息週期:</strong> 1994-1995 年</div>
-              <div><strong>持續時間:</strong> 約 1 年</div>
-              <div><strong>利率起點:</strong> 3.00%</div>
-              <div><strong>最高利率:</strong> 6.00%</div>
-              <div><strong>CPI 變化:</strong> 2.7% -> 2.5%</div>
-              <div><strong>主要原因:</strong> 經濟增長加速，Fed 升息防止經濟過熱。</div>
-              <div><strong>重大事件:</strong> 這次升息成功避免了進一步通脹，但也帶來了短暫的市場波動。</div>
-          `,
+        <div><strong>升息週期:</strong> 1994-1995 年</div>
+        <div><strong>持續時間:</strong> 約 1 年</div>
+        <div><strong>利率起點:</strong> 3.00%</div>
+        <div><strong>最高利率:</strong> 6.00%</div>
+        <div><strong>CPI 變化:</strong> 2.7% -> 2.5%</div>
+        <div><strong>主要原因:</strong> 經濟增長加速，Fed 升息防止經濟過熱。</div>
+        <div><strong>重大事件:</strong> 這次升息成功避免了進一步通脹，但也帶來了短暫的市場波動。</div>
+    `,
           events: [
             {
               date: "1994年2月",
@@ -612,14 +642,14 @@
           cpiEnd: 3.4,
           description: "互聯網泡沫期間市場過熱，Fed 升息冷卻市場。",
           detailedAnalysis: `
-              <div><strong>升息週期:</strong> 1999-2000 年</div>
-              <div><strong>持續時間:</strong> 約 1 年</div>
-              <div><strong>利率起點:</strong> 4.75%</div>
-              <div><strong>最高利率:</strong> 6.50%</div>
-              <div><strong>CPI 變化:</strong> 2.1% -> 3.4%</div>
-              <div><strong>主要原因:</strong> 互聯網泡沫期間市場過熱，Fed 升息冷卻市場。</div>
-              <div><strong>重大事件:</strong> 互聯網泡沫破滅，經濟隨後進入衰退。</div>
-          `,
+        <div><strong>升息週期:</strong> 1999-2000 年</div>
+        <div><strong>持續時間:</strong> 約 1 年</div>
+        <div><strong>利率起點:</strong> 4.75%</div>
+        <div><strong>最高利率:</strong> 6.50%</div>
+        <div><strong>CPI 變化:</strong> 2.1% -> 3.4%</div>
+        <div><strong>主要原因:</strong> 互聯網泡沫期間市場過熱，Fed 升息冷卻市場。</div>
+        <div><strong>重大事件:</strong> 互聯網泡沫破滅，經濟隨後進入衰退。</div>
+    `,
           events: [
             {
               date: "1999年6月",
@@ -653,14 +683,14 @@
           cpiEnd: 2.7,
           description: "經濟強勁復甦，Fed 升息防止經濟過熱。",
           detailedAnalysis: `
-              <div><strong>升息週期:</strong> 2004-2006 年</div>
-              <div><strong>持續時間:</strong> 約 2 年</div>
-              <div><strong>利率起點:</strong> 1.00%</div>
-              <div><strong>最高利率:</strong> 5.25%</div>
-              <div><strong>CPI 變化:</strong> 3.1% -> 2.7%</div>
-              <div><strong>主要原因:</strong> 經濟強勁復甦，Fed 升息防止經濟過熱。</div>
-              <div><strong>重大事件:</strong> 儘管升息，但房地產市場泡沫繼續膨脹，隨後引發了金融危機。</div>
-          `,
+        <div><strong>升息週期:</strong> 2004-2006 年</div>
+        <div><strong>持續時間:</strong> 約 2 年</div>
+        <div><strong>利率起點:</strong> 1.00%</div>
+        <div><strong>最高利率:</strong> 5.25%</div>
+        <div><strong>CPI 變化:</strong> 3.1% -> 2.7%</div>
+        <div><strong>主要原因:</strong> 經濟強勁復甦，Fed 升息防止經濟過熱。</div>
+        <div><strong>重大事件:</strong> 儘管升息，但房地產市場泡沫繼續膨脹，隨後引發了金融危機。</div>
+    `,
           events: [
             {
               date: "2004年6月",
@@ -695,14 +725,14 @@
           description:
             "全球金融危機後，經濟逐漸復甦，Fed 開始升息以恢復正常利率水平。",
           detailedAnalysis: `
-              <div><strong>升息週期:</strong> 2015-2018 年</div>
-              <div><strong>持續時間:</strong> 約 3 年</div>
-              <div><strong>利率起點:</strong> 0.25%</div>
-              <div><strong>最高利率:</strong> 2.50%</div>
-              <div><strong>CPI 變化:</strong> 0.7% -> 2.2%</div>
-              <div><strong>主要原因:</strong> 全球金融危機後，經濟逐漸復甦，Fed 開始升息以恢復正常利率水平。</div>
-              <div><strong>重大事件:</strong> 2018年市場波動增加，促使Fed在2019年開始降息。</div>
-          `,
+        <div><strong>升息週期:</strong> 2015-2018 年</div>
+        <div><strong>持續時間:</strong> 約 3 年</div>
+        <div><strong>利率起點:</strong> 0.25%</div>
+        <div><strong>最高利率:</strong> 2.50%</div>
+        <div><strong>CPI 變化:</strong> 0.7% -> 2.2%</div>
+        <div><strong>主要原因:</strong> 全球金融危機後，經濟逐漸復甦，Fed 開始升息以恢復正常利率水平。</div>
+        <div><strong>重大事件:</strong> 2018年市場波動增加，促使Fed在2019年開始降息。</div>
+    `,
           events: [
             {
               date: "2015年12月",
@@ -742,14 +772,14 @@
           description:
             "COVID-19 大流行後的供應鏈問題和需求激增導致通脹，Fed 採取快速升息來抑制通脹。",
           detailedAnalysis: `
-                          <div><strong>升息週期:</strong> 2022-2024 年</div>
-                          <div><strong>持續時間:</strong> 約 2 年</div>
-                          <div><strong>利率起點:</strong> 0.25%</div>
-                          <div><strong>最高利率:</strong> 5.50%</div>
-                          <div><strong>CPI 變化:</strong> 7.9% -> 3.1%</div>
-                          <div><strong>主要原因:</strong> COVID-19 大流行後的供應鏈問題和需求激增導致通脹，Fed 採取快速升息來抑制通脹。</div>
-                          <div><strong>重大事件:</strong> 2024年6月，美聯儲首次暫停升息，決定保持觀望以評估經濟走勢。</div>
-                      `,
+                    <div><strong>升息週期:</strong> 2022-2024 年</div>
+                    <div><strong>持續時間:</strong> 約 2 年</div>
+                    <div><strong>利率起點:</strong> 0.25%</div>
+                    <div><strong>最高利率:</strong> 5.50%</div>
+                    <div><strong>CPI 變化:</strong> 7.9% -> 3.1%</div>
+                    <div><strong>主要原因:</strong> COVID-19 大流行後的供應鏈問題和需求激增導致通脹，Fed 採取快速升息來抑制通脹。</div>
+                    <div><strong>重大事件:</strong> 2024年6月，美聯儲首次暫停升息，決定保持觀望以評估經濟走勢。</div>
+                `,
           events: [
             {
               date: "2022年3月",
@@ -824,6 +854,27 @@
                 beginAtZero: true,
               },
             },
+            plugins: {
+              legend: {
+                display: true,
+                position: "top",
+              },
+              annotation: {
+                annotations: cycleData.map((cycle, index) => ({
+                  type: "line",
+                  mode: "vertical",
+                  scaleID: "x-axis-0",
+                  value: cycle.startDate,
+                  borderColor: "rgba(0, 123, 255, 0.75)",
+                  borderWidth: 2,
+                  label: {
+                    enabled: true,
+                    content: cycle.period,
+                    position: "top",
+                  },
+                })),
+              },
+            },
           },
         });
       }
@@ -872,51 +923,104 @@
                 beginAtZero: true,
               },
             },
+            plugins: {
+              legend: {
+                display: true,
+                position: "top",
+              },
+              annotation: {
+                annotations: cycleData.map((cycle, index) => ({
+                  type: "line",
+                  mode: "vertical",
+                  scaleID: "x-axis-0",
+                  value: cycle.startDate,
+                  borderColor: "rgba(54, 162, 235, 0.75)",
+                  borderWidth: 2,
+                  label: {
+                    enabled: true,
+                    content: cycle.period,
+                    position: "top",
+                  },
+                })),
+              },
+            },
           },
         });
       }
 
       function populateCycleAnalysis() {
         const container = document.getElementById("cycleAnalysis");
-        cycleData.forEach((cycle) => {
-          const analysisHTML = `
-                          <div class="cycle-card card">
-                              <div class="card-body">
-                                  <h5 class="card-title">${cycle.period}</h5>
-                                  <h6 class="card-subtitle mb-2 text-muted">(${
-                                    cycle.startDate
-                                  } - ${cycle.endDate})</h6>
-                                  <p class="card-text">${cycle.description}</p>
-                                  <a href="#" class="card-link" data-bs-toggle="collapse" data-bs-target="#analysis-${cycle.period.replace(
-                                    /[\s:-]/g,
-                                    ""
-                                  )}">詳細分析</a>
-                                  <div class="collapse" id="analysis-${cycle.period.replace(
-                                    /[\s:-]/g,
-                                    ""
-                                  )}">
-                                      <div class="mt-3">${
-                                        cycle.detailedAnalysis
-                                      }</div>
-                                  </div>
-                              </div>
-                          </div>`;
-          container.insertAdjacentHTML("beforeend", analysisHTML);
-        });
+        const groupedData = groupCyclesByType();
+
+        for (const [type, cycles] of Object.entries(groupedData)) {
+          const typeHeader = `<h3>${type}</h3>`;
+          container.insertAdjacentHTML("beforeend", typeHeader);
+
+          cycles.forEach((cycle) => {
+            const analysisHTML = `
+                        <div class="cycle-card card">
+                            <div class="card-body">
+                                <button class="btn-toggle" onclick="toggleContent('analysis-${cycle.period.replace(
+                                  /[\s:-]/g,
+                                  ""
+                                )}')">
+                                    ${cycle.period} (${cycle.startDate} - ${
+              cycle.endDate
+            })
+                                </button>
+                                <div id="analysis-${cycle.period.replace(
+                                  /[\s:-]/g,
+                                  ""
+                                )}" class="toggle-content">
+                                    ${cycle.detailedAnalysis}
+                                    <div class="nav-btn">
+                                        <a href="#timeline-${cycle.period.replace(
+                                          /[\s:-]/g,
+                                          ""
+                                        )}">查看時間線</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+            container.insertAdjacentHTML("beforeend", analysisHTML);
+          });
+        }
+      }
+
+      function toggleContent(id) {
+        const content = document.getElementById(id);
+        content.style.display =
+          content.style.display === "none" ? "block" : "none";
+      }
+
+      function groupCyclesByType() {
+        return cycleData.reduce((acc, cycle) => {
+          if (!acc[cycle.type]) {
+            acc[cycle.type] = [];
+          }
+          acc[cycle.type].push(cycle);
+          return acc;
+        }, {});
       }
 
       function createTimeline() {
         const timeline = document.getElementById("eventTimeline");
         cycleData.forEach((cycle) => {
+          const timelineHeader = `<h4 id="timeline-${cycle.period.replace(
+            /[\s:-]/g,
+            ""
+          )}">${cycle.period}</h4>`;
+          timeline.insertAdjacentHTML("beforeend", timelineHeader);
+
           cycle.events.forEach((event, index) => {
             const isRight = index % 2 === 0 ? "right" : "left";
             const eventHTML = `
-                              <div class="timeline-container ${isRight}">
-                                  <div class="content">
-                                      <h5><i class="fa ${event.icon} event-icon"></i>${event.date}</h5>
-                                      <p>${event.description}</p>
-                                  </div>
-                              </div>`;
+                        <div class="timeline-container ${isRight}">
+                            <div class="content">
+                                <h5><i class="fa ${event.icon} event-icon"></i>${event.date}</h5>
+                                <p>${event.description}</p>
+                            </div>
+                        </div>`;
             timeline.insertAdjacentHTML("beforeend", eventHTML);
           });
         });
