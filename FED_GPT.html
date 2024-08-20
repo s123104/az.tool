@@ -8,30 +8,35 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
       body {
-        font-family: "Microsoft JhengHei", sans-serif;
+        font-family: "Microsoft JhengHei", "Heiti TC", "Arial", sans-serif;
         background-color: #f8f9fa;
       }
       .header {
         background-color: #003366;
         color: white;
-        padding: 20px 0;
+        padding: 30px 0;
+        margin-bottom: 30px;
+      }
+      .cycle-card {
         margin-bottom: 20px;
+        transition: transform 0.3s ease;
+      }
+      .cycle-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       }
       .chart-container {
         position: relative;
         margin: auto;
-        height: 50vh;
-        width: 100%;
-      }
-      .analysis-section {
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        margin-bottom: 20px;
+        height: 60vh;
+        width: 80vw;
       }
       .timeline {
         position: relative;
@@ -72,6 +77,33 @@
       .right {
         left: 50%;
       }
+      .left::before {
+        content: " ";
+        height: 0;
+        position: absolute;
+        top: 22px;
+        width: 0;
+        z-index: 1;
+        right: 30px;
+        border: medium solid #003366;
+        border-width: 10px 0 10px 10px;
+        border-color: transparent transparent transparent #003366;
+      }
+      .right::before {
+        content: " ";
+        height: 0;
+        position: absolute;
+        top: 22px;
+        width: 0;
+        z-index: 1;
+        left: 30px;
+        border: medium solid #003366;
+        border-width: 10px 10px 10px 0;
+        border-color: transparent #003366 transparent transparent;
+      }
+      .right::after {
+        left: -16px;
+      }
       .content {
         padding: 20px 30px;
         background-color: white;
@@ -87,6 +119,12 @@
           padding-left: 70px;
           padding-right: 25px;
         }
+        .timeline-container::before {
+          left: 60px;
+          border: medium solid #003366;
+          border-width: 10px 10px 10px 0;
+          border-color: transparent #003366 transparent transparent;
+        }
         .left::after,
         .right::after {
           left: 15px;
@@ -94,6 +132,17 @@
         .right {
           left: 0%;
         }
+      }
+      .event-icon {
+        font-size: 24px;
+        margin-right: 10px;
+      }
+      .analysis-section {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 30px;
       }
     </style>
   </head>
@@ -112,6 +161,17 @@
             <h2 class="text-center mb-4">利率變化趨勢圖</h2>
             <div class="chart-container">
               <canvas id="rateChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-md-12">
+          <div class="analysis-section">
+            <h2 class="text-center mb-4">S&P 500指數變化趨勢圖</h2>
+            <div class="chart-container">
+              <canvas id="sp500Chart"></canvas>
             </div>
           </div>
         </div>
@@ -140,16 +200,22 @@
       </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       const cycleData = [
         {
           period: "1958-1959",
+          startDate: "1958年1月",
+          endDate: "1959年12月",
           startRate: 1.75,
           endRate: 4.0,
           duration: "約1年",
           type: "經濟增長期",
-          cpiChange: "2.7% -> 1.5%",
-          sp500Change: "40.49 -> 55.85 (37.91%)",
+          sp500Start: 40.49,
+          sp500End: 55.85,
+          sp500Change: 37.91,
+          cpiStart: 2.7,
+          cpiEnd: 1.5,
           description: "戰後經濟快速增長，Fed通過升息來穩定物價。",
           detailedAnalysis: `
                     這次升息週期發生在戰後經濟繁榮時期。主要特點包括：
@@ -157,9 +223,9 @@
                         <li>經濟快速增長，GDP年增長率超過6%</li>
                         <li>就業市場強勁，失業率降至5%以下</li>
                         <li>消費者支出和企業投資大幅增加</li>
-                        <li>通貨膨脹壓力開始顯現，CPI從1.8%上升到2.7%</li>
+                        <li>通貨膨脹壓力開始顯現，但在升息後有所緩解</li>
                     </ul>
-                    Fed的升息行動旨在防止經濟過熱和控制通脹。這次適度的貨幣緊縮政策被認為是成功的，因為它在不引發經濟衰退的情況下穩定了物價。
+                    Fed的升息行動旨在防止經濟過熱和控制通脹。這次適度的貨幣緊縮政策被認為是成功的，因為它在不引發經濟衰退的情況下穩定了物價。同時，S&P 500指數大幅上漲，反映了投資者對經濟前景的樂觀態度。
                 `,
           events: [
             {
@@ -179,8 +245,8 @@
             },
             {
               date: "1959年10月",
-              description: "通脹率達到頂峰2.7%",
-              icon: "fa-fire",
+              description: "通脹率開始回落",
+              icon: "fa-fire-extinguisher",
             },
             {
               date: "1959年12月",
@@ -189,108 +255,598 @@
             },
           ],
         },
-        // ... 其他週期數據 ...
+        {
+          period: "1965-1966",
+          startDate: "1965年1月",
+          endDate: "1966年12月",
+          startRate: 4.0,
+          endRate: 5.5,
+          duration: "約1年",
+          type: "軍費開支增加期",
+          sp500Start: 84.75,
+          sp500End: 80.33,
+          sp500Change: -5.23,
+          cpiStart: 1.6,
+          cpiEnd: 3.2,
+          description:
+            "越南戰爭期間經濟過熱，特別是軍費開支增加，加劇了通脹壓力。",
+          detailedAnalysis: `
+                    這次升息週期發生在越南戰爭期間，主要特點包括：
+                    <ul>
+                        <li>政府軍事支出大幅增加，推動經濟快速增長</li>
+                        <li>通脹壓力顯著上升，CPI從1.6%升至3.2%</li>
+                        <li>勞動力市場緊張，失業率降至歷史低點</li>
+                        <li>股市出現小幅下跌，反映了投資者對經濟過熱的擔憂</li>
+                    </ul>
+                    Fed的升息行動旨在控制通脹和冷卻過熱的經濟。然而，這次升息也帶來了一些負面影響，如股市下跌和經濟增長放緩的跡象。這個時期開始顯現出"滯脹"的特徵，即經濟增長放緩但通脹持續上升。
+                `,
+          events: [
+            {
+              date: "1965年1月",
+              description: "Fed開始新一輪升息",
+              icon: "fa-chart-line",
+            },
+            {
+              date: "1965年7月",
+              description: "越南戰爭升級，軍費開支大幅增加",
+              icon: "fa-helicopter",
+            },
+            { date: "1966年2月", description: "通脹率突破3%", icon: "fa-fire" },
+            {
+              date: "1966年8月",
+              description: "股市開始回調",
+              icon: "fa-chart-line",
+            },
+            {
+              date: "1966年12月",
+              description: "Fed將利率上調至5.50%，結束本輪升息",
+              icon: "fa-circle-check",
+            },
+          ],
+        },
+        {
+          period: "1972-1974",
+          startDate: "1972年1月",
+          endDate: "1974年12月",
+          startRate: 3.25,
+          endRate: 13.0,
+          duration: "約2年",
+          type: "第一次石油危機",
+          sp500Start: 102.09,
+          sp500End: 68.56,
+          sp500Change: -32.86,
+          cpiStart: 3.4,
+          cpiEnd: 12.3,
+          description: "第一次石油危機導致全球能源價格飆升，推動通脹大幅上升。",
+          detailedAnalysis: `
+                    這次升息週期發生在第一次石油危機期間，主要特點包括：
+                    <ul>
+                        <li>石油價格暴漲，推高了全球能源成本</li>
+                        <li>美國經濟陷入滯脹，通脹率從3.4%飆升至12.3%</li>
+                        <li>Fed大幅升息，將利率從3.25%提高至13.00%</li>
+                        <li>S&P 500指數下跌32.86%，經濟衰退明顯</li>
+                    </ul>
+                    這次危機對全球經濟產生了深遠影響，並加劇了市場的不確定性。
+                `,
+          events: [
+            {
+              date: "1972年1月",
+              description: "Fed開始升息，利率從3.25%起步",
+              icon: "fa-chart-line",
+            },
+            {
+              date: "1973年10月",
+              description: "第一次石油危機爆發，油價大幅上漲",
+              icon: "fa-oil-can",
+            },
+            {
+              date: "1974年8月",
+              description: "美國經濟陷入嚴重衰退，通脹持續飆升",
+              icon: "fa-arrow-down",
+            },
+            {
+              date: "1974年12月",
+              description: "Fed將利率提高至13.00%，結束本輪升息",
+              icon: "fa-circle-check",
+            },
+          ],
+        },
+        {
+          period: "1977-1981",
+          startDate: "1977年1月",
+          endDate: "1981年12月",
+          startRate: 6.0,
+          endRate: 20.0,
+          duration: "約4年",
+          type: "第二次石油危機",
+          sp500Start: 103.8,
+          sp500End: 122.55,
+          sp500Change: 18.04,
+          cpiStart: 6.7,
+          cpiEnd: 10.3,
+          description:
+            "第二次石油危機期間，物價上漲速度加快，Fed 採取了激進的加息政策。",
+          detailedAnalysis: `
+                    這次升息週期發生在第二次石油危機期間，主要特點包括：
+                    <ul>
+                        <li>全球石油供應再次中斷，推高了物價</li>
+                        <li>Fed將利率逐步提高至20.00%，創歷史新高</li>
+                        <li>S&P 500指數在這期間上漲了18.04%，但經濟衰退風險加大</li>
+                        <li>保羅·沃爾克的激進加息策略最終成功遏制了高通脹，但導致經濟衰退</li>
+                    </ul>
+                `,
+          events: [
+            {
+              date: "1977年1月",
+              description: "Fed開始升息，利率從6.00%起步",
+              icon: "fa-chart-line",
+            },
+            {
+              date: "1979年3月",
+              description: "第二次石油危機爆發，物價上漲加速",
+              icon: "fa-oil-can",
+            },
+            {
+              date: "1980年10月",
+              description: "保羅·沃爾克上任Fed主席，實行激進加息政策",
+              icon: "fa-gavel",
+            },
+            {
+              date: "1981年12月",
+              description: "Fed將利率提高至20.00%，結束本輪升息",
+              icon: "fa-circle-check",
+            },
+          ],
+        },
+        {
+          period: "1983-1984",
+          startDate: "1983年1月",
+          endDate: "1984年12月",
+          startRate: 8.5,
+          endRate: 11.5,
+          duration: "約1年",
+          type: "經濟復甦期",
+          sp500Start: 140.64,
+          sp500End: 167.24,
+          sp500Change: 18.9,
+          cpiStart: 3.8,
+          cpiEnd: 4.2,
+          description: "經濟從衰退中復甦後，美聯儲為防止通脹反彈而升息。",
+          detailedAnalysis: `
+                    這次升息週期發生在經濟從衰退中復甦的時期，主要特點包括：
+                    <ul>
+                        <li>經濟增長穩定，失業率下降</li>
+                        <li>通脹壓力略有回升，CPI從3.8%上升至4.2%</li>
+                        <li>Fed為防止通脹反彈，將利率提高至11.50%</li>
+                        <li>S&P 500指數上漲18.90%，經濟增長良好</li>
+                    </ul>
+                    這次升息穩定了通脹預期，並為隨後的經濟增長奠定了基礎。
+                `,
+          events: [
+            {
+              date: "1983年1月",
+              description: "Fed開始升息，利率從8.50%起步",
+              icon: "fa-chart-line",
+            },
+            {
+              date: "1983年9月",
+              description: "美國經濟增長速度加快，失業率下降",
+              icon: "fa-arrow-trend-up",
+            },
+            {
+              date: "1984年6月",
+              description: "通脹率回升至4.2%，Fed繼續升息",
+              icon: "fa-fire",
+            },
+            {
+              date: "1984年12月",
+              description: "Fed將利率提高至11.50%，結束本輪升息",
+              icon: "fa-circle-check",
+            },
+          ],
+        },
+        {
+          period: "1987-1989",
+          startDate: "1987年1月",
+          endDate: "1989年12月",
+          startRate: 6.75,
+          endRate: 9.75,
+          duration: "約2年",
+          type: "股市波動期",
+          sp500Start: 242.17,
+          sp500End: 353.4,
+          sp500Change: 45.95,
+          cpiStart: 4.4,
+          cpiEnd: 5.2,
+          description: "在股市暴跌後，通脹壓力依然存在，美聯儲繼續升息。",
+          detailedAnalysis: `
+                    這次升息週期發生在1987年股市暴跌後，主要特點包括：
+                    <ul>
+                        <li>1987年"黑色星期一"全球股市崩盤，隨後市場逐步恢復</li>
+                        <li>通脹壓力仍然存在，Fed將利率提高至9.75%</li>
+                        <li>S&P 500指數在這期間上漲45.95%，經濟保持穩定</li>
+                        <li>Fed通過緊縮政策成功抑制了通脹，但市場波動依然存在</li>
+                    </ul>
+                `,
+          events: [
+            {
+              date: "1987年1月",
+              description: "Fed開始升息，利率從6.75%起步",
+              icon: "fa-chart-line",
+            },
+            {
+              date: "1987年10月",
+              description: "黑色星期一，全球股市崩盤",
+              icon: "fa-chart-line-down",
+            },
+            {
+              date: "1988年3月",
+              description: "經濟開始復甦，市場情緒回暖",
+              icon: "fa-arrow-trend-up",
+            },
+            {
+              date: "1989年12月",
+              description: "Fed將利率提高至9.75%，結束本輪升息",
+              icon: "fa-circle-check",
+            },
+          ],
+        },
+        {
+          period: "1994-1995",
+          startDate: "1994年2月",
+          endDate: "1995年2月",
+          startRate: 3.0,
+          endRate: 6.0,
+          duration: "約1年",
+          type: "經濟加速增長期",
+          sp500Start: 470.42,
+          sp500End: 500.71,
+          sp500Change: 6.43,
+          cpiStart: 2.7,
+          cpiEnd: 2.5,
+          description: "經濟增長加速，Fed 升息防止經濟過熱。",
+          detailedAnalysis: `
+                    這次升息週期發生在經濟加速增長的時期，主要特點包括：
+                    <ul>
+                        <li>美國經濟增長速度加快，失業率持續下降</li>
+                        <li>Fed為防止經濟過熱，將利率提高至6.00%</li>
+                        <li>S&P 500指數上漲6.43%，市場表現穩定</li>
+                        <li>這次升息成功避免了進一步通脹，但也帶來了短暫的市場波動</li>
+                    </ul>
+                `,
+          events: [
+            {
+              date: "1994年2月",
+              description: "Fed開始升息，利率從3.00%起步",
+              icon: "fa-chart-line",
+            },
+            {
+              date: "1994年10月",
+              description: "市場波動增加，投資者情緒波動",
+              icon: "fa-arrow-trend-down",
+            },
+            {
+              date: "1995年2月",
+              description: "Fed將利率提高至6.00%，結束本輪升息",
+              icon: "fa-circle-check",
+            },
+          ],
+        },
+        {
+          period: "1999-2000",
+          startDate: "1999年6月",
+          endDate: "2000年5月",
+          startRate: 4.75,
+          endRate: 6.5,
+          duration: "約1年",
+          type: "互聯網泡沫期",
+          sp500Start: 1320.41,
+          sp500End: 1420.6,
+          sp500Change: 7.59,
+          cpiStart: 2.1,
+          cpiEnd: 3.4,
+          description: "互聯網泡沫期間市場過熱，Fed 升息冷卻市場。",
+          detailedAnalysis: `
+                    這次升息週期發生在互聯網泡沫期間，主要特點包括：
+                    <ul>
+                        <li>互聯網和科技公司股價飆升，市場過熱</li>
+                        <li>Fed為冷卻市場，將利率提高至6.50%</li>
+                        <li>S&P 500指數上漲7.59%，但市場波動性增加</li>
+                        <li>互聯網泡沫破滅，經濟隨後進入衰退</li>
+                    </ul>
+                `,
+          events: [
+            {
+              date: "1999年6月",
+              description: "Fed開始升息，利率從4.75%起步",
+              icon: "fa-chart-line",
+            },
+            {
+              date: "2000年3月",
+              description: "互聯網泡沫達到頂峰，市場波動加劇",
+              icon: "fa-wave-square",
+            },
+            {
+              date: "2000年5月",
+              description: "Fed將利率提高至6.50%，結束本輪升息",
+              icon: "fa-circle-check",
+            },
+          ],
+        },
+        {
+          period: "2004-2006",
+          startDate: "2004年6月",
+          endDate: "2006年6月",
+          startRate: 1.0,
+          endRate: 5.25,
+          duration: "約2年",
+          type: "經濟強勁復甦期",
+          sp500Start: 1130.2,
+          sp500End: 1270.09,
+          sp500Change: 12.36,
+          cpiStart: 3.1,
+          cpiEnd: 2.7,
+          description: "經濟強勁復甦，Fed 升息防止經濟過熱。",
+          detailedAnalysis: `
+                    這次升息週期發生在經濟強勁復甦的時期，主要特點包括：
+                    <ul>
+                        <li>美國經濟增長強勁，失業率持續下降</li>
+                        <li>房地產市場繁榮，導致市場過熱</li>
+                        <li>Fed為防止經濟過熱，將利率逐步提高至5.25%</li>
+                        <li>S&P 500指數上漲12.36%，但房地產市場泡沫開始形成</li>
+                        <li>儘管升息，但房地產市場泡沫繼續膨脹，隨後引發了金融危機</li>
+                    </ul>
+                `,
+          events: [
+            {
+              date: "2004年6月",
+              description: "Fed開始升息，利率從1.00%起步",
+              icon: "fa-chart-line",
+            },
+            {
+              date: "2005年8月",
+              description: "房地產市場繼續膨脹，泡沫風險增加",
+              icon: "fa-home",
+            },
+            {
+              date: "2006年6月",
+              description: "Fed將利率提高至5.25%，結束本輪升息",
+              icon: "fa-circle-check",
+            },
+          ],
+        },
+        {
+          period: "2015-2018",
+          startDate: "2015年12月",
+          endDate: "2018年12月",
+          startRate: 0.25,
+          endRate: 2.5,
+          duration: "約3年",
+          type: "後金融危機復甦期",
+          sp500Start: 2058.9,
+          sp500End: 2506.85,
+          sp500Change: 21.74,
+          cpiStart: 0.7,
+          cpiEnd: 2.2,
+          description:
+            "全球金融危機後，經濟逐漸復甦，Fed 開始升息以恢復正常利率水平。",
+          detailedAnalysis: `
+                    這次升息週期發生在後金融危機復甦期，主要特點包括：
+                    <ul>
+                        <li>經濟逐漸復甦，失業率下降至歷史低點</li>
+                        <li>Fed逐步提高利率，恢復正常的貨幣政策</li>
+                        <li>S&P 500指數上漲21.74%，市場對經濟前景樂觀</li>
+                        <li>2018年市場波動增加，促使Fed在2019年開始降息</li>
+                    </ul>
+                `,
+          events: [
+            {
+              date: "2015年12月",
+              description: "Fed開始升息，利率從0.25%起步",
+              icon: "fa-chart-line",
+            },
+            {
+              date: "2017年9月",
+              description: "美國經濟強勁增長，市場持續上漲",
+              icon: "fa-arrow-trend-up",
+            },
+            {
+              date: "2018年12月",
+              description: "市場波動性增加，Fed暫停升息",
+              icon: "fa-wave-square",
+            },
+            {
+              date: "2018年12月",
+              description: "Fed將利率提高至2.50%，結束本輪升息",
+              icon: "fa-circle-check",
+            },
+          ],
+        },
+        {
+          period: "2022-2024",
+          startDate: "2022年3月",
+          endDate: "2024年6月",
+          startRate: 0.25,
+          endRate: 5.5,
+          duration: "約2年",
+          type: "後疫情高通脹期",
+          sp500Start: 4531.6,
+          sp500End: 4498.85,
+          sp500Change: -0.72,
+          cpiStart: 7.9,
+          cpiEnd: 3.1,
+          description:
+            "COVID-19 大流行後的供應鏈問題和需求激增導致通脹，Fed 採取快速升息來抑制通脹。",
+          detailedAnalysis: `
+                    這次升息週期是近年來最激進的一次，主要特點包括：
+                    <ul>
+                        <li>後疫情時代，經濟快速復甦導致需求激增</li>
+                        <li>全球供應鏈中斷造成供給短缺，進一步推高物價</li>
+                        <li>通脹率達到40年來的高點，Fed被迫快速且大幅度升息</li>
+                        <li>勞動力市場保持強勁，失業率維持在低水平</li>
+                        <li>股市經歷顯著波動，但總體保持韌性</li>
+                    </ul>
+                    Fed的快速升息政策成功地將通脹率從高點7.9%降至3.1%。然而，這一政策也帶來了經濟增長放緩的風險。S&P 500指數在這期間略有下跌，反映了市場對高利率環境的擔憂。2024年6月，Fed暫停升息，表明可能已經接近本輪緊縮週期的尾聲。
+                `,
+          events: [
+            {
+              date: "2022年3月",
+              description: "Fed開始新一輪升息，利率從0.25%起步",
+              icon: "fa-chart-line",
+            },
+            {
+              date: "2022年6月",
+              description: "通脹率達到40年來高點9.1%",
+              icon: "fa-fire",
+            },
+            {
+              date: "2023年3月",
+              description: "區域銀行危機爆發，Fed面臨政策兩難",
+              icon: "fa-building-columns",
+            },
+            {
+              date: "2023年7月",
+              description: "通脹率開始顯著回落",
+              icon: "fa-arrow-trend-down",
+            },
+            {
+              date: "2024年6月",
+              description: "Fed暫停升息，利率維持在5.50%",
+              icon: "fa-hand",
+            },
+          ],
+        },
       ];
 
-      function createChart() {
+      function createRateChart() {
         const ctx = document.getElementById("rateChart").getContext("2d");
         new Chart(ctx, {
           type: "line",
           data: {
-            labels: cycleData.map((cycle) => cycle.period),
+            labels: cycleData.map((cycle) => cycle.startDate),
             datasets: [
               {
-                label: "起始利率",
-                data: cycleData.map((cycle) => cycle.startRate),
-                borderColor: "rgb(75, 192, 192)",
-                tension: 0.1,
-              },
-              {
-                label: "結束利率",
+                label: "利率 (%)",
                 data: cycleData.map((cycle) => cycle.endRate),
-                borderColor: "rgb(255, 99, 132)",
-                tension: 0.1,
+                backgroundColor: "rgba(0, 51, 102, 0.2)",
+                borderColor: "rgba(0, 51, 102, 1)",
+                borderWidth: 1,
+                fill: true,
               },
             ],
           },
           options: {
             responsive: true,
-            maintainAspectRatio: false,
             scales: {
+              x: {
+                display: true,
+                title: {
+                  display: true,
+                  text: "時間",
+                },
+              },
               y: {
-                beginAtZero: true,
+                display: true,
                 title: {
                   display: true,
                   text: "利率 (%)",
                 },
-              },
-              x: {
-                title: {
-                  display: true,
-                  text: "升息週期",
-                },
-              },
-            },
-            plugins: {
-              legend: {
-                position: "top",
-              },
-              title: {
-                display: true,
-                text: "美聯儲歷史升息週期利率變化",
+                beginAtZero: true,
               },
             },
           },
         });
       }
 
-      function generateCycleAnalysis() {
-        const analysisContainer = document.getElementById("cycleAnalysis");
-        cycleData.forEach((cycle) => {
-          const analysisHtml = `
-                    <div class="mb-4">
-                        <h3>${cycle.period} 升息週期</h3>
-                        <h5 class="text-muted">${cycle.type}</h5>
-                        <p><strong>起始利率:</strong> ${cycle.startRate}% | <strong>結束利率:</strong> ${cycle.endRate}% | <strong>持續時間:</strong> ${cycle.duration}</p>
-                        <p><strong>CPI 變化:</strong> ${cycle.cpiChange} | <strong>S&P 500 漲跌幅:</strong> ${cycle.sp500Change}</p>
-                        <p><strong>概述:</strong> ${cycle.description}</p>
-                        <div class="mt-3">
-                            <h5>詳細分析</h5>
-                            ${cycle.detailedAnalysis}
-                        </div>
-                    </div>
-                    <hr>
-                `;
-          analysisContainer.innerHTML += analysisHtml;
+      function createSP500Chart() {
+        const ctx = document.getElementById("sp500Chart").getContext("2d");
+        new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: cycleData.map((cycle) => cycle.startDate),
+            datasets: [
+              {
+                label: "S&P 500指數",
+                data: cycleData.map((cycle) => cycle.sp500End),
+                backgroundColor: "rgba(255, 159, 64, 0.2)",
+                borderColor: "rgba(255, 159, 64, 1)",
+                borderWidth: 1,
+                fill: true,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            scales: {
+              x: {
+                display: true,
+                title: {
+                  display: true,
+                  text: "時間",
+                },
+              },
+              y: {
+                display: true,
+                title: {
+                  display: true,
+                  text: "指數",
+                },
+                beginAtZero: true,
+              },
+            },
+          },
         });
       }
 
-      function generateEventTimeline() {
-        const timelineContainer = document.getElementById("eventTimeline");
-        cycleData.forEach((cycle, index) => {
-          cycle.events.forEach((event, eventIndex) => {
-            const isLeft = eventIndex % 2 === 0;
-            const timelineHtml = `
-                        <div class="timeline-container ${
-                          isLeft ? "left" : "right"
-                        }">
-                            <div class="content">
-                                <h2>${event.date}</h2>
-                                <p><i class="fas ${
-                                  event.icon
-                                } event-icon"></i>${event.description}</p>
+      function populateCycleAnalysis() {
+        const container = document.getElementById("cycleAnalysis");
+        cycleData.forEach((cycle) => {
+          const analysisHTML = `
+                    <div class="cycle-card card">
+                        <div class="card-body">
+                            <h5 class="card-title">${cycle.period}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">(${
+                              cycle.startDate
+                            } - ${cycle.endDate})</h6>
+                            <p class="card-text">${cycle.description}</p>
+                            <a href="#" class="card-link" data-bs-toggle="collapse" data-bs-target="#analysis-${cycle.period.replace(
+                              /[\s:-]/g,
+                              ""
+                            )}">詳細分析</a>
+                            <div class="collapse" id="analysis-${cycle.period.replace(
+                              /[\s:-]/g,
+                              ""
+                            )}">
+                                <p class="mt-3">${cycle.detailedAnalysis}</p>
                             </div>
                         </div>
-                    `;
-            timelineContainer.innerHTML += timelineHtml;
+                    </div>`;
+          container.insertAdjacentHTML("beforeend", analysisHTML);
+        });
+      }
+
+      function createTimeline() {
+        const timeline = document.getElementById("eventTimeline");
+        cycleData.forEach((cycle) => {
+          cycle.events.forEach((event, index) => {
+            const isRight = index % 2 === 0 ? "right" : "left";
+            const eventHTML = `
+                        <div class="timeline-container ${isRight}">
+                            <div class="content">
+                                <h5><i class="fa ${event.icon} event-icon"></i>${event.date}</h5>
+                                <p>${event.description}</p>
+                            </div>
+                        </div>`;
+            timeline.insertAdjacentHTML("beforeend", eventHTML);
           });
         });
       }
 
       document.addEventListener("DOMContentLoaded", function () {
-        createChart();
-        generateCycleAnalysis();
-        generateEventTimeline();
+        createRateChart();
+        createSP500Chart();
+        populateCycleAnalysis();
+        createTimeline();
       });
     </script>
   </body>
