@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rebel Dog - Digital Resistance</title>
+    <style>
+        /* 基本設置 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #1e1e1e;
+            color: #f4f4f4;
+            overflow-x: hidden;
+        }
+
+        header {
+            background-color: #333;
+            padding: 15px;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #fff;
+        }
+
+        /* 主頁面設置 */
+        .container {
+            padding: 100px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .icon {
+            width: 100px;
+            height: 100px;
+            background-color: #444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            animation: spin 3s linear infinite;
+        }
+
+        .icon img {
+            width: 50%;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 20px;
+        }
+
+        /* 過場動畫 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .section {
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        /* 轉場動畫 */
+        .fade {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .fade.show {
+            opacity: 1;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 18px;
+            }
+            .icon {
+                width: 80px;
+                height: 80px;
+            }
+            .icon img {
+                width: 40%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Rebel Dog - Digital Resistance</h1>
+    </header>
+
+    <div class="container section" id="section1">
+        <div class="icon">
+            <img src="https://via.placeholder.com/50" alt="Rebel Dog Icon">
+        </div>
+        <div class="content">
+            <h2>反叛狗的起源</h2>
+            <p>反叛狗象徵著對抗壓迫和捍衛自由的精神，最早由Telegram創始人Pavel Durov在2010年創造，並在2018年的數位抵抗運動中成為了象徵性標誌。</p>
+        </div>
+    </div>
+
+    <div class="container section" id="section2">
+        <div class="icon">
+            <img src="https://via.placeholder.com/50" alt="PLANE Icon">
+        </div>
+        <div class="content">
+            <h2>$PLANE 代幣的意義</h2>
+            <p>$PLANE 代幣源自Durov發起的紙飛機快閃行動，象徵著信息自由和對抗審查的精神。</p>
+        </div>
+    </div>
+
+    <div class="container section" id="section3">
+        <div class="icon">
+            <img src="https://via.placeholder.com/50" alt="REDO Icon">
+        </div>
+        <div class="content">
+            <h2>$REDO 代幣的關聯</h2>
+            <p>$REDO 代幣代表了持續抵抗的力量，與反叛狗和$PLANE代幣緊密相連，強調了數位抵抗運動的持久性和決心。</p>
+        </div>
+    </div>
+
+    <script>
+        // 簡單的滾動效果
+        document.addEventListener("scroll", function() {
+            var sections = document.querySelectorAll('.section');
+            sections.forEach(function(section) {
+                var sectionPos = section.getBoundingClientRect().top;
+                var screenPos = window.innerHeight / 1.5;
+
+                if (sectionPos < screenPos) {
+                    section.classList.add('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
