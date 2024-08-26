@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>數位抵抗運動 - 反叛狗與自由的象徵</title>
+    <title>Resistance Dog & Paper Plane - 數位抵抗與夢想起飛</title>
     <style>
         /* 基本設置 */
         body, html {
@@ -22,17 +22,18 @@
             position: fixed;
             width: 100%;
             z-index: 1000;
+            border-bottom: 2px solid #444;
         }
 
         header h1 {
             margin: 0;
-            font-size: 24px;
+            font-size: 28px;
             color: #ffffff;
         }
 
         /* 主頁面設置 */
         .container {
-            padding: 100px 20px;
+            padding: 120px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -42,19 +43,19 @@
         }
 
         .icon {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             background-color: #444;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             animation: spin 3s linear infinite;
         }
 
         .icon img {
-            width: 50%;
+            width: 70%;
         }
 
         .content {
@@ -63,18 +64,34 @@
         }
 
         .content h2 {
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: #ffcc00;
         }
 
         .content p {
-            font-size: 18px;
-            line-height: 1.6;
+            font-size: 20px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .cta {
+            background-color: #ffcc00;
+            color: #222;
+            padding: 15px 30px;
+            text-decoration: none;
+            font-size: 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .cta:hover {
+            background-color: #ff9900;
         }
 
         /* 過場動畫 */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -84,104 +101,115 @@
         }
 
         .section {
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        /* 轉場動畫 */
-        .fade {
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-        }
-
-        .fade.show {
-            opacity: 1;
+            animation: fadeIn 1.5s ease-in-out;
         }
 
         /* 響應式設計 */
         @media (max-width: 600px) {
             header h1 {
-                font-size: 18px;
+                font-size: 22px;
             }
             .icon {
-                width: 80px;
-                height: 80px;
+                width: 90px;
+                height: 90px;
             }
             .icon img {
-                width: 40%;
+                width: 50%;
             }
             .content h2 {
                 font-size: 24px;
             }
             .content p {
-                font-size: 16px;
+                font-size: 18px;
             }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>數位抵抗運動 - 反叛狗與自由的象徵</h1>
+        <h1>Resistance Dog & Paper Plane - 數位抵抗與夢想起飛</h1>
     </header>
 
-    <div class="container section" id="section1">
+    <div class="container section" id="intro">
         <div class="icon">
-            <img src="https://via.placeholder.com/50" alt="Rebel Dog Icon">
+            <img src="https://via.placeholder.com/70" alt="Welcome Icon">
         </div>
         <div class="content">
-            <h2>反叛狗的起源</h2>
-            <p>反叛狗象徵著對抗壓迫和捍衛自由的精神，最早由Telegram創始人Pavel Durov在2010年創造，並在2018年的數位抵抗運動中成為了象徵性標誌。這隻戴著兜帽的狗被廣泛使用，並激發了大量俄羅斯民眾參與抗議行動。</p>
+            <h2>Welcome to PAPER $PLANE</h2>
+            <p>歡迎來到Paper $PLANE，一個由社群全力支持的項目，靈感來自Telegram/TON創始人Pavel Durov。我們的目標是讓每個人的夢想通過DeFi展翅高飛。無論是參與我們的遊戲還是購買代幣，Paper $PLANE將帶您進入充滿活力的DeFi世界，天空才是極限！</p>
+            <a href="#how-to-buy" class="cta">開始購買</a>
         </div>
     </div>
 
-    <div class="container section" id="section2">
+    <div class="container section" id="paper-plane">
         <div class="icon">
-            <img src="https://via.placeholder.com/50" alt="PLANE Icon">
+            <img src="https://via.placeholder.com/70" alt="Paper Plane Icon">
         </div>
         <div class="content">
-            <h2>$PLANE 代幣的意義</h2>
-            <p>$PLANE 代幣源自Pavel Durov發起的紙飛機快閃行動，象徵著信息自由和對抗審查的精神。紙飛機作為Telegram的標誌，自然而然成為了這場運動中的重要象徵，象徵著信息自由的傳遞。</p>
+            <h2>關於 Paper $PLANE</h2>
+            <p>Paper $PLANE 受到了Pavel Durov及其創作的啟發，他曾將5000俄羅斯盧布紙幣折成紙飛機，並從辦公室的窗戶丟出。TON區塊鏈的標誌也暗示了紙飛機的概念。Paper $PLANE 項目旨在將這一象徵性元素融入TON生態系統中，並由社群驅動，共同參與這場旅程。</p>
+            <a href="#tokenomics-plane" class="cta">了解代幣經濟學</a>
         </div>
     </div>
 
-    <div class="container section" id="section3">
+    <div class="container section" id="how-to-buy">
         <div class="icon">
-            <img src="https://via.placeholder.com/50" alt="REDO Icon">
+            <img src="https://via.placeholder.com/70" alt="Buy $PLANE">
         </div>
         <div class="content">
-            <h2>$REDO 代幣的關聯</h2>
-            <p>$REDO 代幣代表了持續抵抗的力量，與反叛狗和$PLANE代幣緊密相連，強調了數位抵抗運動的持久性和決心。這個代幣象徵著不懈的努力和持續的反抗精神。</p>
+            <h2>如何購買 $PLANE</h2>
+            <p>1. 下載 Tonkeeper 錢包：<a href="https://tonkeeper.com/" target="_blank">https://tonkeeper.com/</a><br>2. 使用橋接服務從其他區塊鏈轉移到TON：<a href="https://app.rocketx.exchange/swap" target="_blank">RocketX</a> 或 <a href="https://fixedfloat.com/" target="_blank">FixedFloat</a>。<br>3. 在去中心化交易所（DEX）上購買：使用 <a href="https://app.ston.fi/" target="_blank">STON.fi</a> 交換TON為 $PLANE。</p>
+            <a href="#vision" class="cta">查看我們的願景</a>
         </div>
     </div>
 
-    <div class="container section" id="section4">
+    <div class="container section" id="vision">
         <div class="icon">
-            <img src="https://via.placeholder.com/50" alt="Protest Icon">
+            <img src="https://via.placeholder.com/70" alt="Our Vision">
         </div>
         <div class="content">
-            <h2>數位抵抗運動的發展</h2>
-            <p>2018年4月30日，數千名俄羅斯人聚集在莫斯科市中心，抗議Roskomnadzor封鎖Telegram的行動。這場抗議由Kremlin反對派領袖Alexey Navalny透過他的社交媒體平台Navalny LIVE廣泛傳播，並且成為了一場象徵著對抗政府網路審查的運動。</p>
+            <h2>我們的願景</h2>
+            <p>$REDO 是為了致敬Pavel Durov的創作而誕生的，它象徵著數位抵抗和捍衛自由的鬥爭精神。我們致力於通過建立一個強大且去中心化的社群，來推動TON - The Open Network的增長和採用。$REDO 社群無懼發聲，與Pavel Durov的願景一致，我們相信去中心化、創意文化和去審查可以推動這個社群達到新的高度。</p>
+            <a href="#tokenomics-redo" class="cta">了解 $REDO 代幣經濟學</a>
         </div>
     </div>
 
-    <div class="container section" id="section5">
+    <div class="container section" id="tokenomics-plane">
         <div class="icon">
-            <img src="https://via.placeholder.com/50" alt="Paper Plane Icon">
+            <img src="https://via.placeholder.com/70" alt="Tokenomics Plane">
         </div>
         <div class="content">
-            <h2>紙飛機作為抗議象徵</h2>
-            <p>紙飛機不僅是Telegram的標誌，也成為了數位抵抗運動中的一個象徵。這個象徵源於2012年，Durov曾將紙幣摺成紙飛機並從辦公室的窗戶丟下，象徵著對抗權威的行動。2018年，這一象徵再次被使用，作為對抗網路審查的象徵性行動。</p>
+            <h2>$PLANE 代幣經濟學</h2>
+            <p>代幣名稱：PAPER PLANE<br>代幣符號：$PLANE<br>稅率：0/0</p>
+            <p>讓我們一起將夢想折成現實，並在充滿活力的DeFi世界中起飛。Paper $PLANE將引領我們飛向成功，無限可能就在前方！</p>
         </div>
     </div>
 
-    <div class="container section" id="section6">
+    <div class="container section" id="tokenomics-redo">
         <div class="icon">
-            <img src="https://via.placeholder.com/50" alt="Social Media Icon">
+            <img src="https://via.placeholder.com/70" alt="Tokenomics REDO">
         </div>
         <div class="content">
-            <h2>社交媒體中的數位抵抗</h2>
-            <p>儘管數位抵抗運動中的象徵符號擁有豐富的社會和歷史背景，然而與之相關的社交媒體社群規模相對較小。這些社群主要分佈在VKontakte（VK）、Facebook和Telegram等平台上，其中VK上的社群最為活躍，並在運動中扮演了重要角色。</p>
+            <h2>$REDO 代幣經濟學</h2>
+            <p>總供應量：100,000,000<br>稅率：0%/0%<br>合約：已放棄<br>初始流動性：已燒毀</p>
+            <p>$REDO 是一個meme代幣，其經濟學設計以簡單和去中心化為核心。我們的社群可以通過外部流動性池來增加流動性，並選擇是否鎖定或燒毀流動性，這進一步確保了代幣的安全和穩定性。</p>
         </div>
     </div>
+
+    <div class="container section" id="join">
+        <div class="icon">
+            <img src="https://via.placeholder.com/70" alt="Join the Resistance">
+        </div>
+        <div class="content">
+            <h2>加入數位抵抗</h2>
+            <p>無論是$PLANE還是$REDO，我們都在努力建立一個自由和去中心化的社群，共同捍衛數位自由和抵抗審查的權利。加入我們，一起為自由而戰，讓我們的聲音傳遍世界！</p>
+            <a href="https://linktr.ee/redoonton" target="_blank" class="cta">加入我們的行列</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Copyright © 2024 Resistance Dog & Paper Plane. All Rights Reserved.</p>
+    </footer>
 
     <script>
         // 滾動動畫
@@ -189,7 +217,7 @@
             var sections = document.querySelectorAll('.section');
             sections.forEach(function(section) {
                 var sectionPos = section.getBoundingClientRect().top;
-                var screenPos = window.innerHeight / 1.5;
+                var screenPos = window.innerHeight / 1.3;
 
                 if (sectionPos < screenPos) {
                     section.classList.add('show');
