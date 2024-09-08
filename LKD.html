@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>優化版輪盤抽獎</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #fff;
+            line-height: 1.6;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .title {
+            font-size: 36px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 10px solid gold;
+            position: relative;
+            overflow: hidden;
+            transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .wheel-section {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+        }
+
+        .spinner {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #ff0000;
+            filter: drop-shadow(0 0 10px rgba(255,0,0,0.7));
+        }
+
+        .settings-panel {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .settings-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .settings-toggle {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .draw-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            z-index: 10;
+        }
+
+        .draw-button:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.7);
+        }
+
+        .result-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .result-content {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 80%;
+            color: #333;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+            animation: popIn 0.5s ease-out;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .result-title {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #ff4500;
+        }
+
+        .result-text {
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
+        .close-button {
+            padding: 10px 20px;
+            background: #ff4500;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .close-button:hover {
+            background: #ff6347;
+        }
+
+        .firework {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            box-shadow: 0 0 #fff,
+                        0 0 #fff,
+                        0 0 #fff,
+                        0 0 #fff,
+                        0 0 #fff,
+                        0 0 #fff,
+                        0 0 #fff,
+                        0 0 #fff;
+            animation: firework 2s ease-out infinite;
+        }
+
+        @keyframes firework {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-800px) scale(0); opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .title {
+                font-size: 28px;
+            }
+
+            .wheel-container {
+                width: 250px;
+                height: 250px;
+            }
+
+            .settings-title {
+                font-size: 20px;
+            }
+
+            .draw-button {
+                width: 80px;
+                height: 80px;
+                font-size: 16px;
+            }
+
+            .result-content {
+                padding: 20px;
+            }
+
+            .result-title {
+                font-size: 28px;
+            }
+
+            .result-text {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F9ED69', '#F08A5D', '#B83B5E'];
+
+        function WheelLotteryApp() {
+            const [title, setTitle] = useState('優化版輪盤抽獎');
+            const [prizes, setPrizes] = useState('');
+            const [participants, setParticipants] = useState('');
+            const [isSpinning, setIsSpinning] = useState(false);
+            const [result, setResult] = useState('');
+            const [showSettings, setShowSettings] = useState(true);
+            const [showResult, setShowResult] = useState(false);
+            const [rotation, setRotation] = useState(0);
+            const wheelRef = useRef(null);
+            const audioRef = useRef(null);
+
+            const toggleSettings = () => {
+                setShowSettings(!showSettings);
+            };
+
+            const playSound = (soundName) => {
+                if (audioRef.current) {
+                    audioRef.current.pause();
+                    audioRef.current.currentTime = 0;
+                }
+                audioRef.current = new Audio(`https://assets.mixkit.co/sfx/preview/${soundName}.mp3`);
+                audioRef.current.play().catch(error => console.error('音頻播放失敗:', error));
+            };
+
+            const handleDraw = () => {
+                if (isSpinning) return;
+
+                const prizeList = prizes.split('\n').filter(prize => prize.trim());
+                const participantList = participants.split('\n').filter(participant => participant.trim());
+
+                if (prizeList.length < 2 || participantList.length === 0) {
+                    alert('請至少輸入兩個獎品和一位參與者');
+                    return;
+                }
+
+                setIsSpinning(true);
+                playSound('429');  // 開始旋轉音效
+
+                const randomDegrees = Math.floor(Math.random() * 360) + 720; // 至少轉兩圈
+                const totalRotation = rotation + randomDegrees;
+                setRotation(totalRotation);
+
+                setTimeout(() => {
+                    const winningIndex = Math.floor((totalRotation % 360) / (360 / prizeList.length));
+                    const winningPrize = prizeList[winningIndex];
+                    const winningParticipant = participantList[Math.floor(Math.random() * participantList.length)];
+                    setResult(`${winningParticipant} 獲得了 ${winningPrize}！`);
+                    setIsSpinning(false);
+                    setShowResult(true);
+                    playSound('13');  // 中獎音效
+                }, 5000);
+            };
+
+            const closeResult = () => {
+                setShowResult(false);
+            };
+
+            useEffect(() => {
+                if (wheelRef.current) {
+                    wheelRef.current.style.transform = `rotate(${rotation}deg)`;
+                }
+            }, [rotation]);
+
+            const prizeList = prizes.split('\n').filter(prize => prize.trim());
+            const sectionAngle = 360 / prizeList.length;
+
+            return (
+                <div className="container">
+                    <h1 className="title">{title}</h1>
+
+                    <div className="wheel-container">
+                        <div className="wheel" ref={wheelRef}>
+                            {prizeList.map((prize, index) => (
+                                <div
+                                    key={index}
+                                    className="wheel-section"
+                                    style={{
+                                        transform: `rotate(${index * sectionAngle}deg)`,
+                                        backgroundColor: colors[index % colors.length],
+                                    }}
+                                >
+                                    {prize}
+                                </div>
+                            ))}
+                        </div>
+                        <div className="spinner"></div>
+                        <button className="draw-button" onClick={handleDraw} disabled={isSpinning}>
+                            {isSpinning ? '抽獎中...' : '開始抽獎'}
+                        </button>
+                    </div>
+
+                    <div className="settings-panel">
+                        <div className="settings-header">
+                            <h2 className="settings-title">設定</h2>
+                            <button className="settings-toggle" onClick={toggleSettings}>
+                                {showSettings ? '▲' : '▼'}
+                            </button>
+                        </div>
+                        {showSettings && (
+                            <>
+                                <div className="input-group">
+                                    <label htmlFor="title">活動標題：</label>
+                                    <input
+                                        id="title"
+                                        type="text"
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                    />
+                                </div>
+                                <div className="input-group">
+                                    <label htmlFor="prizes">獎品列表（每行一個）：</label>
+                                    <textarea
+                                        id="prizes"
+                                        rows="5"
+                                        value={prizes}
+                                        onChange={(e) => setPrizes(e.target.value)}
+                                    />
+                                </div>
+                                <div className="input-group">
+                                    <label htmlFor="participants">參與者列表（每行一個）：</label>
+                                    <textarea
+                                        id="participants"
+                                        rows="5"
+                                        value={participants}
+                                        onChange={(e) => setParticipants(e.target.value)}
+                                    />
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    {showResult && (
+                        <div className="result-modal">
+                            <div className="result-content">
+                                <h2 className="result-title">恭喜中獎！</h2>
+                                <p className="result-text">{result}</p>
+                                <button className="close-button" onClick={closeResult}>關閉</button>
+                            </div>
+                            {[...Array(20)].map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="firework"
+                                    style={{
+                                        left: `${Math.random() * 100}%`,
+                                        top: `${Math.random() * 100}%`,
+                                        animationDelay: `${Math.random() * 2}s`
+                                    }}
+                                ></div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.render(<WheelLotteryApp />, document.getElementById('root'));
+    </script>
+</body>
+</html>
