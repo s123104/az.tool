@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>優化版輪盤抽獎</title>
-    <!-- 引入 React 和 ReactDOM -->
     <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
-    <!-- 引入 Babel 來支持 JSX 語法 -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
@@ -50,8 +48,8 @@
 
         .wheel-container {
             position: relative;
-            width: 300px;
-            height: 300px;
+            width: 400px; /* 增大輪盤尺寸 */
+            height: 400px;
             margin: 0 auto;
         }
 
@@ -74,7 +72,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
             color: #fff;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
@@ -115,14 +113,6 @@
             font-weight: 600;
         }
 
-        .settings-toggle {
-            background: none;
-            border: none;
-            color: #fff;
-            cursor: pointer;
-            font-size: 20px;
-        }
-
         .input-group {
             margin-bottom: 15px;
         }
@@ -142,10 +132,7 @@
         }
 
         .draw-button {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            margin-top: 20px;
             width: 100px;
             height: 100px;
             border-radius: 50%;
@@ -157,11 +144,10 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-            z-index: 10;
         }
 
         .draw-button:hover {
-            transform: translate(-50%, -50%) scale(1.05);
+            transform: scale(1.05);
             box-shadow: 0 0 30px rgba(255, 255, 255, 0.7);
         }
 
@@ -200,26 +186,6 @@
             color: #ff4500;
         }
 
-        .result-text {
-            font-size: 24px;
-            margin-bottom: 30px;
-        }
-
-        .close-button {
-            padding: 10px 20px;
-            background: #ff4500;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .close-button:hover {
-            background: #ff6347;
-        }
-
         .firework {
             position: absolute;
             width: 5px;
@@ -251,12 +217,8 @@
             }
 
             .wheel-container {
-                width: 250px;
-                height: 250px;
-            }
-
-            .settings-title {
-                font-size: 20px;
+                width: 300px;
+                height: 300px;
             }
 
             .draw-button {
@@ -272,17 +234,12 @@
             .result-title {
                 font-size: 28px;
             }
-
-            .result-text {
-                font-size: 20px;
-            }
         }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
-    <!-- 使用 Babel 來處理 JSX -->
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
@@ -290,80 +247,67 @@
 
         function WheelLotteryApp() {
             const [title, setTitle] = useState('優化版輪盤抽獎');
-            const [prizes, setPrizes] = useState('');
+            const [prizes, setPrizes] = useState([{ name: '獎品', quantity: 1 }]); // 預設只有一個獎品
             const [participants, setParticipants] = useState('');
             const [isSpinning, setIsSpinning] = useState(false);
-            const [result, setResult] = useState('');
-            const [showSettings, setShowSettings] = useState(true);
+           
+
+ const [result, setResult] = useState('');
             const [showResult, setShowResult] = useState(false);
             const [rotation, setRotation] = useState(0);
-            const [history, setHistory] = useState([]);  // 儲存結果歷史
-            const [timer, setTimer] = useState(0);  // 倒數計時器
-            const [isCounting, setIsCounting] = useState(false);  // 是否倒數中
+            const [currentPrizeIndex, setCurrentPrizeIndex] = useState(0);
+            const [usedParticipants, setUsedParticipants] = useState([]);  // 不重複參與者
+            const [fireworks, setFireworks] = useState([]); // 煙火動畫
             const wheelRef = useRef(null);
-            const audioRef = useRef(null);
-
-            // 預載音效
-            const sounds = {
-                spin: new Audio('https://assets.mixkit.co/sfx/preview/429.mp3'),
-                win: new Audio('https://assets.mixkit.co/sfx/preview/13.mp3'),
-            };
-
-            const toggleSettings = () => {
-                setShowSettings(!showSettings);
-            };
 
             const handleDraw = () => {
-                if (isSpinning) return;
+                if (isSpinning || participants.split('\n').filter(p => p.trim()).length === 0) return;
 
-                const prizeList = prizes.split('\n').filter(prize => prize.trim());
-                const participantList = participants.split('\n').filter(participant => participant.trim());
+                const participantList = participants.split('\n').filter(p => p.trim());
+                const availableParticipants = participantList.filter(p => !usedParticipants.includes(p));
 
-                if (prizeList.length < 2 || participantList.length === 0) {
-                    alert('請至少輸入兩個獎品和一位參與者');
+                if (availableParticipants.length === 0) {
+                    alert('沒有可參加的參與者');
                     return;
                 }
 
-                setIsSpinning(true);
-                sounds.spin.play();  // 播放旋轉音效
+                const randomIndex = Math.floor(Math.random() * availableParticipants.length);
+                const selectedParticipant = availableParticipants[randomIndex];
 
-                const randomDegrees = Math.floor(Math.random() * 360) + 720; // 至少轉兩圈
+                setIsSpinning(true);
+
+                const totalParticipants = availableParticipants.length;
+                const sectionAngle = 360 / totalParticipants;
+                const randomDegrees = randomIndex * sectionAngle + 1440; // 至少轉四圈
                 const totalRotation = rotation + randomDegrees;
                 setRotation(totalRotation);
 
                 setTimeout(() => {
-                    const winningIndex = Math.floor((totalRotation % 360) / (360 / prizeList.length));
-                    const winningPrize = prizeList[winningIndex];
-                    const winningParticipant = participantList[Math.floor(Math.random() * participantList.length)];
-                    const resultText = `${winningParticipant} 獲得了 ${winningPrize}！`;
+                    const prize = prizes[currentPrizeIndex];
+                    const resultText = `${selectedParticipant} 獲得了 ${prize.name}！`;
                     setResult(resultText);
-                    setIsSpinning(false);
                     setShowResult(true);
-                    sounds.win.play();  // 播放中獎音效
+                    setIsSpinning(false);
 
-                    // 保存到歷史紀錄
-                    setHistory([...history, resultText]);
+                    // 添加已用過的參與者
+                    setUsedParticipants([...usedParticipants, selectedParticipant]);
+
+                    // 煙火動畫
+                    setFireworks([...Array(10).keys()].map(i => ({
+                        id: i,
+                        left: `${Math.random() * 100}%`,
+                        top: `${Math.random() * 100}%`,
+                        animationDelay: `${Math.random()}s`
+                    })));
+
+                    // 檢查是否有更多獎品需要抽
+                    if (prizes[currentPrizeIndex].quantity > 1) {
+                        prizes[currentPrizeIndex].quantity--;
+                    } else if (currentPrizeIndex < prizes.length - 1) {
+                        setCurrentPrizeIndex(currentPrizeIndex + 1);
+                    }
+
                 }, 5000);
-            };
-
-            const closeResult = () => {
-                setShowResult(false);
-            };
-
-            const handleStartTimer = () => {
-                if (timer <= 0 || isCounting) return;
-                setIsCounting(true);
-                const countdown = setInterval(() => {
-                    setTimer(prev => {
-                        if (prev === 1) {
-                            clearInterval(countdown);
-                            setIsCounting(false);
-                            handleDraw();
-                            return 0;
-                        }
-                        return prev - 1;
-                    });
-                }, 1000);
             };
 
             useEffect(() => {
@@ -372,8 +316,8 @@
                 }
             }, [rotation]);
 
-            const prizeList = prizes.split('\n').filter(prize => prize.trim());
-            const sectionAngle = 360 / prizeList.length;
+            const participantList = participants.split('\n').filter(p => p.trim());
+            const sectionAngle = 360 / participantList.length;
 
             return (
                 <div className="container">
@@ -381,7 +325,7 @@
 
                     <div className="wheel-container">
                         <div className="wheel" ref={wheelRef}>
-                            {prizeList.map((prize, index) => (
+                            {participantList.map((participant, index) => (
                                 <div
                                     key={index}
                                     className="wheel-section"
@@ -390,106 +334,72 @@
                                         backgroundColor: colors[index % colors.length],
                                     }}
                                 >
-                                    {prize}
+                                    {participant}
                                 </div>
                             ))}
                         </div>
                         <div className="spinner"></div>
-                        <button className="draw-button" onClick={handleDraw} disabled={isSpinning || isCounting}>
-                            {isSpinning ? '抽獎中...' : '開始抽獎'}
-                        </button>
                     </div>
+
+                    <button className="draw-button" onClick={handleDraw} disabled={isSpinning}>
+                        {isSpinning ? '抽獎中...' : '開始抽獎'}
+                    </button>
 
                     <div className="settings-panel">
                         <div className="settings-header">
                             <h2 className="settings-title">設定</h2>
-                            <button className="settings-toggle" onClick={toggleSettings}>
-                                {showSettings ? '▲' : '▼'}
-                            </button>
                         </div>
-                        {showSettings && (
-                            <>
-                                <div className="input-group">
-                                    <label htmlFor="title">活動標題：</label>
-                                    <input
-                                        id="title"
-                                        type="text"
-                                        value={title}
-                                        onChange={(e) => setTitle(e.target.value)}
-                                    />
-                                </div>
-                                <div className="input-group">
-                                    <label htmlFor="prizes">獎品列表（每行一個）：</label>
-                                    <textarea
-                                        id="prizes"
-                                        rows="5"
-                                        value={prizes}
-                                        onChange={(e) => setPrizes(e.target.value)}
-                                    />
-                                </div>
-                                <div className="input-group">
-                                    <label htmlFor="participants">參與者列表（每行一個）：</label>
-                                    <textarea
-                                        id="participants"
-                                        rows="5"
-                                        value={participants}
-                                        onChange={(e) => setParticipants(e.target.value)}
-                                    />
-                                </div>
-                                <div className="input-group">
-                                    <label htmlFor="timer">倒數計時（秒）：</label>
-                                    <input
-                                        id="timer"
-                                        type="number"
-                                        min="0"
-                                        value={timer}
-                                        onChange={(e) => setTimer(Number(e.target.value))}
-                                    />
-                                </div>
-                                <button onClick={handleStartTimer} disabled={isCounting || timer <= 0}>
-                                    {isCounting ? '倒數中...' : '開始倒數'}
-                                </button>
-                            </>
-                        )}
+                        <div className="input-group">
+                            <label htmlFor="title">活動標題：</label>
+                            <input
+                                id="title"
+                                type="text"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                            />
+                        </div>
+                        <div className="input-group">
+                            <label htmlFor="prizes">獎品列表（格式：獎品名, 數量）：</label>
+                            <textarea
+                                id="prizes"
+                                rows="3"
+                                value={prizes.map(p => `${p.name}, ${p.quantity}`).join('\n')}
+                                onChange={(e) => setPrizes(e.target.value.split('\n').map(p => {
+                                    const [name, quantity] = p.split(',').map(s => s.trim());
+                                    return { name, quantity: parseInt(quantity, 10) || 1 };
+                                }))}
+                            />
+                        </div>
+                        <div className="input-group">
+                            <label htmlFor="participants">參與者列表（每行一個）：</label>
+                            <textarea
+                                id="participants"
+                                rows="5"
+                                value={participants}
+                                onChange={(e) => setParticipants(e.target.value)}
+                            />
+                        </div>
                     </div>
 
                     {showResult && (
                         <div className="result-modal">
                             <div className="result-content">
                                 <h2 className="result-title">恭喜中獎！</h2>
-                                <p className="result-text">{result}</p>
-                                <button className="close-button" onClick={closeResult}>關閉</button>
+                                <p>{result}</p>
                             </div>
-                            {[...Array(20)].map((_, i) => (
+                            {fireworks.map(firework => (
                                 <div
-                                    key={i}
+                                    key={firework.id}
                                     className="firework"
                                     style={{
-                                        left: `${Math.random() * 100}%`,
-                                        top: `${Math.random() * 100}%`,
-                                        animationDelay: `${Math.random() * 2}s`
+                                        left: firework.left,
+                                        top: firework.top,
+                                        animationDelay: firework.animationDelay
                                     }}
                                 ></div>
                             ))}
                         </div>
                     )}
-
-                    <div className="settings-panel">
-                        <div className="settings-header">
-                            <h2 className="settings-title">抽獎結果紀錄</h2>
-                        </div>
-                        <div>
-                            {history.length > 0 ? (
-                                <ul>
-                                    {history.map((item, index) => (
-                                        <li key={index}>{item}</li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p>暫無結果</p>
-                            )}
-                        </div>
-                    </div>
                 </div>
             );
         }
