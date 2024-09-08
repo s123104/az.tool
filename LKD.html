@@ -294,20 +294,20 @@
             const [showSettings, setShowSettings] = useState(true);
             const [showResult, setShowResult] = useState(false);
             const [rotation, setRotation] = useState(0);
+            const [history, setHistory] = useState([]);  // 儲存結果歷史
+            const [timer, setTimer] = useState(0);  // 倒數計時器
+            const [isCounting, setIsCounting] = useState(false);  // 是否倒數中
             const wheelRef = useRef(null);
             const audioRef = useRef(null);
 
-            const toggleSettings = () => {
-                setShowSettings(!showSettings);
+            // 預載音效
+            const sounds = {
+                spin: new Audio('https://assets.mixkit.co/sfx/preview/429.mp3'),
+                win: new Audio('https://assets.mixkit.co/sfx/preview/13.mp3'),
             };
 
-            const playSound = (soundName) => {
-                if (audioRef.current) {
-                    audioRef.current.pause();
-                    audioRef.current.currentTime = 0;
-                }
-                audioRef.current = new Audio(`https://assets.mixkit.co/sfx/preview/${soundName}.mp3`);
-                audioRef.current.play().catch(error => console.error('音頻播放失敗:', error));
+            const toggleSettings = () => {
+                setShowSettings(!showSettings);
             };
 
             const handleDraw = () => {
@@ -322,7 +322,7 @@
                 }
 
                 setIsSpinning(true);
-                playSound('429');  // 開始旋轉音效
+                sounds.spin.play();  // 播放旋轉音效
 
                 const randomDegrees = Math.floor(Math.random() * 360) + 720; // 至少轉兩圈
                 const totalRotation = rotation + randomDegrees;
@@ -332,15 +332,35 @@
                     const winningIndex = Math.floor((totalRotation % 360) / (360 / prizeList.length));
                     const winningPrize = prizeList[winningIndex];
                     const winningParticipant = participantList[Math.floor(Math.random() * participantList.length)];
-                    setResult(`${winningParticipant} 獲得了 ${winningPrize}！`);
+                    const resultText = `${winningParticipant} 獲得了 ${winningPrize}！`;
+                    setResult(resultText);
                     setIsSpinning(false);
                     setShowResult(true);
-                    playSound('13');  // 中獎音效
+                    sounds.win.play();  // 播放中獎音效
+
+                    // 保存到歷史紀錄
+                    setHistory([...history, resultText]);
                 }, 5000);
             };
 
             const closeResult = () => {
                 setShowResult(false);
+            };
+
+            const handleStartTimer = () => {
+                if (timer <= 0 || isCounting) return;
+                setIsCounting(true);
+                const countdown = setInterval(() => {
+                    setTimer(prev => {
+                        if (prev === 1) {
+                            clearInterval(countdown);
+                            setIsCounting(false);
+                            handleDraw();
+                            return 0;
+                        }
+                        return prev - 1;
+                    });
+                }, 1000);
             };
 
             useEffect(() => {
@@ -372,7 +392,7 @@
                             ))}
                         </div>
                         <div className="spinner"></div>
-                        <button className="draw-button" onClick={handleDraw} disabled={isSpinning}>
+                        <button className="draw-button" onClick={handleDraw} disabled={isSpinning || isCounting}>
                             {isSpinning ? '抽獎中...' : '開始抽獎'}
                         </button>
                     </div>
@@ -413,6 +433,19 @@
                                         onChange={(e) => setParticipants(e.target.value)}
                                     />
                                 </div>
+                                <div className="input-group">
+                                    <label htmlFor="timer">倒數計時（秒）：</label>
+                                    <input
+                                        id="timer"
+                                        type="number"
+                                        min="0"
+                                        value={timer}
+                                        onChange={(e) => setTimer(Number(e.target.value))}
+                                    />
+                                </div>
+                                <button onClick={handleStartTimer} disabled={isCounting || timer <= 0}>
+                                    {isCounting ? '倒數中...' : '開始倒數'}
+                                </button>
                             </>
                         )}
                     </div>
@@ -437,6 +470,23 @@
                             ))}
                         </div>
                     )}
+
+                    <div className="settings-panel">
+                        <div className="settings-header">
+                            <h2 className="settings-title">抽獎結果紀錄</h2>
+                        </div>
+                        <div>
+                            {history.length > 0 ? (
+                                <ul>
+                                    {history.map((item, index) => (
+                                        <li key={index}>{item}</li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p>暫無結果</p>
+                            )}
+                        </div>
+                    </div>
                 </div>
             );
         }
