@@ -42,7 +42,7 @@
       }
 
       h1 {
-        font-size: 3vw; /* 使用較小的基準字體，讓字體適應屏幕寬度 */
+        font-size: 3vw;
         color: var(--highlight-color);
         text-align: center;
         margin-top: 20px;
@@ -84,12 +84,12 @@
       .card {
         background: var(--card-bg);
         border-radius: 15px;
-        box-shadow: 0 6px 18px rgba(31, 38, 135, 0.15); /* 調整陰影 */
+        box-shadow: 0 6px 18px rgba(31, 38, 135, 0.15);
         overflow: hidden;
         transition: all 0.5s ease;
         transform-style: preserve-3d;
         position: relative;
-        will-change: transform, opacity; /* 優化動畫 */
+        will-change: transform, opacity;
       }
 
       .card::before {
@@ -98,19 +98,19 @@
         right: 10px;
         font-size: 1.5rem;
         color: var(--accent-color);
-        opacity: 0.6; /* 提高透明度，符號更清晰 */
-        text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2); /* 增加陰影效果 */
+        opacity: 0.6;
+        text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
         transition: opacity 0.3s ease;
       }
 
       .card:hover::before {
-        opacity: 0.9; /* 懸浮時符號更清晰 */
-        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3); /* 懸浮時增強陰影 */
+        opacity: 0.9;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
       }
 
       .card:hover {
-        transform: translateY(-10px) rotateX(3deg) rotateY(3deg); /* 減少旋轉幅度 */
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* 調整陰影 */
+        transform: translateY(-10px) rotateX(3deg) rotateY(3deg);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
       }
 
       .card-header {
@@ -137,8 +137,8 @@
         display: flex;
         flex-direction: column;
         gap: 15px;
-        font-size: 1rem; /* 提高字體大小 */
-        line-height: 1.7; /* 提高行高，增加可讀性 */
+        font-size: 1rem;
+        line-height: 1.7;
       }
 
       .card p {
@@ -152,17 +152,19 @@
         opacity: 0.8;
       }
 
-      /* 當螢幕寬度小於768px時，調整字體大小 */
+      .save-btn {
+        cursor: pointer;
+      }
+
       @media (max-width: 768px) {
         h1 {
-          font-size: 3.5vw; /* 減小字體，適合平板等設備 */
+          font-size: 3.5vw;
         }
       }
 
-      /* 當螢幕寬度小於480px時，進一步縮小字體 */
       @media (max-width: 480px) {
         h1 {
-          font-size: 3vw; /* 在手機螢幕上進一步縮小字體 */
+          font-size: 3vw;
         }
       }
 
@@ -240,6 +242,7 @@
       </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
     <script>
       const cardContainer = document.getElementById("card-container");
 
@@ -572,6 +575,7 @@
         symbol.textContent = mathSymbols[index % mathSymbols.length];
         symbol.style.fontSize = "1.2rem";
         symbol.style.opacity = "0.7";
+        symbol.classList.add("save-btn");
 
         cardHeader.appendChild(title);
         cardHeader.appendChild(symbol);
@@ -591,8 +595,25 @@
         card.appendChild(cardHeader);
         card.appendChild(cardBody);
 
+        // Click symbol to save card as image
+        symbol.addEventListener("click", () => saveCardAsImage(card, index));
+
         cardContainer.appendChild(card);
       });
+
+      function saveCardAsImage(card, index) {
+        domtoimage
+          .toPng(card)
+          .then((dataUrl) => {
+            const link = document.createElement("a");
+            link.href = dataUrl;
+            link.download = `card-${index + 1}.png`;
+            link.click();
+          })
+          .catch((error) => {
+            console.error("oops, something went wrong!", error);
+          });
+      }
     </script>
   </body>
 </html>
