@@ -3,14 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Prompt Cleaner - 通用型範例生成網頁</title>
+    <title>HTML Prompt Simplifier - 爬蟲範例生成器</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap"
       rel="stylesheet"
     />
     <link
       rel="icon"
-      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧹</text></svg>"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📄</text></svg>"
     />
     <style>
       :root {
@@ -21,7 +21,6 @@
         --shadow-color: rgba(1, 87, 155, 0.1);
         --active-button-background: #0288d1;
         --active-button-text-color: white;
-        --button-hover-bg: #81d4fa;
       }
 
       * {
@@ -71,6 +70,34 @@
         text-shadow: 2px 2px 4px var(--shadow-color);
       }
 
+      .button-group {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+
+      .button-group button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px var(--shadow-color);
+        margin: 0 10px;
+        outline: none;
+      }
+
+      .button-group button.active {
+        background-color: var(--active-button-background);
+        color: var(--active-button-text-color);
+        box-shadow: 0 6px 12px var(--shadow-color);
+        transform: scale(1.05);
+      }
+
       .input-output {
         display: flex;
         gap: 30px;
@@ -111,29 +138,6 @@
         color: var(--text-color);
       }
 
-      .button-group-actions {
-        display: flex;
-        justify-content: flex-start;
-        margin-top: 10px;
-        gap: 10px;
-      }
-
-      .button-group-actions button {
-        background-color: var(--secondary-color);
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background-color 0.3s ease;
-        box-shadow: 0 2px 4px var(--shadow-color);
-      }
-
-      .button-group-actions button:hover {
-        background-color: #0288d1;
-      }
-
       .copy-notification {
         position: fixed;
         top: 20px;
@@ -146,7 +150,6 @@
         transition: all 0.3s ease;
         transform: translateY(-20px);
         box-shadow: 0 4px 6px var(--shadow-color);
-        z-index: 1000;
       }
 
       .show-notification {
@@ -188,44 +191,56 @@
         }
       }
     </style>
+    <!-- 引入 js-beautify 庫 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify-html.min.js"></script>
   </head>
   <body>
     <div class="container">
       <div class="header">
-        <span class="logo">🧹</span>
-        <h1>Prompt Cleaner</h1>
+        <span class="logo">📄</span>
+        <h1>HTML Prompt Simplifier</h1>
+      </div>
+      <div class="button-group">
+        <button id="generalBtn" class="active">通用</button>
+        <button id="htmlBtn">HTML</button>
+        <!-- 可根據需求添加更多按鈕 -->
       </div>
       <div class="input-output">
         <div class="column">
           <textarea
             id="input"
-            placeholder="在此貼上您的複雜 Prompt..."
+            placeholder="在此貼上您的 HTML 內容..."
           ></textarea>
-          <div class="button-group-actions">
-            <button id="pasteBtn">貼上</button>
+          <div
+            class="button-group"
+            style="justify-content: flex-start; margin-top: 10px"
+          >
+            <button id="pasteBtn">
+              貼上內容（<span id="pasteCount">０</span>）
+            </button>
             <button id="clearBtn">清除</button>
           </div>
           <div class="count-display">
-            總行數: <span id="inputLineCount">0</span>
+            總行數: <span id="inputLineCount">０</span><br />
+            總字數: <span id="inputWordCount">０</span>
           </div>
         </div>
         <div class="column">
           <textarea
             id="output"
             readonly
-            placeholder="清理後的範例解析將顯示在這裡..."
+            placeholder="解析後的內容將顯示在這裡..."
           ></textarea>
-          <div class="button-group-actions">
-            <button id="copyBtn">複製解析內容</button>
+          <div
+            class="button-group"
+            style="justify-content: flex-start; margin-top: 10px"
+          >
+            <button id="copyBtn">複製解析後的內容</button>
           </div>
           <div class="count-display">
-            總行數: <span id="outputLineCount">0</span>
-          </div>
-          <div
-            id="duplicateCount"
-            style="margin-top: 10px; font-size: 1em; color: var(--text-color)"
-          >
-            移除重複結構: <span id="duplicateNumber">0</span>
+            總行數: <span id="outputLineCount">０</span><br />
+            總字數: <span id="outputWordCount">０</span>
           </div>
         </div>
       </div>
@@ -235,138 +250,288 @@
     <script>
       const input = document.getElementById("input");
       const output = document.getElementById("output");
-      const pasteBtn = document.getElementById("pasteBtn");
       const copyBtn = document.getElementById("copyBtn");
+      const pasteBtn = document.getElementById("pasteBtn");
       const clearBtn = document.getElementById("clearBtn");
       const copyNotification = document.getElementById("copyNotification");
+      const pasteCount = document.getElementById("pasteCount");
       const inputLineCount = document.getElementById("inputLineCount");
+      const inputWordCount = document.getElementById("inputWordCount");
       const outputLineCount = document.getElementById("outputLineCount");
-      const duplicateNumber = document.getElementById("duplicateNumber");
+      const outputWordCount = document.getElementById("outputWordCount");
+      const buttons = document.querySelectorAll(".button-group button");
+      let pasteTimes = 0;
+      let pastedTextSet = new Set();
+      let selectedButton = document.querySelector(
+        ".button-group button.active"
+      ); // 初始化為通用模式的按鈕
 
-      // Function to remove duplicate lines based on element structure
-      function removeDuplicateStructures(html) {
+      /**
+       * 功能：解析並縮減 HTML
+       * @param {string} html - 原始 HTML 字符串
+       * @returns {string} 簡化後的 HTML 字符串
+       */
+      function simplifyHTML(html) {
+        // 創建一個 DOMParser 解析 HTML 字符串
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
-        const elements = Array.from(doc.body.children);
-        const uniqueElements = [];
-        let duplicates = 0;
 
-        elements.forEach((el) => {
-          const serialized = el.outerHTML;
-          if (!uniqueElements.some((uniqueEl) => uniqueEl === serialized)) {
-            uniqueElements.push(serialized);
-          } else {
-            duplicates++;
-          }
+        /**
+         * 遞歸函數：處理每個元素的子元素，移除重複項
+         * @param {HTMLElement} element - 要處理的父元素
+         */
+        function processElement(element) {
+          const children = Array.from(element.children);
+          const seen = new Map();
+
+          children.forEach((child) => {
+            // 保留必要的屬性，移除不必要的屬性
+            const attributesToKeep = ["id", "class"];
+            const attributesToRemove = [];
+
+            Array.from(child.attributes).forEach((attr) => {
+              if (
+                !attributesToKeep.some((pattern) =>
+                  pattern.endsWith("*")
+                    ? attr.name.startsWith(pattern.slice(0, -1))
+                    : attr.name === pattern
+                ) &&
+                !attr.name.startsWith("aria-") &&
+                !attr.name.startsWith("data-")
+              ) {
+                attributesToRemove.push(attr.name);
+              }
+            });
+
+            attributesToRemove.forEach((attr) => child.removeAttribute(attr));
+
+            // 構建元素的唯一標識（tag + id + class + content）
+            let identifier = child.tagName.toLowerCase();
+            if (child.id) {
+              identifier += `#${child.id}`;
+            }
+
+            let classList = "";
+            if (child.className) {
+              if (typeof child.className === "string") {
+                // 排除特定的動態類名模式，如 'css-1dbjc4n'
+                const classes = child.className
+                  .split(" ")
+                  .filter((cls) => !/^css-\w+$/.test(cls))
+                  .join(".");
+                if (classes) {
+                  classList = classes;
+                }
+              } else if (child.className.baseVal) {
+                // 處理 SVG 元素的 className
+                const classes = child.className.baseVal
+                  .split(" ")
+                  .filter((cls) => !/^css-\w+$/.test(cls))
+                  .join(".");
+                if (classes) {
+                  classList = classes;
+                }
+              }
+              if (classList) {
+                identifier += `.${classList}`;
+              }
+            }
+
+            // 取得元素的內容
+            const content = child.outerHTML.trim(); // 使用 outerHTML 確保包含子元素
+            identifier += `|${content}`;
+
+            // 判斷是否已存在
+            if (seen.has(identifier)) {
+              // 如果存在，移除該元素並更新註釋
+              const entry = seen.get(identifier);
+              entry.count += 1;
+              element.removeChild(child);
+
+              if (entry.count === 2) {
+                // 剛剛發現重複，插入註釋
+                const tag = child.tagName.toLowerCase();
+                const attrs = [];
+                if (child.id) {
+                  attrs.push(`id="${child.id}"`);
+                }
+                if (classList) {
+                  attrs.push(`class="${classList}"`);
+                }
+                const attrString = attrs.length ? " " + attrs.join(" ") : "";
+                // 包含被移除元素的具體內容
+                const innerContent = child.innerHTML.trim();
+                const commentContent = `<${tag}${attrString}>${innerContent}</${tag}> 重複 ${
+                  entry.count - 1
+                } 次`;
+                const comment = doc.createComment(commentContent);
+                // 在註釋前後添加換行
+                element.insertBefore(
+                  document.createTextNode("\n"),
+                  entry.element.nextSibling
+                );
+                element.insertBefore(comment, entry.element.nextSibling);
+                element.insertBefore(
+                  document.createTextNode("\n"),
+                  entry.element.nextSibling
+                );
+                // 保存註釋節點
+                entry.comment = comment;
+              } else if (entry.count > 2 && entry.comment) {
+                // 更新現有的註釋
+                const tag = child.tagName.toLowerCase();
+                const attrs = [];
+                if (child.id) {
+                  attrs.push(`id="${child.id}"`);
+                }
+                if (classList) {
+                  attrs.push(`class="${classList}"`);
+                }
+                const attrString = attrs.length ? " " + attrs.join(" ") : "";
+                const innerContent = child.innerHTML.trim();
+                entry.comment.textContent = `<${tag}${attrString}>${innerContent}</${tag}> 重複 ${
+                  entry.count - 1
+                } 次`;
+              }
+            } else {
+              // 如果不存在，記錄該元素
+              seen.set(identifier, { count: 1, element: child, comment: null });
+              // 遞歸處理子元素
+              processElement(child);
+            }
+          });
+        }
+
+        // 開始處理 body 的子元素
+        processElement(doc.body);
+
+        // 獲取處理後的 HTML
+        let simplifiedHTML = doc.body.innerHTML;
+
+        // 使用 js-beautify 格式化 HTML
+        simplifiedHTML = html_beautify(simplifiedHTML, {
+          indent_size: 2,
+          space_in_empty_paren: true,
+          wrap_line_length: 0,
+          end_with_newline: true,
         });
 
-        return { cleanedHTML: uniqueElements.join("\n"), duplicates };
+        return simplifiedHTML;
       }
 
-      // Function to remove redundant HTML tags and attributes
-      function cleanHTML(text) {
-        // Create a DOM parser
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(text, "text/html");
-
-        // Remove all class, style, id, aria-disabled, disabled, data-focusable, tabindex attributes
-        const elements = doc.querySelectorAll("*");
-        elements.forEach((el) => {
-          el.removeAttribute("class");
-          el.removeAttribute("style");
-          el.removeAttribute("id");
-          el.removeAttribute("aria-disabled");
-          el.removeAttribute("disabled");
-          el.removeAttribute("data-focusable");
-          el.removeAttribute("tabindex");
-        });
-
-        // Optionally, remove empty elements
-        const emptyElements = doc.querySelectorAll(":empty");
-        emptyElements.forEach((el) => el.remove());
-
-        return doc.body.innerHTML;
-      }
-
-      // Function to process the input and generate the output
-      function processInput() {
-        let text = input.value;
-
-        if (!text.trim()) {
+      /**
+       * 功能：解析輸入的 HTML 並顯示結果
+       */
+      function parseHTML() {
+        const inputHTML = input.value;
+        if (!inputHTML.trim()) {
           output.value = "";
-          updateLineCounts();
-          duplicateNumber.textContent = "0";
+          outputLineCount.textContent = "０";
+          outputWordCount.textContent = "０";
           return;
         }
 
-        // Clean HTML
-        text = cleanHTML(text);
+        const simplified = simplifyHTML(inputHTML);
+        output.value = simplified;
+        outputLineCount.textContent = simplified
+          ? simplified.split("\n").length
+          : 0;
 
-        // Remove duplicate structures
-        const { cleanedHTML, duplicates } = removeDuplicateStructures(text);
-
-        // Update duplicate count
-        duplicateNumber.textContent = duplicates;
-
-        // Display cleaned HTML
-        output.value = cleanedHTML;
-
-        // Update line counts
-        updateLineCounts();
+        // 計算字數（不包括註釋）
+        const textWithoutComments = simplified.replace(/<!--[\s\S]*?-->/g, "");
+        const wordCount = textWithoutComments
+          ? textWithoutComments.replace(/\s+/g, " ").trim().split(" ").length
+          : 0;
+        outputWordCount.textContent = wordCount;
       }
 
-      // Function to update line counts
-      function updateLineCounts() {
-        const inputLines = input.value ? input.value.split("\n").length : 0;
-        const outputLines = output.value ? output.value.split("\n").length : 0;
-        inputLineCount.textContent = inputLines;
-        outputLineCount.textContent = outputLines;
+      /**
+       * 功能：更新輸入區域的行數和字數
+       */
+      function updateInputCounts() {
+        inputLineCount.textContent = input.value
+          ? input.value.split("\n").length
+          : 0;
+        inputWordCount.textContent = input.value
+          ? input.value.replace(/\s+/g, " ").trim().split(" ").length
+          : 0;
       }
 
-      // Function to copy output to clipboard
-      function copyOutput() {
+      // 切換按鈕樣式
+      buttons.forEach((button) => {
+        if (
+          button.id !== "copyBtn" &&
+          button.id !== "pasteBtn" &&
+          button.id !== "clearBtn"
+        ) {
+          button.addEventListener("click", () => {
+            selectedButton.classList.remove("active");
+            button.classList.add("active");
+            selectedButton = button; // 更新當前選定的按鈕
+            // 根據選定的模式執行不同的解析邏輯
+            // 目前僅實現通用模式
+            parseHTML();
+          });
+        }
+      });
+
+      // 自動解析輸入內容
+      input.addEventListener("input", () => {
+        updateInputCounts();
+        parseHTML();
+      });
+
+      /**
+       * 功能：複製解析後的內容
+       */
+      copyBtn.addEventListener("click", function () {
         output.select();
-        output.setSelectionRange(0, 99999); // For mobile devices
+        document.execCommand("copy");
 
-        navigator.clipboard.writeText(output.value).then(
-          () => {
-            // Show copy notification
-            copyNotification.classList.add("show-notification");
-            setTimeout(() => {
-              copyNotification.classList.remove("show-notification");
-            }, 2000);
-          },
-          (err) => {
-            console.error("無法複製內容: ", err);
-          }
-        );
-      }
+        // 顯示複製成功通知
+        copyNotification.classList.add("show-notification");
+        setTimeout(() => {
+          copyNotification.classList.remove("show-notification");
+        }, 1000);
+      });
 
-      // Function to clear input and output
-      function clearFields() {
-        input.value = "";
-        output.value = "";
-        updateLineCounts();
-        duplicateNumber.textContent = "0";
-      }
-
-      // Event listeners
+      /**
+       * 功能：粘貼內容並解析
+       */
       pasteBtn.addEventListener("click", async function () {
         try {
           const text = await navigator.clipboard.readText();
-          input.value += text;
-          processInput();
+          if (!pastedTextSet.has(text)) {
+            input.value += text;
+            pastedTextSet.add(text);
+            pasteTimes++;
+            pasteCount.textContent = pasteTimes;
+            updateInputCounts();
+            parseHTML();
+          }
         } catch (err) {
           console.error("無法讀取剪貼簿:", err);
         }
       });
 
-      copyBtn.addEventListener("click", copyOutput);
-      clearBtn.addEventListener("click", clearFields);
-      input.addEventListener("input", processInput);
+      /**
+       * 功能：清除輸入和輸出內容
+       */
+      clearBtn.addEventListener("click", function () {
+        input.value = "";
+        output.value = "";
+        pastedTextSet.clear();
+        pasteTimes = 0;
+        pasteCount.textContent = pasteTimes;
+        inputLineCount.textContent = 0;
+        inputWordCount.textContent = 0;
+        outputLineCount.textContent = 0;
+        outputWordCount.textContent = 0;
+      });
 
-      // Initialize line counts
-      updateLineCounts();
+      // 初始化行數和字數統計
+      updateInputCounts();
+      parseHTML();
     </script>
   </body>
 </html>
