@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prompt Cleaner - 通用型範例生成網頁</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧹</text></svg>"
+    />
+    <style>
+      :root {
+        --primary-color: #4fc3f7;
+        --secondary-color: #03a9f4;
+        --background-color: #e1f5fe;
+        --text-color: #01579b;
+        --shadow-color: rgba(1, 87, 155, 0.1);
+        --active-button-background: #0288d1;
+        --active-button-text-color: white;
+        --button-hover-bg: #81d4fa;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      .container {
+        background-color: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 40px var(--shadow-color);
+        padding: 40px;
+        width: 95%;
+        max-width: 1200px;
+        animation: fadeIn 0.5s ease-out;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 30px;
+      }
+
+      .logo {
+        font-size: 3em;
+        margin-right: 20px;
+        color: var(--primary-color);
+        animation: float 3s ease-in-out infinite;
+      }
+
+      h1 {
+        color: var(--secondary-color);
+        font-size: 2.5em;
+        margin: 0;
+        text-shadow: 2px 2px 4px var(--shadow-color);
+      }
+
+      .input-output {
+        display: flex;
+        gap: 30px;
+        height: 60vh;
+      }
+
+      .column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+
+      textarea {
+        width: 100%;
+        height: 100%;
+        padding: 20px;
+        border: 2px solid var(--primary-color);
+        border-radius: 12px;
+        font-size: 16px;
+        resize: none;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 2px 4px var(--shadow-color);
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 3px rgba(3, 169, 244, 0.2);
+      }
+
+      .count-display {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        font-size: 1.2em;
+        font-weight: bold;
+        color: var(--text-color);
+      }
+
+      .button-group-actions {
+        display: flex;
+        justify-content: flex-start;
+        margin-top: 10px;
+        gap: 10px;
+      }
+
+      .button-group-actions button {
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+        box-shadow: 0 2px 4px var(--shadow-color);
+      }
+
+      .button-group-actions button:hover {
+        background-color: #0288d1;
+      }
+
+      .copy-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: var(--secondary-color);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 50px;
+        opacity: 0;
+        transition: all 0.3s ease;
+        transform: translateY(-20px);
+        box-shadow: 0 4px 6px var(--shadow-color);
+        z-index: 1000;
+      }
+
+      .show-notification {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+        100% {
+          transform: translateY(0px);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .input-output {
+          flex-direction: column;
+          height: auto;
+        }
+
+        textarea {
+          height: 200px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <span class="logo">🧹</span>
+        <h1>Prompt Cleaner</h1>
+      </div>
+      <div class="input-output">
+        <div class="column">
+          <textarea
+            id="input"
+            placeholder="在此貼上您的複雜 Prompt..."
+          ></textarea>
+          <div class="button-group-actions">
+            <button id="pasteBtn">貼上</button>
+            <button id="clearBtn">清除</button>
+          </div>
+          <div class="count-display">
+            總行數: <span id="inputLineCount">0</span>
+          </div>
+        </div>
+        <div class="column">
+          <textarea
+            id="output"
+            readonly
+            placeholder="清理後的範例解析將顯示在這裡..."
+          ></textarea>
+          <div class="button-group-actions">
+            <button id="copyBtn">複製解析內容</button>
+          </div>
+          <div class="count-display">
+            總行數: <span id="outputLineCount">0</span>
+          </div>
+          <div
+            id="duplicateCount"
+            style="margin-top: 10px; font-size: 1em; color: var(--text-color)"
+          >
+            移除重複結構: <span id="duplicateNumber">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="copyNotification" class="copy-notification">複製成功！</div>
+
+    <script>
+      const input = document.getElementById("input");
+      const output = document.getElementById("output");
+      const pasteBtn = document.getElementById("pasteBtn");
+      const copyBtn = document.getElementById("copyBtn");
+      const clearBtn = document.getElementById("clearBtn");
+      const copyNotification = document.getElementById("copyNotification");
+      const inputLineCount = document.getElementById("inputLineCount");
+      const outputLineCount = document.getElementById("outputLineCount");
+      const duplicateNumber = document.getElementById("duplicateNumber");
+
+      // Function to remove duplicate lines based on element structure
+      function removeDuplicateStructures(html) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        const elements = Array.from(doc.body.children);
+        const uniqueElements = [];
+        let duplicates = 0;
+
+        elements.forEach((el) => {
+          const serialized = el.outerHTML;
+          if (!uniqueElements.some((uniqueEl) => uniqueEl === serialized)) {
+            uniqueElements.push(serialized);
+          } else {
+            duplicates++;
+          }
+        });
+
+        return { cleanedHTML: uniqueElements.join("\n"), duplicates };
+      }
+
+      // Function to remove redundant HTML tags and attributes
+      function cleanHTML(text) {
+        // Create a DOM parser
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, "text/html");
+
+        // Remove all class, style, id, aria-disabled, disabled, data-focusable, tabindex attributes
+        const elements = doc.querySelectorAll("*");
+        elements.forEach((el) => {
+          el.removeAttribute("class");
+          el.removeAttribute("style");
+          el.removeAttribute("id");
+          el.removeAttribute("aria-disabled");
+          el.removeAttribute("disabled");
+          el.removeAttribute("data-focusable");
+          el.removeAttribute("tabindex");
+        });
+
+        // Optionally, remove empty elements
+        const emptyElements = doc.querySelectorAll(":empty");
+        emptyElements.forEach((el) => el.remove());
+
+        return doc.body.innerHTML;
+      }
+
+      // Function to process the input and generate the output
+      function processInput() {
+        let text = input.value;
+
+        if (!text.trim()) {
+          output.value = "";
+          updateLineCounts();
+          duplicateNumber.textContent = "0";
+          return;
+        }
+
+        // Clean HTML
+        text = cleanHTML(text);
+
+        // Remove duplicate structures
+        const { cleanedHTML, duplicates } = removeDuplicateStructures(text);
+
+        // Update duplicate count
+        duplicateNumber.textContent = duplicates;
+
+        // Display cleaned HTML
+        output.value = cleanedHTML;
+
+        // Update line counts
+        updateLineCounts();
+      }
+
+      // Function to update line counts
+      function updateLineCounts() {
+        const inputLines = input.value ? input.value.split("\n").length : 0;
+        const outputLines = output.value ? output.value.split("\n").length : 0;
+        inputLineCount.textContent = inputLines;
+        outputLineCount.textContent = outputLines;
+      }
+
+      // Function to copy output to clipboard
+      function copyOutput() {
+        output.select();
+        output.setSelectionRange(0, 99999); // For mobile devices
+
+        navigator.clipboard.writeText(output.value).then(
+          () => {
+            // Show copy notification
+            copyNotification.classList.add("show-notification");
+            setTimeout(() => {
+              copyNotification.classList.remove("show-notification");
+            }, 2000);
+          },
+          (err) => {
+            console.error("無法複製內容: ", err);
+          }
+        );
+      }
+
+      // Function to clear input and output
+      function clearFields() {
+        input.value = "";
+        output.value = "";
+        updateLineCounts();
+        duplicateNumber.textContent = "0";
+      }
+
+      // Event listeners
+      pasteBtn.addEventListener("click", async function () {
+        try {
+          const text = await navigator.clipboard.readText();
+          input.value += text;
+          processInput();
+        } catch (err) {
+          console.error("無法讀取剪貼簿:", err);
+        }
+      });
+
+      copyBtn.addEventListener("click", copyOutput);
+      clearBtn.addEventListener("click", clearFields);
+      input.addEventListener("input", processInput);
+
+      // Initialize line counts
+      updateLineCounts();
+    </script>
+  </body>
+</html>
