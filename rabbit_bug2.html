@@ -12,7 +12,7 @@
       href="https://s123104.github.io/az.tool/img/magician-hat.png"
     />
     <style>
-      /* 原有的CSS樣式保持不變 */
+      /* 您原本的CSS樣式保持不變 */
       body,
       html {
         font-family: "Arial", sans-serif;
@@ -258,7 +258,8 @@
       }
 
       input[type="text"],
-      input[type="date"] {
+      input[type="date"],
+      textarea {
         width: calc(100% - 10px);
         padding: 5px;
         margin: 5px 0;
@@ -368,21 +369,20 @@
         background-color: #ff0000;
       }
 
-      /* Toast樣式 */
+      /* 浮動提示窗樣式 */
       .toast {
         visibility: hidden;
         min-width: 250px;
-        background-color: #333;
-        color: #fff;
+        background-color: #ff1493;
+        color: white;
         text-align: center;
         border-radius: 2px;
         padding: 16px;
         position: fixed;
         z-index: 1000;
-        left: 50%;
-        bottom: 30px;
-        transform: translateX(-50%);
-        font-size: 17px;
+        right: 30px;
+        top: 30px;
+        font-size: 14px;
       }
 
       .toast.show {
@@ -393,44 +393,44 @@
 
       @-webkit-keyframes fadein {
         from {
-          bottom: 0;
+          top: 0;
           opacity: 0;
         }
         to {
-          bottom: 30px;
+          top: 30px;
           opacity: 1;
         }
       }
 
       @keyframes fadein {
         from {
-          bottom: 0;
+          top: 0;
           opacity: 0;
         }
         to {
-          bottom: 30px;
+          top: 30px;
           opacity: 1;
         }
       }
 
       @-webkit-keyframes fadeout {
         from {
-          bottom: 30px;
+          top: 30px;
           opacity: 1;
         }
         to {
-          bottom: 0;
+          top: 0;
           opacity: 0;
         }
       }
 
       @keyframes fadeout {
         from {
-          bottom: 30px;
+          top: 30px;
           opacity: 1;
         }
         to {
-          bottom: 0;
+          top: 0;
           opacity: 0;
         }
       }
@@ -481,6 +481,7 @@
         input[type="text"],
         input[type="date"],
         input[type="number"],
+        textarea,
         button[type="submit"] {
           padding: 7px;
           margin: 3px 0;
@@ -647,9 +648,28 @@
             <ul>
               <li>工作名稱: 透過上方「工作名稱」欄位輸入。</li>
               <li>指令格式: 月/日-月/日 時間-時間 (星期)</li>
-              <li>範例: 8/15-8/20 12.0-20.0 (一,三,五)</li>
+              <li>
+                範例:
+                <ul>
+                  <li>10/10-10/13 12:00-20:30</li>
+                  <li>10/15-10/18 12.-20.5</li>
+                  <li>10/15~10/18 12:00-20:30</li>
+                  <li>10/15~10/18 12.-20.5</li>
+                  <li>10/10-10/13 12:00~20:30</li>
+                  <li>10/15-10/18 12.~20.5</li>
+                  <li>10/15~10/18 12:00~20:30</li>
+                  <li>10/15~10/18 12.~20.5</li>
+                  <li>10/10-10/13 12:00-20:30(一,三,五)</li>
+                  <li>10/15-10/18 12.-20.5(一,三,五)</li>
+                  <li>10/15~10/18 12:00-20:30(一,三,五)</li>
+                  <li>10/15~10/18 12.-20.5(一,三,五)</li>
+                  <li>10/10-10/13 12:00~20:30(一,三,五)</li>
+                  <li>10/15-10/18 12.~20.5(一,三,五)</li>
+                  <li>10/15~10/18 12:00~20:30(一,三,五)</li>
+                  <li>10/15~10/18 12.~20.5(一,三,五)</li>
+                </ul>
+              </li>
               <li>特殊規則: -~為區間符號, 12.為12:00簡寫, 12.5為12:30簡寫</li>
-              <li>若不指定星期幾，則會應用於所有日期。</li>
             </ul>
             <button type="submit">執行指令</button>
           </form>
@@ -694,7 +714,7 @@
       </div>
     </div>
 
-    <!-- Toast提示框 -->
+    <!-- 浮動提示窗 -->
     <div id="toast" class="toast"></div>
 
     <script>
@@ -722,6 +742,7 @@
         const jobNameInputBatchAdd = document.getElementById("batchAddJobName");
         const jobNameInputEdit = document.getElementById("editJobName");
         const commandJobNameInput = document.getElementById("commandJobName");
+        const commandInput = document.getElementById("commandInput");
         const toast = document.getElementById("toast");
         let schedules = JSON.parse(localStorage.getItem("schedules")) || {};
         let jobNames = JSON.parse(localStorage.getItem("jobNames")) || [];
@@ -863,7 +884,18 @@
         }
 
         function parseTime(timeStr) {
-          const [hours, minutes] = timeStr.split(":").map(Number);
+          // 支援 "12:00", "12.", "12.5"
+          const [hoursStr, minutesStr] = timeStr.split(":");
+          const hours = parseInt(hoursStr, 10);
+          let minutes = 0;
+          if (minutesStr !== undefined) {
+            if (minutesStr.includes(".")) {
+              const parts = minutesStr.split(".");
+              minutes = parts[1] && parts[1] === "5" ? 30 : 0;
+            } else {
+              minutes = parseInt(minutesStr, 10);
+            }
+          }
           return new Date(0, 0, 0, hours, minutes);
         }
 
@@ -938,15 +970,7 @@
           localStorage.setItem("schedules", JSON.stringify(schedules));
           updateSchedule();
           updateTotalHours();
-          showToast(`刪除了工作：${jobName}`);
-        }
-
-        function showToast(message) {
-          toast.textContent = message;
-          toast.className = "toast show";
-          setTimeout(() => {
-            toast.className = toast.className.replace("show", "");
-          }, 3000);
+          showToast(`已刪除工作: ${jobName}`);
         }
 
         function saveAddSchedule() {
@@ -1020,10 +1044,7 @@
             date <= endDate;
             date.setDate(date.getDate() + 1)
           ) {
-            if (
-              selectedDays.length === 0 ||
-              selectedDays.includes(date.getDay())
-            ) {
+            if (selectedDays.includes(date.getDay())) {
               const dateKey = date.toISOString().split("T")[0];
               schedules[dateKey] = {
                 jobName,
@@ -1048,16 +1069,14 @@
           const commandJobName = document
             .getElementById("commandJobName")
             .value.trim();
-          const commandInput = document.getElementById("commandInput").value;
-          const commands = commandInput
+          const commandInputValue =
+            document.getElementById("commandInput").value;
+          const commands = commandInputValue
             .split("\n")
             .map((cmd) => cmd.trim())
             .filter((cmd) => cmd !== "");
 
-          let successfulCommands = 0;
-          let failedCommands = 0;
-
-          commands.forEach((command, index) => {
+          commands.forEach((command) => {
             const parsedCommand = parseCommand(command);
             if (parsedCommand) {
               const { startDate, endDate, startTime, endTime, weekdays } =
@@ -1079,10 +1098,6 @@
                   };
                 }
               }
-              successfulCommands++;
-            } else {
-              console.error(`指令解析失敗於第 ${index + 1} 行: ${command}`);
-              failedCommands++;
             }
           });
 
@@ -1091,65 +1106,40 @@
             jobNames.push(commandJobName);
             localStorage.setItem("jobNames", JSON.stringify(jobNames));
           }
-
-          if (successfulCommands > 0) {
-            showToast(`成功新增 ${successfulCommands} 個排班`);
-          }
-          if (failedCommands > 0) {
-            showToast(`有 ${failedCommands} 個指令解析失敗，請檢查格式`);
-          }
-
           closeAddModal();
           updateSchedule();
           updateTotalHours();
+          showToast(`已新增工作: ${commandJobName || "指令新增"}`);
         }
 
         function parseCommand(command) {
           const commandRegex =
-            /(\d{1,2}\/\d{1,2})[-~](\d{1,2}\/\d{1,2})\s+([\d.]{1,5})[-~]([\d.]{1,5})\s*(?:\(([^)]+)\))?/;
+            /^(\d{1,2})\/(\d{1,2})\s*[-~]\s*(\d{1,2})\/(\d{1,2})\s+([\d.]{1,5})\s*[-~]\s*([\d.]{1,5})(?:\s*\(([^)]+)\))?$/;
           const match = command.match(commandRegex);
 
           if (!match) return null;
 
-          const startDateParts = match[1].split("/");
-          const endDateParts = match[2].split("/");
-          const startTimeParts = match[3].split(".");
-          const endTimeParts = match[4].split(".");
-          const weekdays = match[5]
-            ? match[5].split(",").map((day) => "日一二三四五六".indexOf(day))
+          const startMonth = parseInt(match[1], 10);
+          const startDay = parseInt(match[2], 10);
+          const endMonth = parseInt(match[3], 10);
+          const endDay = parseInt(match[4], 10);
+          const startTimeStr = match[5];
+          const endTimeStr = match[6];
+          const weekdaysStr = match[7] || "";
+
+          const weekdays = weekdaysStr
+            ? weekdaysStr
+                .split(",")
+                .map((day) => "日一二三四五六".indexOf(day.trim()))
             : [];
 
           const currentYear = new Date().getFullYear();
 
-          const startDate = new Date(
-            currentYear,
-            parseInt(startDateParts[0], 10) - 1,
-            parseInt(startDateParts[1], 10)
-          );
-          const endDate = new Date(
-            currentYear,
-            parseInt(endDateParts[0], 10) - 1,
-            parseInt(endDateParts[1], 10)
-          );
+          const startDate = new Date(currentYear, startMonth - 1, startDay);
+          const endDate = new Date(currentYear, endMonth - 1, endDay);
 
-          const startTime =
-            startTimeParts.length === 1
-              ? `${startTimeParts[0].padStart(2, "0")}:00`
-              : `${startTimeParts[0].padStart(2, "0")}:${convertMinutes(
-                  startTimeParts[1]
-                )}`;
-          const endTime =
-            endTimeParts.length === 1
-              ? `${endTimeParts[0].padStart(2, "0")}:00`
-              : `${endTimeParts[0].padStart(2, "0")}:${convertMinutes(
-                  endTimeParts[1]
-                )}`;
-
-          // 檢查日期是否有效
-          if (startDate > endDate) return null;
-
-          // 檢查時間是否有效
-          if (!isValidTime(startTime) || !isValidTime(endTime)) return null;
+          const startTime = convertTime(startTimeStr);
+          const endTime = convertTime(endTimeStr);
 
           return {
             startDate,
@@ -1160,22 +1150,21 @@
           };
         }
 
-        function convertMinutes(minuteStr) {
-          if (minuteStr === "5") return "30";
-          if (minuteStr.length === 1) return minuteStr.padStart(2, "0");
-          return minuteStr.padStart(2, "0");
-        }
-
-        function isValidTime(timeStr) {
-          const [hours, minutes] = timeStr.split(":").map(Number);
-          return (
-            Number.isInteger(hours) &&
-            Number.isInteger(minutes) &&
-            hours >= 0 &&
-            hours <= 23 &&
-            minutes >= 0 &&
-            minutes <= 59
-          );
+        function convertTime(timeStr) {
+          // 支援 "12:00", "12.", "12.5"
+          if (timeStr.includes(":")) {
+            return timeStr;
+          } else if (timeStr.includes(".")) {
+            const parts = timeStr.split(".");
+            const hours = parts[0].padStart(2, "0");
+            let minutes = "00";
+            if (parts[1] === "5") {
+              minutes = "30";
+            }
+            return `${hours}:${minutes}`;
+          } else {
+            return `${timeStr.padStart(2, "0")}:00`;
+          }
         }
 
         function toggleWeekdaySelection(event) {
@@ -1219,15 +1208,15 @@
             let x = document.getElementById(this.id + "autocomplete-list");
             if (x) x = x.getElementsByTagName("div");
             if (e.keyCode == 40) {
-              // 下鍵
+              // Down key
               currentFocus++;
               addActive(x);
             } else if (e.keyCode == 38) {
-              // 上鍵
+              // Up key
               currentFocus--;
               addActive(x);
             } else if (e.keyCode == 13) {
-              // Enter鍵
+              // Enter key
               e.preventDefault();
               if (currentFocus > -1) {
                 if (x) x[currentFocus].click();
@@ -1373,6 +1362,7 @@
           closeEditModal();
           updateSchedule();
           updateTotalHours();
+          showToast(`已修改工作: ${jobName}`);
         }
 
         function updateTimeScale() {
@@ -1442,6 +1432,14 @@
           toggleAddMode("single");
         }
 
+        function showToast(message) {
+          toast.textContent = message;
+          toast.className = "toast show";
+          setTimeout(() => {
+            toast.className = toast.className.replace("show", "");
+          }, 3000);
+        }
+
         generateWeekGrid();
         updateDates();
         updateSchedule();
@@ -1450,6 +1448,7 @@
         autocomplete(jobNameInputAdd, jobNames);
         autocomplete(jobNameInputBatchAdd, jobNames);
         autocomplete(jobNameInputEdit, jobNames);
+        autocomplete(commandJobNameInput, jobNames);
         populateTimeOptions();
 
         document.querySelectorAll(".weekday").forEach((day) => {
