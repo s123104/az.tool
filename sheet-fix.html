@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>輸入內容生成表格</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #4fc3f7;
+        --secondary-color: #03a9f4;
+        --background-color: #e1f5fe;
+        --text-color: #01579b;
+        --shadow-color: rgba(1, 87, 155, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      .container {
+        background-color: white;
+        border-radius: 24px;
+        padding: 40px;
+        width: 95%;
+        max-width: 1200px;
+        position: relative;
+        text-align: center;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      h1 {
+        color: var(--secondary-color);
+        font-size: 2.5em;
+        margin: 0;
+      }
+
+      .input-output {
+        display: flex;
+        gap: 30px;
+        height: 60vh;
+      }
+
+      .column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+
+      .textarea-wrapper {
+        border: 2px solid var(--primary-color);
+        border-radius: 12px;
+        flex: 1;
+        overflow: hidden;
+      }
+
+      textarea {
+        width: 100%;
+        height: 100%;
+        padding: 20px;
+        font-size: 16px;
+        resize: none;
+        transition: all 0.3s ease;
+        border: none;
+        overflow-y: scroll;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 3px rgba(3, 169, 244, 0.2);
+      }
+
+      .count-display {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        font-size: 1.2em;
+        font-weight: bold;
+        color: var(--text-color);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      table,
+      th,
+      td {
+        border: 1px solid var(--primary-color);
+        padding: 10px;
+        text-align: center;
+      }
+
+      th {
+        background-color: var(--secondary-color);
+        color: white;
+      }
+
+      .button-group {
+        display: flex;
+        justify-content: flex-start;
+        margin: 10px 0;
+      }
+
+      .button-group button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        margin-right: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .button-group button:hover {
+        background-color: var(--secondary-color);
+      }
+
+      .scrollable-output {
+        overflow-y: auto;
+        height: 100%;
+        padding: 20px;
+      }
+
+      .table-wrapper {
+        border: 2px solid var(--primary-color);
+        border-radius: 12px;
+        flex: 1;
+        overflow: hidden;
+      }
+
+      /* 設定框 */
+      .settings {
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .settings input {
+        padding: 5px;
+        border: 2px solid var(--primary-color);
+        border-radius: 8px;
+        font-size: 1em;
+        width: 100px;
+        text-align: center;
+      }
+
+      .copy-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: var(--secondary-color);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 50px;
+        opacity: 0;
+        transition: all 0.3s ease;
+        transform: translateY(-20px);
+        box-shadow: 0 4px 6px var(--primary-color);
+      }
+
+      .show-notification {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .save-load-group {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+
+      .save-load-group input {
+        padding: 5px;
+        border: 2px solid var(--primary-color);
+        border-radius: 8px;
+        font-size: 1em;
+        width: 300px;
+        text-align: center;
+      }
+
+      .save-load-group button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+
+      .save-load-group button:hover {
+        background-color: var(--secondary-color);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>輸入內容生成表格</h1>
+      </div>
+
+      <div class="settings">
+        <span>範圍</span>
+        <input type="text" id="columnRange" placeholder="1-2 或 3" />
+        <span>欄 除以</span>
+        <input type="number" id="divideBy" value="10" />
+        <span>範圍</span>
+        <input type="text" id="afterColumn" value="3" style="width: 60px" />
+        <span>欄以後除以</span>
+        <input
+          type="number"
+          id="afterColumnDivideBy"
+          value="2"
+          style="width: 60px"
+        />
+      </div>
+
+      <div class="save-load-group">
+        <input type="text" id="fileNameInput" placeholder="檔名 (可選)" />
+        <button id="saveJsonBtn">儲存 JSON</button>
+        <input type="file" id="loadJsonInput" style="display: none" />
+        <button id="loadJsonBtn">讀取 JSON</button>
+      </div>
+
+      <div class="input-output">
+        <div class="column">
+          <div class="textarea-wrapper">
+            <textarea
+              id="input"
+              placeholder="在此貼上您的內容，每行數字用 Tab 或空格分隔..."
+            ></textarea>
+          </div>
+          <div class="button-group">
+            <button id="pasteBtn">貼上程式碼</button>
+            <button id="clearBtn">清除</button>
+          </div>
+          <div class="count-display">
+            行數: <span id="inputLineCount">0</span>
+          </div>
+        </div>
+        <div class="column">
+          <div class="table-wrapper">
+            <div id="tableContainer" class="scrollable-output"></div>
+          </div>
+          <div class="button-group">
+            <button id="copyBtn">複製表格內容</button>
+          </div>
+          <div class="count-display">
+            表格行數: <span id="tableRowCount">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="copyNotification" class="copy-notification">複製成功！</div>
+
+    <script>
+      const input = document.getElementById("input");
+      const tableContainer = document.getElementById("tableContainer");
+      const inputLineCount = document.getElementById("inputLineCount");
+      const tableRowCount = document.getElementById("tableRowCount");
+      const pasteBtn = document.getElementById("pasteBtn");
+      const clearBtn = document.getElementById("clearBtn");
+      const copyNotification = document.getElementById("copyNotification");
+      const saveJsonBtn = document.getElementById("saveJsonBtn");
+      const loadJsonBtn = document.getElementById("loadJsonBtn");
+      const loadJsonInput = document.getElementById("loadJsonInput");
+      const fileNameInput = document.getElementById("fileNameInput");
+      const columnRangeInput = document.getElementById("columnRange");
+      const divideByInput = document.getElementById("divideBy");
+      const afterColumnInput = document.getElementById("afterColumn");
+      const afterColumnDivideByInput = document.getElementById(
+        "afterColumnDivideBy"
+      );
+
+      // 儲存 JSON 檔案功能
+      saveJsonBtn.addEventListener("click", function () {
+        const inputText = input.value.trim();
+        if (!inputText) {
+          alert("請輸入內容後再儲存！");
+          return;
+        }
+
+        const jsonData = {
+          timestamp: new Date().toLocaleString(),
+          data: inputText.split("\n").map((line) => line.split(/\s+/)),
+        };
+
+        const jsonString = JSON.stringify(jsonData, null, 2);
+        const blob = new Blob([jsonString], { type: "application/json" });
+
+        let fileName = fileNameInput.value.trim();
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+        if (!fileName) {
+          fileName = `data-${timestamp}.json`; // 無命名時，使用時間命名
+        } else {
+          fileName = `${fileName}-${timestamp}.json`; // 有命名則加上時間
+        }
+
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
+      });
+
+      // 讀取 JSON 檔案功能
+      loadJsonBtn.addEventListener("click", () => loadJsonInput.click());
+      loadJsonInput.addEventListener("change", function () {
+        const file = this.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          try {
+            const jsonData = JSON.parse(e.target.result);
+            input.value = jsonData.data.map((row) => row.join("\t")).join("\n");
+            updateTable(); // 讀取後自動更新表格
+          } catch (error) {
+            alert("無法讀取檔案內容，請確認檔案格式是否正確！");
+          }
+        };
+        reader.readAsText(file);
+      });
+
+      function updateTable() {
+        const inputText = input.value.trim();
+        const rows = inputText
+          .split("\n")
+          .map((row) => row.split(/\s+/).filter((cell) => cell.trim() !== ""))
+          .filter((row) => row.length > 0);
+
+        inputLineCount.textContent = rows.length;
+
+        if (rows.length === 0) {
+          tableContainer.innerHTML = "";
+          tableRowCount.textContent = 0;
+          return;
+        }
+
+        const range = parseRange(columnRangeInput.value);
+        const divideBy = parseFloat(divideByInput.value);
+        const afterColumn = parseInt(afterColumnInput.value) - 1;
+        const afterColumnDivideBy = parseFloat(afterColumnDivideByInput.value);
+
+        let tableHTML = "<table><thead><tr>";
+        const columnCount = rows[0].length; // 預設第一行的欄位數
+
+        // 動態生成表頭
+        for (let i = 0; i < columnCount; i++) {
+          tableHTML += `<th>欄位${i + 1}</th>`;
+        }
+        tableHTML += "</tr></thead><tbody>";
+
+        rows.forEach((row) => {
+          tableHTML += "<tr>";
+          row.forEach((cell, index) => {
+            let value = parseFloat(cell);
+            if (index >= range.start && index <= range.end) {
+              value = value / divideBy;
+            } else if (index >= afterColumn) {
+              value = value / afterColumnDivideBy;
+            }
+            value = Math.round(value); // 預設四捨五入
+            tableHTML += `<td>${value}</td>`;
+          });
+          tableHTML += "</tr>";
+        });
+
+        tableHTML += "</tbody></table>";
+        tableContainer.innerHTML = tableHTML;
+        tableRowCount.textContent = rows.length;
+      }
+
+      function parseRange(range) {
+        const parts = range.split("-").map(Number);
+        if (parts.length === 1) {
+          return { start: parts[0] - 1, end: parts[0] - 1 };
+        } else if (parts.length === 2) {
+          return { start: parts[0] - 1, end: parts[1] - 1 };
+        } else {
+          return { start: 0, end: 0 }; // 預設返回值
+        }
+      }
+
+      input.addEventListener("input", updateTable);
+
+      pasteBtn.addEventListener("click", async function () {
+        try {
+          const text = await navigator.clipboard.readText();
+          input.value += text;
+          updateTable();
+        } catch (err) {
+          console.error("無法讀取剪貼簿:", err);
+        }
+      });
+
+      clearBtn.addEventListener("click", function () {
+        input.value = "";
+        tableContainer.innerHTML = "";
+        inputLineCount.textContent = 0;
+        tableRowCount.textContent = 0;
+      });
+
+      copyBtn.addEventListener("click", function () {
+        const rows = tableContainer.querySelectorAll("tbody tr");
+        let tableText = "";
+
+        rows.forEach((row) => {
+          let rowText = "";
+          row.querySelectorAll("td").forEach((cell) => {
+            rowText += cell.textContent + "\t";
+          });
+          tableText += rowText.trim() + "\n";
+        });
+
+        navigator.clipboard
+          .writeText(tableText)
+          .then(() => {
+            showNotification("表格內容已複製！");
+          })
+          .catch((err) => {
+            console.error("無法複製表格內容:", err);
+          });
+      });
+
+      // 顯示彈跳通知
+      function showNotification(message) {
+        copyNotification.textContent = message;
+        copyNotification.classList.add("show-notification");
+        setTimeout(() => {
+          copyNotification.classList.remove("show-notification");
+        }, 2000);
+      }
+    </script>
+  </body>
+</html>
