@@ -71,10 +71,6 @@
         transition: background-color 0.3s;
       }
 
-      .nav-button:hover {
-        background-color: #ff69b4;
-      }
-
       .add-button {
         position: absolute;
         top: 5px;
@@ -268,7 +264,8 @@
       }
 
       /* 統一「修改」和「刪除」按鈕的樣式 */
-      .job-actions .action-btn {
+      .job-actions .action-btn,
+      .delete-btn {
         padding: 5px 10px;
         border: none;
         border-radius: 20px; /* 圓弧 */
@@ -302,9 +299,9 @@
         background-color: #ff4c4c;
         border: none;
         color: white;
-        font-size: 10px;
-        width: 14px;
-        height: 14px;
+        font-size: 8px;
+        width: 12px;
+        height: 12px;
         border-radius: 50%;
         cursor: pointer;
         position: absolute;
@@ -585,12 +582,6 @@
 
         .schedule-item {
           font-size: 7px;
-        }
-
-        .delete-btn {
-          width: 12px;
-          height: 12px;
-          font-size: 8px;
         }
       }
     </style>
