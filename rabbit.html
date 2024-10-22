@@ -184,29 +184,28 @@
         flex: 0 0 auto;
       }
 
+      /* 現有模態框的樣式 */
       .modal {
-        display: none;
-        position: fixed;
-        z-index: 2;
+        display: none; /* 隱藏模態框 */
+        position: fixed; /* 固定位置 */
+        z-index: 1000; /* 確保在最上層 */
         left: 0;
         top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto; /* 允許模態框內部滾動 */
-        background-color: rgba(0, 0, 0, 0.4);
-        padding-top: 60px;
+        width: 100%; /* 全寬 */
+        height: 100%; /* 全高 */
+        overflow: auto; /* 滾動 */
+        background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
       }
 
       .modal-content {
-        background-color: #fff;
-        margin: auto;
+        background-color: #fefefe;
+        margin: 10% auto; /* 垂直和水平置中 */
         padding: 20px;
         border: 1px solid #888;
-        width: 90%;
-        max-width: 400px;
-        border-radius: 10px;
-        max-height: 70vh;
-        overflow-y: auto; /* 允許內容滾動 */
+        width: 80%; /* 寬度 */
+        max-width: 600px; /* 最大寬度 */
+        border-radius: 8px; /* 圓角 */
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
       }
 
       .close {
@@ -214,13 +213,61 @@
         float: right;
         font-size: 28px;
         font-weight: bold;
+        cursor: pointer;
       }
 
       .close:hover,
       .close:focus {
         color: black;
         text-decoration: none;
+      }
+
+      /* 新增的當日工作列表樣式 */
+      .day-schedule-list {
+        list-style-type: none;
+        padding: 0;
+      }
+
+      .day-schedule-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .day-schedule-list li:last-child {
+        border-bottom: none;
+      }
+
+      .day-schedule-list .job-details {
+        flex: 1;
+      }
+
+      .day-schedule-list .job-actions button {
+        margin-left: 10px;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 4px;
         cursor: pointer;
+      }
+
+      .day-schedule-list .job-actions .edit-btn {
+        background-color: #4caf50; /* 綠色 */
+        color: white;
+      }
+
+      .day-schedule-list .job-actions .delete-btn {
+        background-color: #f44336; /* 紅色 */
+        color: white;
+      }
+
+      .day-schedule-list .job-actions .edit-btn:hover {
+        background-color: #45a049;
+      }
+
+      .day-schedule-list .job-actions .delete-btn:hover {
+        background-color: #da190b;
       }
 
       .toggle-container {
@@ -737,6 +784,17 @@
       </div>
     </div>
 
+    <!-- 新增的模態框：檢視當日工作 -->
+    <div id="modal-view-day" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeViewDay">&times;</span>
+        <h2 id="viewDayTitle">工作列表</h2>
+        <ul id="dayScheduleList" class="day-schedule-list">
+          <!-- 動態生成的工作項目將插入於此 -->
+        </ul>
+      </div>
+    </div>
+
     <!-- 浮動提示窗 -->
     <div id="toast" class="toast"></div>
 
@@ -748,8 +806,10 @@
         const addButton = document.getElementById("addButton");
         const modalAdd = document.getElementById("modal-add");
         const modalEdit = document.getElementById("modal-edit");
+        const modalViewDay = document.getElementById("modal-view-day"); // 新增的模態框
         const closeAddBtn = document.getElementById("closeAdd");
         const closeEditBtn = document.getElementById("closeEdit");
+        const closeViewDayBtn = document.getElementById("closeViewDay"); // 新增的關閉按鈕
         const addForm = document.getElementById("addForm");
         const batchAddForm = document.getElementById("batchAddForm");
         const commandForm = document.getElementById("commandForm");
@@ -761,6 +821,8 @@
         const batchAddContainer = document.getElementById("batchAddContainer");
         const commandContainer = document.getElementById("commandContainer");
         const editForm = document.getElementById("editForm");
+        const viewDayTitle = document.getElementById("viewDayTitle"); // 新增的標題元素
+        const dayScheduleList = document.getElementById("dayScheduleList"); // 新增的工作列表元素
         const jobNameInputAdd = document.getElementById("addJobName");
         const jobNameInputBatchAdd = document.getElementById("batchAddJobName");
         const jobNameInputEdit = document.getElementById("editJobName");
@@ -824,9 +886,12 @@
           );
           generateWeekGrid();
           updateDates();
-          updateSchedule();
-          updateTotalHours();
-          updateTimeScale(); // 更新時間刻度
+          updateTimeScale(); // 先更新時間刻度
+          // 使用 requestAnimationFrame 確保 DOM 已渲染
+          requestAnimationFrame(() => {
+            updateSchedule();
+            updateTotalHours();
+          });
         }
 
         function generateWeekGrid() {
@@ -839,6 +904,7 @@
             const dayHeader = document.createElement("div");
             dayHeader.classList.add("day-header");
             dayHeader.innerHTML = ["一", "二", "三", "四", "五", "六", "日"][i];
+            dayHeader.dataset.dayIndex = i; // 設定資料屬性以便後續使用
             dayColumn.appendChild(dayHeader);
 
             const dayContent = document.createElement("div");
@@ -846,6 +912,14 @@
             dayColumn.appendChild(dayContent);
 
             weekGrid.appendChild(dayColumn);
+
+            // 新增點擊事件監聽器到日期標頭
+            dayHeader.addEventListener("click", () => {
+              const date = new Date(currentWeekStart);
+              date.setDate(date.getDate() + i);
+              const dateKey = getLocalDateKey(date);
+              openViewDayModal(dateKey);
+            });
           }
         }
 
@@ -1057,18 +1131,21 @@
           document.getElementById("editJobName").value = schedule.jobName;
           document.getElementById("editJobDate").value = dateKey;
 
-          const startHour = String(
-            parseInt(parseTime(schedule.start).getHours())
-          ).padStart(2, "0");
-          const startMinute = String(
-            parseInt(parseTime(schedule.start).getMinutes())
-          ).padStart(2, "0");
-          const endHour = String(
-            parseInt(parseTime(schedule.end).getHours())
-          ).padStart(2, "0");
-          const endMinute = String(
-            parseInt(parseTime(schedule.end).getMinutes())
-          ).padStart(2, "0");
+          const startTimeObj = parseTime(schedule.start);
+          const endTimeObj = parseTime(schedule.end);
+
+          if (!startTimeObj || !endTimeObj) {
+            console.error(`無法解析時間: ${schedule.start} 或 ${schedule.end}`);
+            return;
+          }
+
+          const startHour = String(startTimeObj.getHours()).padStart(2, "0");
+          const startMinute = String(startTimeObj.getMinutes()).padStart(
+            2,
+            "0"
+          );
+          const endHour = String(endTimeObj.getHours()).padStart(2, "0");
+          const endMinute = String(endTimeObj.getMinutes()).padStart(2, "0");
 
           document.getElementById("editStartHour").value = startHour;
           document.getElementById("editStartMinute").value = startMinute;
@@ -1081,6 +1158,74 @@
         function closeEditModal() {
           modalEdit.style.display = "none";
           currentEditKey = null;
+        }
+
+        function openViewDayModal(dateKey) {
+          const date = new Date(dateKey);
+          const formattedDate = `${date.getMonth() + 1}/${date.getDate()}`;
+          viewDayTitle.textContent = `工作列表 - ${formattedDate}`;
+          populateDayScheduleList(dateKey);
+          modalViewDay.style.display = "block";
+        }
+
+        function closeViewDayModal() {
+          modalViewDay.style.display = "none";
+          dayScheduleList.innerHTML = ""; // 清空列表
+        }
+
+        function populateDayScheduleList(dateKey) {
+          dayScheduleList.innerHTML = ""; // 清空原有內容
+          const scheduleArray = schedules[dateKey] || [];
+
+          if (scheduleArray.length === 0) {
+            const noScheduleItem = document.createElement("li");
+            noScheduleItem.textContent = "當日無任何工作。";
+            dayScheduleList.appendChild(noScheduleItem);
+            return;
+          }
+
+          scheduleArray.forEach((schedule) => {
+            const { id, jobName, start, end, color } = schedule;
+
+            const listItem = document.createElement("li");
+            listItem.classList.add("day-schedule-item");
+            listItem.style.borderLeft = `4px solid ${color}`;
+
+            const jobInfo = document.createElement("div");
+            jobInfo.classList.add("job-info");
+            jobInfo.innerHTML = `<strong>${jobName}</strong><br>${formatTime(
+              start
+            )} - ${formatTime(end)}`;
+            listItem.appendChild(jobInfo);
+
+            const actions = document.createElement("div");
+            actions.classList.add("job-actions");
+
+            // 修改按鈕
+            const editBtn = document.createElement("button");
+            editBtn.classList.add("action-btn", "edit-btn");
+            editBtn.textContent = "修改";
+            editBtn.addEventListener("click", () => {
+              closeViewDayModal();
+              openEditModal(dateKey, id);
+            });
+            actions.appendChild(editBtn);
+
+            // 刪除按鈕
+            const deleteBtn = document.createElement("button");
+            deleteBtn.classList.add("action-btn", "delete-btn");
+            deleteBtn.textContent = "刪除";
+            deleteBtn.addEventListener("click", () => {
+              if (confirm(`確定要刪除工作 "${jobName}" 嗎？`)) {
+                deleteSchedule(dateKey, id, jobName, start, end);
+                populateDayScheduleList(dateKey); // 更新列表
+              }
+            });
+            actions.appendChild(deleteBtn);
+
+            listItem.appendChild(actions);
+            dayScheduleList.appendChild(listItem);
+          });
         }
 
         function deleteSchedule(dateKey, scheduleId, jobName, start, end) {
@@ -1473,6 +1618,7 @@
 
         closeAddBtn.addEventListener("click", closeAddModal);
         closeEditBtn.addEventListener("click", closeEditModal);
+        closeViewDayBtn.addEventListener("click", closeViewDayModal); // 新增的關閉事件
 
         window.addEventListener("click", (event) => {
           if (event.target == modalAdd) {
@@ -1480,6 +1626,10 @@
           }
           if (event.target == modalEdit) {
             closeEditModal();
+          }
+          if (event.target == modalViewDay) {
+            // 新增的判斷
+            closeViewDayModal();
           }
         });
 
@@ -1577,6 +1727,23 @@
             )}-${formatTime(endTime)})`,
             color
           );
+
+          // 如果當前查看的日期是修改後的日期，更新視圖
+          const viewedDateKey =
+            viewDayTitle.textContent.match(/(\d{1,2}\/\d{1,2})$/)[1];
+          const viewedDate = new Date(
+            `${currentWeekStart.getFullYear()}-${viewedDateKey.replace(
+              "/",
+              "-"
+            )}`
+          );
+          const viewedDateKeyFormatted = getLocalDateKey(viewedDate);
+          if (
+            viewedDateKeyFormatted === newDateKey ||
+            viewedDateKeyFormatted === dateKey
+          ) {
+            populateDayScheduleList(viewedDateKeyFormatted);
+          }
         }
 
         function updateTimeScale() {
@@ -1660,8 +1827,11 @@
         generateWeekGrid();
         updateDates();
         updateTimeScale(); // 先更新時間刻度
-        updateSchedule(); // 然後更新排程
-        updateTotalHours();
+        // 使用 requestAnimationFrame 確保 DOM 已渲染
+        requestAnimationFrame(() => {
+          updateSchedule();
+          updateTotalHours();
+        });
         autocomplete(jobNameInputAdd, jobNames);
         autocomplete(jobNameInputBatchAdd, jobNames);
         autocomplete(jobNameInputEdit, jobNames);
