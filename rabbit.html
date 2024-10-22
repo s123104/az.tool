@@ -68,6 +68,7 @@
         border-radius: 15px;
         font-size: 12px;
         cursor: pointer;
+        transition: background-color 0.3s;
       }
 
       .nav-button:hover {
@@ -91,6 +92,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: background-color 0.3s;
       }
 
       .add-button:hover {
@@ -143,6 +145,12 @@
         font-weight: bold;
         background-color: #ffd1dc;
         border-bottom: 1px solid #ff69b4;
+        cursor: pointer; /* 改變游標 */
+        transition: background-color 0.3s;
+      }
+
+      .day-header:hover {
+        background-color: #ffb6c1; /* 滑鼠移動時背景顏色變化 */
       }
 
       .day-content {
@@ -161,10 +169,16 @@
         flex-direction: column;
         align-items: center;
         justify-content: space-around;
-        border-radius: 3px;
+        border-radius: 8px; /* 圓角 */
         padding: 2px;
         text-align: center;
         cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .schedule-item:hover {
+        transform: scale(1.02);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       }
 
       .vertical-line {
@@ -214,6 +228,7 @@
         font-size: 28px;
         font-weight: bold;
         cursor: pointer;
+        transition: color 0.3s;
       }
 
       .close:hover,
@@ -226,48 +241,84 @@
       .day-schedule-list {
         list-style-type: none;
         padding: 0;
+        max-height: 400px;
+        overflow-y: auto;
       }
 
-      .day-schedule-list li {
+      .day-schedule-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px 0;
+        padding: 10px;
         border-bottom: 1px solid #ddd;
+        border-radius: 8px; /* 圓角 */
+        background-color: white; /* 底色設為白色 */
+        margin-bottom: 5px;
+        transition: background-color 0.3s;
       }
 
-      .day-schedule-list li:last-child {
-        border-bottom: none;
-      }
-
-      .day-schedule-list .job-details {
+      .job-info {
         flex: 1;
+        margin-right: 10px;
       }
 
-      .day-schedule-list .job-actions button {
-        margin-left: 10px;
+      .job-actions {
+        display: flex;
+        gap: 0; /* 移除按鈕之間的空隙 */
+      }
+
+      /* 統一「修改」和「刪除」按鈕的樣式 */
+      .job-actions .action-btn {
         padding: 5px 10px;
         border: none;
-        border-radius: 4px;
+        border-radius: 20px; /* 圓弧 */
         cursor: pointer;
+        font-size: 10px;
+        transition: background-color 0.3s;
       }
 
-      .day-schedule-list .job-actions .edit-btn {
-        background-color: #4caf50; /* 綠色 */
+      .job-actions .edit-btn {
+        background-color: #ff69b4; /* 一致的粉色系列 */
         color: white;
+        margin-right: 5px; /* 移除右側間距 */
       }
 
-      .day-schedule-list .job-actions .delete-btn {
-        background-color: #f44336; /* 紅色 */
+      .job-actions .edit-btn:hover {
+        background-color: #ff1493;
+      }
+
+      .job-actions .delete-btn {
+        background-color: #ff5781; /* 一致的粉色系列 */
         color: white;
+        margin-right: 0; /* 移除右側間距 */
       }
 
-      .day-schedule-list .job-actions .edit-btn:hover {
-        background-color: #45a049;
+      .job-actions .delete-btn:hover {
+        background-color: #ff1447;
       }
 
-      .day-schedule-list .job-actions .delete-btn:hover {
-        background-color: #da190b;
+      /* 保留外側模態框的刪除按鈕樣式 */
+      .schedule-item .delete-btn {
+        background-color: #ff4c4c;
+        border: none;
+        color: white;
+        font-size: 10px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        cursor: pointer;
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        transition: background-color 0.3s;
+      }
+
+      .schedule-item .delete-btn:hover {
+        background-color: #ff0000;
       }
 
       .toggle-container {
@@ -283,6 +334,7 @@
         border-radius: 15px;
         color: white;
         font-size: 14px;
+        transition: background-color 0.3s;
       }
 
       .toggle-button.single {
@@ -348,6 +400,12 @@
         justify-content: center;
         cursor: pointer;
         font-size: 14px;
+        transition: background-color 0.3s, transform 0.3s;
+      }
+
+      .weekday:hover {
+        background-color: #ff69b4;
+        transform: scale(1.1);
       }
 
       .weekday.selected {
@@ -363,6 +421,7 @@
         cursor: pointer;
         font-size: 16px;
         width: 100%;
+        transition: background-color 0.3s;
       }
 
       button[type="submit"]:hover {
@@ -398,28 +457,6 @@
         color: #ffffff;
       }
 
-      .delete-btn {
-        background-color: #ff4c4c;
-        border: none;
-        color: white;
-        font-size: 10px;
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        cursor: pointer;
-        position: absolute;
-        top: 2px;
-        right: 2px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0;
-      }
-
-      .delete-btn:hover {
-        background-color: #ff0000;
-      }
-
       /* 浮動提示窗樣式 */
       .toast {
         visibility: hidden;
@@ -435,10 +472,12 @@
         bottom: 30px; /* 移至底部 */
         font-size: 14px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        transition: opacity 0.5s;
       }
 
       .toast.show {
         visibility: visible;
+        opacity: 1;
         -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
         animation: fadein 0.5s, fadeout 0.5s 2.5s;
       }
