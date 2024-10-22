@@ -1030,6 +1030,9 @@
                 deleteButton.addEventListener("click", (event) => {
                   event.stopPropagation(); // 防止觸發 scheduleItem 的 click 事件
                   deleteSchedule(dateKey, id, jobName, start, end);
+                  scheduleItem.remove();
+                  updateTotalHours();
+                  showToast(`已刪除工作 (${formatDate(dateKey)})`, "#ff1493");
                 });
                 scheduleItem.appendChild(deleteButton);
 
@@ -1072,7 +1075,7 @@
           });
           totalHoursElement.textContent = `本週總工時：${totalHours.toFixed(
             1
-          )}小時`;
+          )} 小時`;
         }
 
         function parseTime(timeStr) {
@@ -1255,10 +1258,9 @@
             deleteBtn.classList.add("action-btn", "delete-btn");
             deleteBtn.textContent = "刪除";
             deleteBtn.addEventListener("click", () => {
-              if (confirm(`確定要刪除工作 "${jobName}" 嗎？`)) {
-                deleteSchedule(dateKey, id, jobName, start, end);
-                populateDayScheduleList(dateKey); // 更新列表
-              }
+              // 移除 confirm 視窗，直接刪除
+              deleteSchedule(dateKey, id, jobName, start, end);
+              populateDayScheduleList(dateKey); // 更新列表
             });
             actions.appendChild(deleteBtn);
 
@@ -1768,19 +1770,18 @@
           );
 
           // 如果當前查看的日期是修改後的日期，更新視圖
-          const viewedDateKey =
-            viewDayTitle.textContent.match(/(\d{1,2}\/\d{1,2})$/)[1];
-          const viewedDate = new Date(
-            `${currentWeekStart.getFullYear()}-${viewedDateKey.replace(
-              "/",
-              "-"
-            )}`
+          const viewedDateMatch = viewDayTitle.textContent.match(
+            /(\d{1,2})\/(\d{1,2})$/
           );
-          const viewedDateKeyFormatted = getLocalDateKey(viewedDate);
-          if (
-            viewedDateKeyFormatted === newDateKey ||
-            viewedDateKeyFormatted === dateKey
-          ) {
+          if (viewedDateMatch) {
+            const viewedMonth = parseInt(viewedDateMatch[1], 10);
+            const viewedDay = parseInt(viewedDateMatch[2], 10);
+            const viewedDate = new Date(
+              currentWeekStart.getFullYear(),
+              viewedMonth - 1,
+              viewedDay
+            );
+            const viewedDateKeyFormatted = getLocalDateKey(viewedDate);
             populateDayScheduleList(viewedDateKeyFormatted);
           }
         }
@@ -1896,6 +1897,7 @@
         );
       });
 
+      // 確保 formatDate 函數只定義一次
       function formatDate(dateStr) {
         const date = new Date(dateStr);
         return `${date.getMonth() + 1}/${date.getDate()}`;
