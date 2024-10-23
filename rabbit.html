@@ -827,7 +827,6 @@
 
     <!-- 浮動提示窗 -->
     <div id="toast" class="toast"></div>
-
     <script>
       document.addEventListener("DOMContentLoaded", (event) => {
         const prevWeekBtn = document.getElementById("prevWeek");
@@ -1324,21 +1323,34 @@
             border-radius: 25px;
             cursor: pointer;
           }
+          .overlap-actions {
+            text-align: center;
+          }
           .overlap-schedule {
-            display: flex;
-            align-items: center;
             margin-bottom: 10px;
           }
-          .overlap-schedule .arrow {
-            margin: 0 10px;
-            font-size: 24px;
-            color: #ff69b4;
-          }
           .overlap-schedule .schedule-details {
-            flex: 1;
-            background: #f0f0f0;
+            display: flex;
+            align-items: center;
             padding: 10px;
             border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+          }
+          .schedule-details .color-block {
+            width: 10px;
+            height: 100%;
+            background-color: #ff69b4;
+            margin-right: 10px;
+          }
+          .schedule-details .schedule-info {
+            flex: 1;
+          }
+          @media (max-width: 600px) {
+            .rounded-button {
+              font-size: 14px;
+              padding: 8px 16px;
+            }
           }
         `;
         document.head.appendChild(style);
@@ -1373,15 +1385,26 @@
             <p>日期：${formatDate(dateKey)}</p>
             <div class="overlap-schedule">
               <div class="schedule-details">
-                <p><strong>${overlap.jobName}</strong></p>
-                <p>${formatTime(overlap.start)} - ${formatTime(overlap.end)}</p>
+                <div class="color-block" style="background-color: ${
+                  jobColors[overlap.jobName] || "#ff69b4"
+                };"></div>
+                <div class="schedule-info">
+                  <p><strong>${overlap.jobName}</strong></p>
+                  <p>${formatTime(overlap.start)} - ${formatTime(
+            overlap.end
+          )}</p>
+                </div>
               </div>
-              <div class="arrow">➔</div>
               <div class="schedule-details">
-                <p><strong>${newSchedule.jobName}</strong></p>
-                <p>${formatTime(newSchedule.start)} - ${formatTime(
+                <div class="color-block" style="background-color: ${
+                  jobColors[newSchedule.jobName] || "#ff69b4"
+                };"></div>
+                <div class="schedule-info">
+                  <p><strong>${newSchedule.jobName}</strong></p>
+                  <p>${formatTime(newSchedule.start)} - ${formatTime(
             newSchedule.end
           )}</p>
+                </div>
               </div>
             </div>
             <p>請選擇操作：</p>
