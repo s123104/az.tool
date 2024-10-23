@@ -1327,9 +1327,12 @@
             text-align: center;
           }
           .overlap-schedule {
+            display: flex;
+            align-items: center;
             margin-bottom: 10px;
           }
           .overlap-schedule .schedule-details {
+            flex: 1;
             display: flex;
             align-items: center;
             padding: 10px;
@@ -1346,7 +1349,24 @@
           .schedule-details .schedule-info {
             flex: 1;
           }
+          .arrow-with-text {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 10px;
+          }
+          .arrow {
+            font-size: 24px;
+            color: #ff69b4;
+          }
+          .replace-text {
+            font-size: 14px;
+            color: #555;
+          }
           @media (max-width: 600px) {
+            .overlap-schedule {
+              flex-direction: column;
+            }
             .rounded-button {
               font-size: 14px;
               padding: 8px 16px;
@@ -1394,6 +1414,9 @@
             overlap.end
           )}</p>
                 </div>
+              </div>
+              <div class="arrow-with-text">
+                <div class="arrow">↓</div>
               </div>
               <div class="schedule-details">
                 <div class="color-block" style="background-color: ${
