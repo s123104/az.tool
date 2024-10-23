@@ -836,10 +836,10 @@
         const addButton = document.getElementById("addButton");
         const modalAdd = document.getElementById("modal-add");
         const modalEdit = document.getElementById("modal-edit");
-        const modalViewDay = document.getElementById("modal-view-day"); // 新增的模態框
+        const modalViewDay = document.getElementById("modal-view-day");
         const closeAddBtn = document.getElementById("closeAdd");
         const closeEditBtn = document.getElementById("closeEdit");
-        const closeViewDayBtn = document.getElementById("closeViewDay"); // 新增的關閉按鈕
+        const closeViewDayBtn = document.getElementById("closeViewDay");
         const addForm = document.getElementById("addForm");
         const batchAddForm = document.getElementById("batchAddForm");
         const commandForm = document.getElementById("commandForm");
@@ -851,8 +851,8 @@
         const batchAddContainer = document.getElementById("batchAddContainer");
         const commandContainer = document.getElementById("commandContainer");
         const editForm = document.getElementById("editForm");
-        const viewDayTitle = document.getElementById("viewDayTitle"); // 新增的標題元素
-        const dayScheduleList = document.getElementById("dayScheduleList"); // 新增的工作列表元素
+        const viewDayTitle = document.getElementById("viewDayTitle");
+        const dayScheduleList = document.getElementById("dayScheduleList");
         const jobNameInputAdd = document.getElementById("addJobName");
         const jobNameInputBatchAdd = document.getElementById("batchAddJobName");
         const jobNameInputEdit = document.getElementById("editJobName");
@@ -864,7 +864,6 @@
         let jobColors = JSON.parse(localStorage.getItem("jobColors")) || {};
         let currentEditKey = null;
 
-        // 更新色票為淡糖果色系
         const colors = [
           "#ffc0cb",
           "#ffb6c1",
@@ -874,22 +873,21 @@
           "#ff8c69",
           "#ff6347",
           "#ff4500",
-          "#FFB3BA", // light red
-          "#FFDFBA", // light orange
-          "#BAE1FF", // light blue
-          "#D9BAFF", // light purple
-          "#FFBAF2", // light pink
-          "#FFC6FF", // light lavender
-          "#FFBAE5", // light magenta
-          "#FFBAB3", // light coral
-          "#FFBAC6", // light salmon
-          "#FFD1BA", // light apricot
-          "#BAD1FF", // light periwinkle
-          "#D1BAFF", // light mauve
-          "#FFBAD1", // light rose
+          "#FFB3BA",
+          "#FFDFBA",
+          "#BAE1FF",
+          "#D9BAFF",
+          "#FFBAF2",
+          "#FFC6FF",
+          "#FFBAE5",
+          "#FFBAB3",
+          "#FFBAC6",
+          "#FFD1BA",
+          "#BAD1FF",
+          "#D1BAFF",
+          "#FFBAD1",
         ];
 
-        // 新增函數以確保日期鍵正確
         function getLocalDateKey(date) {
           const year = date.getFullYear();
           const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -897,18 +895,16 @@
           return `${year}-${month}-${day}`;
         }
 
-        // 使用新的 Date 物件來表示當前週的起始日期（星期一）
         let currentWeekStart = getMonday(new Date());
 
         function getMonday(d) {
           d = new Date(d);
           const day = d.getDay();
-          const diff = d.getDate() - day + (day === 0 ? -6 : 1); // 如果是星期日，往前推6天
+          const diff = d.getDate() - day + (day === 0 ? -6 : 1);
           return new Date(d.setDate(diff));
         }
 
         function updateWeek(direction) {
-          // 不修改原始 currentWeekStart，創建新的日期
           currentWeekStart = new Date(
             currentWeekStart.getFullYear(),
             currentWeekStart.getMonth(),
@@ -916,8 +912,7 @@
           );
           generateWeekGrid();
           updateDates();
-          updateTimeScale(); // 先更新時間刻度
-          // 使用 requestAnimationFrame 確保 DOM 已渲染
+          updateTimeScale();
           requestAnimationFrame(() => {
             updateSchedule();
             updateTotalHours();
@@ -926,7 +921,7 @@
 
         function generateWeekGrid() {
           const weekGrid = document.querySelector(".week-grid");
-          weekGrid.innerHTML = ""; // 清空原有內容
+          weekGrid.innerHTML = "";
           for (let i = 0; i < 7; i++) {
             const dayColumn = document.createElement("div");
             dayColumn.classList.add("day-column");
@@ -934,7 +929,7 @@
             const dayHeader = document.createElement("div");
             dayHeader.classList.add("day-header");
             dayHeader.innerHTML = ["一", "二", "三", "四", "五", "六", "日"][i];
-            dayHeader.dataset.dayIndex = i; // 設定資料屬性以便後續使用
+            dayHeader.dataset.dayIndex = i;
             dayColumn.appendChild(dayHeader);
 
             const dayContent = document.createElement("div");
@@ -943,7 +938,6 @@
 
             weekGrid.appendChild(dayColumn);
 
-            // 新增點擊事件監聽器到日期標頭
             dayHeader.addEventListener("click", () => {
               const date = new Date(currentWeekStart);
               date.setDate(date.getDate() + i);
@@ -966,10 +960,10 @@
 
         function updateSchedule() {
           const dayContents = document.querySelectorAll(".day-content");
-          dayContents.forEach((content) => (content.innerHTML = "")); // 清空原有內容
+          dayContents.forEach((content) => (content.innerHTML = ""));
 
           const dayContentHeight = dayContents[0].clientHeight;
-          const totalMinutesInDay = 17 * 60; // 17 小時
+          const totalMinutesInDay = 17 * 60;
 
           Object.keys(schedules).forEach((dateKey) => {
             const scheduleArray = schedules[dateKey];
@@ -984,8 +978,8 @@
             if (scheduleDate >= weekStartDate && scheduleDate < weekEndDate) {
               scheduleArray.forEach((schedule) => {
                 const { id, jobName, start, end } = schedule;
-                const color = jobColors[jobName] || "#ff69b4"; // 使用已分配的顏色或預設顏色
-                const dayIndex = (scheduleDate.getDay() + 6) % 7; // 將星期日轉為6
+                const color = jobColors[jobName] || "#ff69b4";
+                const dayIndex = (scheduleDate.getDay() + 6) % 7;
                 const startTime = parseTime(start);
                 const endTime = parseTime(end);
 
@@ -994,14 +988,14 @@
                   return;
                 }
 
-                const duration = (endTime - startTime) / 60000; // 轉換為分鐘
+                const duration = (endTime - startTime) / 60000;
                 const topPosition =
                   (((startTime.getHours() - 7) * 60 + startTime.getMinutes()) /
                     totalMinutesInDay) *
                   dayContentHeight;
                 const height =
                   (duration / totalMinutesInDay) * dayContentHeight;
-                if (topPosition < 0 || height <= 0) return; // 避免顯示在非工作時間
+                if (topPosition < 0 || height <= 0) return;
 
                 const scheduleItem = document.createElement("div");
                 scheduleItem.classList.add("schedule-item");
@@ -1014,12 +1008,11 @@
                   end
                 )}`;
 
-                // 新增刪除按鈕
                 const deleteButton = document.createElement("button");
                 deleteButton.classList.add("delete-btn");
                 deleteButton.innerHTML = "X";
                 deleteButton.addEventListener("click", (event) => {
-                  event.stopPropagation(); // 防止觸發 scheduleItem 的 click 事件
+                  event.stopPropagation();
                   deleteSchedule(dateKey, id, jobName, start, end);
                   scheduleItem.remove();
                   updateTotalHours();
@@ -1059,7 +1052,7 @@
                   console.error(`無法解析時間: ${start} 或 ${end}`);
                   return;
                 }
-                const duration = (endTime - startTime) / 3600000; // 轉換為小時
+                const duration = (endTime - startTime) / 3600000;
                 totalHours += duration;
               });
             }
@@ -1070,7 +1063,6 @@
         }
 
         function parseTime(timeStr) {
-          // 支援 "12:00", "12.", "12.5", "13.10", "13.05"
           if (timeStr.includes(":")) {
             const [hoursStr, minutesStr] = timeStr.split(":");
             const hours = parseInt(hoursStr, 10);
@@ -1127,7 +1119,6 @@
           if (jobColors[jobName]) {
             return jobColors[jobName];
           } else {
-            // 選擇一個未被使用的顏色
             const usedColors = Object.values(jobColors);
             const availableColors = colors.filter(
               (color) => !usedColors.includes(color)
@@ -1139,7 +1130,6 @@
                   Math.floor(Math.random() * availableColors.length)
                 ];
             } else {
-              // 如果色票用完，隨機選一個顏色
               color = colors[Math.floor(Math.random() * colors.length)];
             }
             jobColors[jobName] = color;
@@ -1203,12 +1193,18 @@
 
         function closeViewDayModal() {
           modalViewDay.style.display = "none";
-          dayScheduleList.innerHTML = ""; // 清空列表
+          dayScheduleList.innerHTML = "";
         }
 
         function populateDayScheduleList(dateKey) {
-          dayScheduleList.innerHTML = ""; // 清空原有內容
+          dayScheduleList.innerHTML = "";
           const scheduleArray = schedules[dateKey] || [];
+
+          scheduleArray.sort((a, b) => {
+            const startA = parseTime(a.start).getTime();
+            const startB = parseTime(b.start).getTime();
+            return startA - startB;
+          });
 
           if (scheduleArray.length === 0) {
             const noScheduleItem = document.createElement("li");
@@ -1234,7 +1230,6 @@
             const actions = document.createElement("div");
             actions.classList.add("job-actions");
 
-            // 修改按鈕
             const editBtn = document.createElement("button");
             editBtn.classList.add("action-btn", "edit-btn");
             editBtn.textContent = "修改";
@@ -1244,14 +1239,12 @@
             });
             actions.appendChild(editBtn);
 
-            // 刪除按鈕
             const deleteBtn = document.createElement("button");
             deleteBtn.classList.add("action-btn", "delete-btn");
             deleteBtn.textContent = "刪除";
             deleteBtn.addEventListener("click", () => {
-              // 移除 confirm 視窗，直接刪除
               deleteSchedule(dateKey, id, jobName, start, end);
-              populateDayScheduleList(dateKey); // 更新列表
+              populateDayScheduleList(dateKey);
             });
             actions.appendChild(deleteBtn);
 
@@ -1281,6 +1274,242 @@
           }
         }
 
+        function findOverlaps(dateKey, newSchedule, ignoreScheduleId) {
+          const overlaps = [];
+          const scheduleArray = schedules[dateKey] || [];
+          const newStart = parseTime(newSchedule.start).getTime();
+          const newEnd = parseTime(newSchedule.end).getTime();
+          for (const existingSchedule of scheduleArray) {
+            if (ignoreScheduleId && existingSchedule.id === ignoreScheduleId) {
+              continue;
+            }
+            const existingStart = parseTime(existingSchedule.start).getTime();
+            const existingEnd = parseTime(existingSchedule.end).getTime();
+            if (newStart < existingEnd && newEnd > existingStart) {
+              overlaps.push(existingSchedule);
+            }
+          }
+          return overlaps;
+        }
+
+        const overlapModal = document.createElement("div");
+        overlapModal.id = "overlapModal";
+        overlapModal.className = "modal";
+        overlapModal.innerHTML = `
+          <div class="modal-content">
+            <span class="close" id="closeOverlapModal">&times;</span>
+            <h2>時間重疊</h2>
+            <div id="overlapContent"></div>
+            <div class="overlap-actions">
+              <button id="replaceButton" class="rounded-button">取代</button>
+              <button id="replaceAllButton" class="rounded-button">全部取代</button>
+              <button id="cancelOverlapButton" class="rounded-button">取消</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(overlapModal);
+
+        const style = document.createElement("style");
+        style.innerHTML = `
+          .rounded-button {
+            background-color: #ff69b4;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            margin: 5px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+          }
+          .overlap-schedule {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+          }
+          .overlap-schedule .arrow {
+            margin: 0 10px;
+            font-size: 24px;
+            color: #ff69b4;
+          }
+          .overlap-schedule .schedule-details {
+            flex: 1;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+          }
+        `;
+        document.head.appendChild(style);
+
+        const closeOverlapModalBtn =
+          document.getElementById("closeOverlapModal");
+        const replaceButton = document.getElementById("replaceButton");
+        const replaceAllButton = document.getElementById("replaceAllButton");
+        const cancelOverlapButton = document.getElementById(
+          "cancelOverlapButton"
+        );
+        const overlapContent = document.getElementById("overlapContent");
+
+        let pendingOverlaps = [];
+        let pendingIndex = 0;
+        let pendingAction = null;
+        let pendingDatesToAdd = [];
+        let isBatch = false;
+
+        function showOverlapModal(overlaps, action) {
+          pendingOverlaps = overlaps;
+          pendingIndex = 0;
+          pendingAction = action;
+          updateOverlapModal();
+          overlapModal.style.display = "block";
+        }
+
+        function updateOverlapModal() {
+          const currentOverlap = pendingOverlaps[pendingIndex];
+          const { dateKey, overlap, newSchedule } = currentOverlap;
+          overlapContent.innerHTML = `
+            <p>日期：${formatDate(dateKey)}</p>
+            <div class="overlap-schedule">
+              <div class="schedule-details">
+                <p><strong>${overlap.jobName}</strong></p>
+                <p>${formatTime(overlap.start)} - ${formatTime(overlap.end)}</p>
+              </div>
+              <div class="arrow">➔</div>
+              <div class="schedule-details">
+                <p><strong>${newSchedule.jobName}</strong></p>
+                <p>${formatTime(newSchedule.start)} - ${formatTime(
+            newSchedule.end
+          )}</p>
+              </div>
+            </div>
+            <p>請選擇操作：</p>
+          `;
+          const remaining = pendingOverlaps.length - pendingIndex - 1;
+          replaceAllButton.textContent = `全部取代(${remaining})`;
+        }
+
+        function closeOverlapModal() {
+          overlapModal.style.display = "none";
+          pendingOverlaps = [];
+          pendingIndex = 0;
+          pendingAction = null;
+          pendingDatesToAdd = [];
+          isBatch = false;
+        }
+
+        closeOverlapModalBtn.addEventListener("click", closeOverlapModal);
+        cancelOverlapButton.addEventListener("click", closeOverlapModal);
+
+        replaceButton.addEventListener("click", () => {
+          if (pendingAction) {
+            pendingAction("replace");
+          }
+        });
+
+        replaceAllButton.addEventListener("click", () => {
+          if (pendingAction) {
+            pendingAction("replaceAll");
+          }
+        });
+
+        window.addEventListener("click", (event) => {
+          if (event.target == overlapModal) {
+            closeOverlapModal();
+          }
+        });
+
+        function removeOverlap(dateKey, overlapSchedule) {
+          schedules[dateKey] = schedules[dateKey].filter(
+            (s) => s.id !== overlapSchedule.id
+          );
+          if (schedules[dateKey].length === 0) {
+            delete schedules[dateKey];
+          }
+        }
+
+        function handleOverlapAction(action) {
+          if (action === "replace") {
+            const { dateKey, overlap, newSchedule } =
+              pendingOverlaps[pendingIndex];
+            removeOverlap(dateKey, overlap);
+            addScheduleToStorage(dateKey, newSchedule, newSchedule.jobName);
+            pendingIndex++;
+            if (pendingIndex < pendingOverlaps.length) {
+              updateOverlapModal();
+            } else {
+              if (isBatch) {
+                pendingDatesToAdd.forEach(({ dateKey, newSchedule }) => {
+                  addScheduleToStorage(
+                    dateKey,
+                    newSchedule,
+                    newSchedule.jobName
+                  );
+                });
+                showToast(
+                  `已批量新增工作: ${newSchedule.jobName}`,
+                  newSchedule.color
+                );
+              } else {
+                showToast(
+                  `已新增工作: ${newSchedule.jobName} (${formatDate(
+                    dateKey
+                  )} ${formatTime(newSchedule.start)}-${formatTime(
+                    newSchedule.end
+                  )})`,
+                  newSchedule.color
+                );
+              }
+              closeOverlapModal();
+              updateSchedule();
+              updateTotalHours();
+            }
+          } else if (action === "replaceAll") {
+            for (let i = pendingIndex; i < pendingOverlaps.length; i++) {
+              const { dateKey, overlap, newSchedule } = pendingOverlaps[i];
+              removeOverlap(dateKey, overlap);
+              addScheduleToStorage(dateKey, newSchedule, newSchedule.jobName);
+            }
+            if (isBatch) {
+              pendingDatesToAdd.forEach(({ dateKey, newSchedule }) => {
+                addScheduleToStorage(dateKey, newSchedule, newSchedule.jobName);
+              });
+              showToast(
+                `已批量新增工作: ${pendingOverlaps[0].newSchedule.jobName}`,
+                pendingOverlaps[0].newSchedule.color
+              );
+            } else {
+              const { dateKey, newSchedule } = pendingOverlaps[pendingIndex];
+              showToast(
+                `已新增工作: ${newSchedule.jobName} (${formatDate(
+                  dateKey
+                )} ${formatTime(newSchedule.start)}-${formatTime(
+                  newSchedule.end
+                )})`,
+                newSchedule.color
+              );
+            }
+            closeOverlapModal();
+            updateSchedule();
+            updateTotalHours();
+          } else {
+            closeOverlapModal();
+          }
+        }
+
+        function addScheduleToStorage(dateKey, newSchedule, jobName) {
+          if (!Array.isArray(schedules[dateKey])) {
+            schedules[dateKey] = [];
+          }
+          schedules[dateKey].push(newSchedule);
+          localStorage.setItem("schedules", JSON.stringify(schedules));
+          if (!jobNames.includes(jobName)) {
+            jobNames.push(jobName);
+            localStorage.setItem("jobNames", JSON.stringify(jobNames));
+          }
+        }
+
         function saveAddSchedule() {
           const jobName = document.getElementById("addJobName").value.trim();
           const jobDate = document.getElementById("addJobDate").value;
@@ -1293,7 +1522,7 @@
             ":" +
             document.getElementById("addEndMinute").value.padStart(2, "0");
           const color = getColorForJob(jobName);
-          const scheduleId = Date.now() + Math.random(); // 使用時間戳加隨機數作為唯一ID
+          const scheduleId = Date.now() + Math.random();
 
           const newSchedule = {
             id: scheduleId,
@@ -1304,16 +1533,20 @@
           };
 
           const dateKey = getLocalDateKey(new Date(jobDate));
-          if (!Array.isArray(schedules[dateKey])) {
-            schedules[dateKey] = [];
-          }
-          schedules[dateKey].push(newSchedule);
 
-          localStorage.setItem("schedules", JSON.stringify(schedules));
-          if (!jobNames.includes(jobName)) {
-            jobNames.push(jobName);
-            localStorage.setItem("jobNames", JSON.stringify(jobNames));
+          const overlaps = findOverlaps(dateKey, newSchedule);
+          if (overlaps.length > 0) {
+            isBatch = false;
+            const overlapData = overlaps.map((overlap) => ({
+              dateKey,
+              overlap,
+              newSchedule,
+            }));
+            showOverlapModal(overlapData, handleOverlapAction);
+            return;
           }
+
+          addScheduleToStorage(dateKey, newSchedule, jobName);
           closeAddModal();
           updateSchedule();
           updateTotalHours();
@@ -1356,6 +1589,7 @@
             return;
           }
 
+          const datesToAdd = [];
           for (
             let date = new Date(startDate);
             date <= endDate;
@@ -1363,7 +1597,7 @@
           ) {
             if (selectedDays.includes(date.getDay())) {
               const dateKey = getLocalDateKey(new Date(date));
-              const scheduleId = Date.now() + Math.random(); // 確保唯一性
+              const scheduleId = Date.now() + Math.random();
 
               const newSchedule = {
                 id: scheduleId,
@@ -1373,22 +1607,45 @@
                 color: color,
               };
 
-              if (!Array.isArray(schedules[dateKey])) {
-                schedules[dateKey] = [];
-              }
-              schedules[dateKey].push(newSchedule);
+              datesToAdd.push({ dateKey, newSchedule });
             }
           }
 
-          localStorage.setItem("schedules", JSON.stringify(schedules));
-          if (!jobNames.includes(jobName)) {
-            jobNames.push(jobName);
-            localStorage.setItem("jobNames", JSON.stringify(jobNames));
-          }
+          handleBatchSchedules(datesToAdd, jobName, color);
           closeAddModal();
-          updateSchedule();
-          updateTotalHours();
-          showToast(`已批量新增工作: ${jobName}`, color);
+        }
+
+        function handleBatchSchedules(datesToAdd, jobName, color) {
+          let allOverlaps = [];
+          let allNewSchedules = [];
+
+          datesToAdd.forEach(({ dateKey, newSchedule }) => {
+            const overlaps = findOverlaps(dateKey, newSchedule);
+            if (overlaps.length > 0) {
+              overlaps.forEach((overlap) => {
+                allOverlaps.push({ dateKey, overlap, newSchedule });
+              });
+            } else {
+              allNewSchedules.push({ dateKey, newSchedule });
+            }
+          });
+
+          if (allOverlaps.length > 0) {
+            isBatch = true;
+            pendingOverlaps = allOverlaps;
+            pendingIndex = 0;
+            pendingAction = handleOverlapAction;
+            pendingDatesToAdd = allNewSchedules;
+            updateOverlapModal();
+            overlapModal.style.display = "block";
+          } else {
+            allNewSchedules.forEach(({ dateKey, newSchedule }) => {
+              addScheduleToStorage(dateKey, newSchedule, jobName);
+            });
+            updateSchedule();
+            updateTotalHours();
+            showToast(`已批量新增工作: ${jobName}`, color);
+          }
         }
 
         function saveCommandSchedule() {
@@ -1405,6 +1662,8 @@
           const jobName = commandJobName || "指令新增";
           const color = getColorForJob(jobName);
 
+          const datesToAdd = [];
+
           commands.forEach((command) => {
             const parsedCommand = parseCommand(command);
             if (parsedCommand) {
@@ -1418,7 +1677,7 @@
               ) {
                 if (weekdays.length === 0 || weekdays.includes(date.getDay())) {
                   const dateKey = getLocalDateKey(new Date(date));
-                  const scheduleId = Date.now() + Math.random(); // 確保唯一性
+                  const scheduleId = Date.now() + Math.random();
 
                   const newSchedule = {
                     id: scheduleId,
@@ -1428,28 +1687,77 @@
                     color: color,
                   };
 
-                  if (!Array.isArray(schedules[dateKey])) {
-                    schedules[dateKey] = [];
-                  }
-                  schedules[dateKey].push(newSchedule);
+                  datesToAdd.push({ dateKey, newSchedule });
                 }
               }
             }
           });
 
-          localStorage.setItem("schedules", JSON.stringify(schedules));
-          if (commandJobName && !jobNames.includes(commandJobName)) {
-            jobNames.push(commandJobName);
-            localStorage.setItem("jobNames", JSON.stringify(jobNames));
-          }
+          handleBatchSchedules(datesToAdd, jobName, color);
           closeAddModal();
+        }
+
+        function saveEditSchedule() {
+          if (!currentEditKey) return;
+          const { dateKey, scheduleId } = currentEditKey;
+
+          const jobName = document.getElementById("editJobName").value.trim();
+          const jobDate = document.getElementById("editJobDate").value;
+          const startTime =
+            document.getElementById("editStartHour").value.padStart(2, "0") +
+            ":" +
+            document.getElementById("editStartMinute").value.padStart(2, "0");
+          const endTime =
+            document.getElementById("editEndHour").value.padStart(2, "0") +
+            ":" +
+            document.getElementById("editEndMinute").value.padStart(2, "0");
+          const color = getColorForJob(jobName);
+
+          const newDateKey = getLocalDateKey(new Date(jobDate));
+
+          const newSchedule = {
+            id: scheduleId,
+            jobName,
+            start: startTime,
+            end: endTime,
+            color,
+          };
+
+          const scheduleArray = schedules[dateKey];
+          const scheduleIndex = scheduleArray.findIndex(
+            (s) => s.id === scheduleId
+          );
+          if (scheduleIndex === -1) return;
+          scheduleArray.splice(scheduleIndex, 1);
+          if (scheduleArray.length === 0) {
+            delete schedules[dateKey];
+          }
+
+          const overlaps = findOverlaps(newDateKey, newSchedule, scheduleId);
+          if (overlaps.length > 0) {
+            isBatch = false;
+            const overlapData = overlaps.map((overlap) => ({
+              dateKey: newDateKey,
+              overlap,
+              newSchedule,
+            }));
+            showOverlapModal(overlapData, handleOverlapAction);
+            return;
+          }
+
+          addScheduleToStorage(newDateKey, newSchedule, jobName);
+          closeEditModal();
           updateSchedule();
           updateTotalHours();
-          showToast(`已新增工作: ${jobName}`, color);
+          showToast(
+            `已修改工作: ${jobName} (${formatDate(jobDate)} ${formatTime(
+              startTime
+            )}-${formatTime(endTime)})`,
+            color
+          );
         }
 
         function parseCommand(command) {
-          // 支援單日和區間日，忽略多個空白和全形/半形括號
           const commandRegex =
             /^(\d{1,2})\/(\d{1,2})(?:\s*[-~]\s*(\d{1,2})\/(\d{1,2}))?\s*([\d.:]{1,5})\s*[-~]\s*([\d.:]{1,5})(?:\s*[（(]([^）)]+)[)）])?$/;
           const match = command.match(commandRegex);
@@ -1497,7 +1805,6 @@
         }
 
         function convertTime(timeStr) {
-          // 支援 "12:00", "12.", "12.5", "13.10", "13.05"
           if (timeStr.includes(":")) {
             const [hoursStr, minutesStr] = timeStr.split(":");
             const hours = parseInt(hoursStr, 10);
@@ -1580,15 +1887,12 @@
             let x = document.getElementById(this.id + "autocomplete-list");
             if (x) x = x.getElementsByTagName("div");
             if (e.keyCode == 40) {
-              // Down key
               currentFocus++;
               addActive(x);
             } else if (e.keyCode == 38) {
-              // Up key
               currentFocus--;
               addActive(x);
             } else if (e.keyCode == 13) {
-              // Enter key
               e.preventDefault();
               if (currentFocus > -1) {
                 if (x) x[currentFocus].click();
@@ -1621,17 +1925,14 @@
         }
 
         function toggleAddMode(selectedMode) {
-          // 移除所有active狀態
           singleAddToggle.classList.remove("active");
           batchAddToggle.classList.remove("active");
           commandToggle.classList.remove("active");
 
-          // 隱藏所有容器
           singleAddContainer.style.display = "none";
           batchAddContainer.style.display = "none";
           commandContainer.style.display = "none";
 
-          // 根據選擇的模式顯示對應的按鈕和容器
           if (selectedMode === "single") {
             singleAddToggle.classList.add("active");
             singleAddContainer.style.display = "block";
@@ -1650,7 +1951,7 @@
 
         closeAddBtn.addEventListener("click", closeAddModal);
         closeEditBtn.addEventListener("click", closeEditModal);
-        closeViewDayBtn.addEventListener("click", closeViewDayModal); // 新增的關閉事件
+        closeViewDayBtn.addEventListener("click", closeViewDayModal);
 
         window.addEventListener("click", (event) => {
           if (event.target == modalAdd) {
@@ -1660,7 +1961,6 @@
             closeEditModal();
           }
           if (event.target == modalViewDay) {
-            // 新增的判斷
             closeViewDayModal();
           }
         });
@@ -1700,86 +2000,9 @@
           saveEditSchedule();
         });
 
-        function saveEditSchedule() {
-          if (!currentEditKey) return;
-          const { dateKey, scheduleId } = currentEditKey;
-
-          const jobName = document.getElementById("editJobName").value.trim();
-          const jobDate = document.getElementById("editJobDate").value;
-          const startTime =
-            document.getElementById("editStartHour").value.padStart(2, "0") +
-            ":" +
-            document.getElementById("editStartMinute").value.padStart(2, "0");
-          const endTime =
-            document.getElementById("editEndHour").value.padStart(2, "0") +
-            ":" +
-            document.getElementById("editEndMinute").value.padStart(2, "0");
-          const color = getColorForJob(jobName);
-
-          // 找到要編輯的工作
-          const scheduleArray = schedules[dateKey];
-          const scheduleIndex = scheduleArray.findIndex(
-            (s) => s.id === scheduleId
-          );
-          if (scheduleIndex === -1) return;
-
-          // 更新工作內容
-          scheduleArray[scheduleIndex] = {
-            ...scheduleArray[scheduleIndex],
-            jobName,
-            start: startTime,
-            end: endTime,
-            color,
-          };
-
-          // 如果日期被更改，移動到新的日期
-          const newDateKey = getLocalDateKey(new Date(jobDate));
-          if (dateKey !== newDateKey) {
-            const updatedSchedule = scheduleArray.splice(scheduleIndex, 1)[0];
-            if (scheduleArray.length === 0) {
-              delete schedules[dateKey];
-            }
-            if (!Array.isArray(schedules[newDateKey])) {
-              schedules[newDateKey] = [];
-            }
-            schedules[newDateKey].push(updatedSchedule);
-          }
-
-          localStorage.setItem("schedules", JSON.stringify(schedules));
-          if (!jobNames.includes(jobName)) {
-            jobNames.push(jobName);
-            localStorage.setItem("jobNames", JSON.stringify(jobNames));
-          }
-          closeEditModal();
-          updateSchedule();
-          updateTotalHours();
-          showToast(
-            `已修改工作: ${jobName} (${formatDate(jobDate)} ${formatTime(
-              startTime
-            )}-${formatTime(endTime)})`,
-            color
-          );
-
-          // 如果當前查看的日期是修改後的日期，更新視圖
-          const viewedDateMatch = viewDayTitle.textContent.match(
-            /(\d{1,2})\/(\d{1,2})$/
-          );
-          if (viewedDateMatch) {
-            const viewedMonth = parseInt(viewedDateMatch[1], 10);
-            const viewedDay = parseInt(viewedDateMatch[2], 10);
-            const viewedDate = new Date(
-              currentWeekStart.getFullYear(),
-              viewedMonth - 1,
-              viewedDay
-            );
-            const viewedDateKeyFormatted = getLocalDateKey(viewedDate);
-            populateDayScheduleList(viewedDateKeyFormatted);
-          }
-        }
-
         function updateTimeScale() {
           const timeScale = document.querySelector(".time-scale");
-          timeScale.innerHTML = ""; // 清空原有內容
+          timeScale.innerHTML = "";
 
           for (let i = 7; i <= 23; i++) {
             const timeSlot = document.createElement("div");
@@ -1801,7 +2024,7 @@
           }
 
           function addOptions(select, options) {
-            select.innerHTML = ""; // 清空現有選項
+            select.innerHTML = "";
             options.forEach((option) => {
               const opt = document.createElement("option");
               opt.value = option;
@@ -1840,25 +2063,22 @@
           document.querySelectorAll(".weekday").forEach((day) => {
             day.classList.remove("selected");
           });
-          // 重置為單次模式
           toggleAddMode("single");
         }
 
         function showToast(message, color) {
           toast.textContent = message;
-          toast.style.backgroundColor = color || "#ff1493"; // default color
+          toast.style.backgroundColor = color || "#ff1493";
           toast.className = "toast show";
           setTimeout(() => {
             toast.className = toast.className.replace("show", "");
-            toast.style.backgroundColor = ""; // reset color
+            toast.style.backgroundColor = "";
           }, 3000);
         }
 
-        // 初始化函數調用順序調整
         generateWeekGrid();
         updateDates();
-        updateTimeScale(); // 先更新時間刻度
-        // 使用 requestAnimationFrame 確保 DOM 已渲染
+        updateTimeScale();
         requestAnimationFrame(() => {
           updateSchedule();
           updateTotalHours();
@@ -1873,7 +2093,6 @@
           day.addEventListener("click", toggleWeekdaySelection);
         });
 
-        // 禁止雙擊縮放
         let lastTouchEnd = 0;
         document.addEventListener(
           "touchend",
@@ -1888,7 +2107,6 @@
         );
       });
 
-      // 確保 formatDate 函數只定義一次
       function formatDate(dateStr) {
         const date = new Date(dateStr);
         return `${date.getMonth() + 1}/${date.getDate()}`;
