@@ -24,10 +24,11 @@
         height: 100%;
       }
 
+      /* 容器與佈局 */
       .calendar-container {
         display: flex;
         flex-direction: column;
-        height: 100%; /* 使用視窗高度 */
+        height: 100%;
         background-color: #ffebee;
       }
 
@@ -71,6 +72,10 @@
         transition: background-color 0.3s;
       }
 
+      .nav-button:hover {
+        background-color: #ff69b4;
+      }
+
       .add-button {
         position: absolute;
         top: 5px;
@@ -95,6 +100,7 @@
         background-color: #ff69b4;
       }
 
+      /* 週視圖 */
       .week-view {
         display: flex;
         flex-grow: 1;
@@ -120,7 +126,7 @@
       .week-grid {
         display: flex;
         flex-grow: 1;
-        overflow-y: auto; /* 允許垂直滾動 */
+        overflow-y: auto;
       }
 
       .day-column {
@@ -141,12 +147,12 @@
         font-weight: bold;
         background-color: #ffd1dc;
         border-bottom: 1px solid #ff69b4;
-        cursor: pointer; /* 改變游標 */
+        cursor: pointer;
         transition: background-color 0.3s;
       }
 
       .day-header:hover {
-        background-color: #ffb6c1; /* 滑鼠移動時背景顏色變化 */
+        background-color: #ffb6c1;
       }
 
       .day-content {
@@ -155,21 +161,23 @@
         overflow: hidden;
       }
 
+      /* 行程項目 */
       .schedule-item {
         position: absolute;
         left: 2px;
         right: 2px;
         color: white;
-        font-size: 8px;
+        font-size: 7px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: space-around;
-        border-radius: 8px; /* 圓角 */
-        padding: 2px;
+        border-radius: 8px;
+        padding: 4px;
         text-align: center;
         cursor: pointer;
         transition: transform 0.2s, box-shadow 0.2s;
+        line-height: 1.2;
       }
 
       .schedule-item:hover {
@@ -185,116 +193,7 @@
         margin: 2px 0;
       }
 
-      .total-hours {
-        text-align: center;
-        padding: 10px;
-        font-weight: bold;
-        background-color: #ff69b4;
-        color: white;
-        flex: 0 0 auto;
-      }
-
-      /* 現有模態框的樣式 */
-      .modal {
-        display: none; /* 隱藏模態框 */
-        position: fixed; /* 固定位置 */
-        z-index: 1000; /* 確保在最上層 */
-        left: 0;
-        top: 0;
-        width: 100%; /* 全寬 */
-        height: 100%; /* 全高 */
-        overflow: auto; /* 滾動 */
-        background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
-      }
-
-      .modal-content {
-        background-color: #fefefe;
-        margin: 10% auto; /* 垂直和水平置中 */
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%; /* 寬度 */
-        max-width: 600px; /* 最大寬度 */
-        border-radius: 8px; /* 圓角 */
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      }
-
-      .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: color 0.3s;
-      }
-
-      .close:hover,
-      .close:focus {
-        color: black;
-        text-decoration: none;
-      }
-
-      /* 新增的當日工作列表樣式 */
-      .day-schedule-list {
-        list-style-type: none;
-        padding: 0;
-        max-height: 400px;
-        overflow-y: auto;
-      }
-
-      .day-schedule-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
-        border-radius: 8px; /* 圓角 */
-        background-color: white; /* 底色設為白色 */
-        margin-bottom: 5px;
-        transition: background-color 0.3s;
-      }
-
-      .job-info {
-        flex: 1;
-        margin-right: 10px;
-      }
-
-      .job-actions {
-        display: flex;
-        gap: 0; /* 移除按鈕之間的空隙 */
-      }
-
-      /* 統一「修改」和「刪除」按鈕的樣式 */
-      .job-actions .action-btn,
-      .delete-btn {
-        padding: 5px 10px;
-        border: none;
-        border-radius: 20px; /* 圓弧 */
-        cursor: pointer;
-        font-size: 10px;
-        transition: background-color 0.3s;
-      }
-
-      .job-actions .edit-btn {
-        background-color: #ff69b4; /* 一致的粉色系列 */
-        color: white;
-        margin-right: 5px; /* 移除右側間距 */
-      }
-
-      .job-actions .edit-btn:hover {
-        background-color: #ff1493;
-      }
-
-      .job-actions .delete-btn {
-        background-color: #ff5781; /* 一致的粉色系列 */
-        color: white;
-        margin-right: 0; /* 移除右側間距 */
-      }
-
-      .job-actions .delete-btn:hover {
-        background-color: #ff1447;
-      }
-
-      /* 保留外側模態框的刪除按鈕樣式 */
+      /* 刪除按鈕 */
       .schedule-item .delete-btn {
         background-color: #ff4c4c;
         border: none;
@@ -318,6 +217,125 @@
         background-color: #ff0000;
       }
 
+      /* 總工時 */
+      .total-hours {
+        text-align: center;
+        padding: 10px;
+        font-weight: bold;
+        background-color: #ff69b4;
+        color: white;
+        flex: 0 0 auto;
+      }
+
+      /* 模態框 */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.3s;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+      }
+
+      /* 當日工作列表 */
+      .day-schedule-list {
+        list-style-type: none;
+        padding: 0;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .day-schedule-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: white;
+        margin-bottom: 5px;
+        transition: background-color 0.3s;
+      }
+
+      .job-info {
+        flex: 1;
+        margin-right: 10px;
+      }
+
+      .job-actions {
+        display: flex;
+        gap: 0;
+      }
+
+      /* 調整 .overlap-actions 的樣式 */
+      .overlap-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center; /* 將按鈕居中對齊 */
+        gap: 5px; /* 按鈕之間的間距 */
+        margin-top: 20px; /* 與上方內容的間距 */
+      }
+
+      /* 按鈕樣式 */
+      .action-btn,
+      .delete-btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: background-color 0.3s;
+        color: white;
+      }
+
+      .edit-btn {
+        background-color: #ff69b4;
+      }
+
+      .edit-btn:hover {
+        background-color: #ff1493;
+      }
+      .del-btn {
+        margin-left: 5px;
+      }
+      .delete-btn {
+        background-color: #ff5781;
+      }
+
+      .delete-btn:hover {
+        background-color: #ff1447;
+      }
+
+      /* 切換按鈕 */
       .toggle-container {
         display: flex;
         justify-content: space-around;
@@ -334,14 +352,8 @@
         transition: background-color 0.3s;
       }
 
-      .toggle-button.single {
-        background-color: #ffb6c1;
-      }
-
-      .toggle-button.multi {
-        background-color: #ffb6c1;
-      }
-
+      .toggle-button.single,
+      .toggle-button.multi,
       .toggle-button.command {
         background-color: #ffb6c1;
       }
@@ -350,6 +362,7 @@
         background-color: #ff1493;
       }
 
+      /* 表單樣式 */
       label {
         display: block;
         margin: 10px 0 5px;
@@ -425,6 +438,7 @@
         background-color: #ff69b4;
       }
 
+      /* 自動完成 */
       .autocomplete-items {
         position: absolute;
         border: 1px solid #d4d4d4;
@@ -454,7 +468,7 @@
         color: #ffffff;
       }
 
-      /* 浮動提示窗樣式 */
+      /* 浮動提示窗 */
       .toast {
         visibility: hidden;
         min-width: 250px;
@@ -466,7 +480,7 @@
         position: fixed;
         z-index: 1000;
         right: 30px;
-        bottom: 30px; /* 移至底部 */
+        bottom: 30px;
         font-size: 14px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         transition: opacity 0.5s;
@@ -523,8 +537,94 @@
         }
       }
 
-      /* 手機介面調整 */
-      @media only screen and (max-width: 600px) {
+      /* 時間重疊模態框 */
+      .label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        text-align: center;
+        width: 100%;
+      }
+
+      /* 調整 .overlap-schedule 容器的樣式 */
+      .overlap-schedule {
+        display: flex;
+        flex-direction: column; /* 改為垂直排列 */
+        align-items: center;
+        margin-bottom: 20px;
+        position: relative;
+      }
+
+      .original-schedule,
+      .new-schedule {
+        width: 100%;
+        position: relative;
+        margin-bottom: 15px;
+      }
+
+      /* 調整 .schedule-details 的樣式 */
+      .schedule-details {
+        position: relative;
+        padding: 10px 15px;
+        border-radius: 10px;
+        background-color: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .schedule-info {
+        margin-left: 15px;
+      }
+
+      /* 新的 color-block 樣式 */
+      .color-block {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 8px;
+        background: linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0.5),
+          rgba(255, 255, 255, 0)
+        );
+      }
+
+      .color-block::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 8px;
+        background-color: var(--block-color);
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+      }
+
+      /* 箭頭樣式 */
+      .arrow {
+        width: 30px;
+        height: 30px;
+        background-image: url("https://s123104.github.io/az.tool/img/down-arrow.png");
+        background-size: contain;
+        background-repeat: no-repeat;
+        animation: arrowBounce 2s infinite;
+        margin-bottom: 15px;
+      }
+
+      /* 箭頭動畫 */
+      @keyframes arrowBounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(10px);
+        }
+      }
+
+      /* 行動裝置調整 */
+      @media (max-width: 600px) {
         .calendar-container {
           padding: 0;
           width: 100%;
@@ -582,6 +682,22 @@
 
         .schedule-item {
           font-size: 7px;
+          line-height: 1.1;
+        }
+
+        /* 時間重疊模態框行動裝置調整 */
+        .arrow {
+          width: 30px;
+          height: 30px;
+        }
+
+        .schedule-details {
+          padding: 10px;
+        }
+
+        .color-block,
+        .color-block::before {
+          width: 6px;
         }
       }
     </style>
@@ -1002,14 +1118,14 @@
                 scheduleItem.style.height = `${height}px`;
                 scheduleItem.style.backgroundColor = color;
                 scheduleItem.innerHTML = `
-                  <div class="schedule-content">
-                    <span>🐰</span>
-                    <br>${jobName}
-                    <br>${formatTime(start)}
-                    <br><span class="vertical-line"></span>
-                    <br>${formatTime(end)}
-                  </div>
-                `;
+            <div class="schedule-content">
+              <span>🐰</span>
+              <br>${jobName}
+              <br>${formatTime(start)}
+              <br><span class="vertical-line"></span>
+              <br>${formatTime(end)}
+            </div>
+          `;
 
                 const deleteButton = document.createElement("button");
                 deleteButton.classList.add("delete-btn");
@@ -1243,7 +1359,7 @@
             actions.appendChild(editBtn);
 
             const deleteBtn = document.createElement("button");
-            deleteBtn.classList.add("action-btn", "delete-btn");
+            deleteBtn.classList.add("action-btn", "delete-btn", "del-btn");
             deleteBtn.textContent = "刪除";
             deleteBtn.addEventListener("click", () => {
               deleteSchedule(dateKey, id, jobName, start, end);
@@ -1300,90 +1416,19 @@
         overlapModal.id = "overlapModal";
         overlapModal.className = "modal";
         overlapModal.innerHTML = `
-          <div class="modal-content">
-            <span class="close" id="closeOverlapModal">&times;</span>
-            <h2>時間重疊</h2>
-            <div id="overlapContent"></div>
-            <div class="overlap-actions">
-              <button id="replaceButton" class="rounded-button">取代</button>
-              <button id="cancelOverlapButton" class="rounded-button">取消</button>
-              <button id="replaceAllButton" class="rounded-button">全部取代</button>
-              <button id="replaceAllCancelButton" class="rounded-button">全部取消</button>
-            </div>
-          </div>
-        `;
+    <div class="modal-content">
+      <span class="close" id="closeOverlapModal">&times;</span>
+      <h2>時間重疊</h2>
+      <div id="overlapContent"></div>
+      <div class="overlap-actions">
+        <button id="replaceButton" class="action-btn edit-btn">取代</button>
+        <button id="cancelOverlapButton" class="action-btn delete-btn">取消</button>
+        <button id="replaceAllButton" class="action-btn edit-btn">全部取代</button>
+        <button id="replaceAllCancelButton" class="action-btn delete-btn">全部取消</button>
+      </div>
+    </div>
+  `;
         document.body.appendChild(overlapModal);
-
-        // 添加 CSS 樣式
-        const style = document.createElement("style");
-        style.innerHTML = `
-          /* 新增標籤樣式 */
-          .label {
-            font-weight: bold;
-            margin-bottom: 5px;
-            text-align: center;
-            width: 100%;
-          }
-    
-          /* 更新 .schedule-details 以符合長條式風格 */
-          .schedule-details {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: #f9f9f9; /* 可根據需要調整背景色 */
-            margin-bottom: 10px;
-            position: relative;
-          }
-    
-          /* 更新 .color-block */
-          .schedule-details .color-block {
-            width: 10px;
-            height: 40px; /* 調整高度以適應長條式 */
-            background-color: #ff69b4;
-            margin-right: 10px;
-          }
-    
-          /* 調整 .schedule-info 的排版 */
-          .schedule-info {
-            flex: 1;
-          }
-    
-          /* 更新按鈕樣式 */
-          .overlap-actions {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-          }
-    
-          .rounded-button {
-            background-color: #ff69b4;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            margin: 5px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            border-radius: 25px;
-            cursor: pointer;
-            min-width: 100px; /* 確保按鈕有一致的最小寬度 */
-          }
-    
-          /* 調整按鈕在手機介面的大小 */
-          @media (max-width: 600px) {
-            .overlap-schedule {
-              flex-direction: column;
-            }
-            .rounded-button {
-              font-size: 14px;
-              padding: 8px 16px;
-              min-width: 80px;
-            }
-          }
-        `;
-        document.head.appendChild(style);
 
         const closeOverlapModalBtn =
           document.getElementById("closeOverlapModal");
@@ -1416,41 +1461,42 @@
           const { dateKey, overlap, newSchedule } = currentOverlap;
           const color = jobColors[newSchedule.jobName] || "#ff69b4";
 
+          const originalColor = jobColors[overlap.jobName] || "#ff69b4";
+          const newColor = jobColors[newSchedule.jobName] || "#ff69b4";
+
           overlapContent.innerHTML = `
-            <p>日期：${formatDate(dateKey)}</p>
-            <div class="overlap-schedule">
-              <div class="original-schedule">
-                <div class="label">原時段</div>
-                <div class="schedule-details">
-                  <div class="color-block" style="background-color: ${
-                    jobColors[overlap.jobName] || "#ff69b4"
-                  };"></div>
-                  <div class="schedule-info">
-                    <p><strong>${overlap.jobName}</strong></p>
-                    <p>${formatTime(overlap.start)} - ${formatTime(
+          <p>日期：${formatDate(dateKey)}</p>
+          <div class="overlap-schedule">
+            <div class="original-schedule">
+              <div class="label">原時段</div>
+              <div class="schedule-details">
+                <div class="color-block" style="--block-color: ${originalColor};"></div>
+                <div class="schedule-info">
+                  <p><strong>${overlap.jobName}</strong></p>
+                  <p>${formatTime(overlap.start)} - ${formatTime(
             overlap.end
           )}</p>
-                  </div>
-                </div>
-              </div>
-              <div class="new-schedule">
-                <div class="label">取代後時段</div>
-                <div class="schedule-details">
-                  <div class="color-block" style="background-color: ${
-                    jobColors[newSchedule.jobName] || "#ff69b4"
-                  };"></div>
-                  <div class="schedule-info">
-                    <p><strong>${newSchedule.jobName}</strong></p>
-                    <p>${formatTime(newSchedule.start)} - ${formatTime(
-            newSchedule.end
-          )}</p>
-                  </div>
                 </div>
               </div>
             </div>
-            <p>請選擇操作：</p>
-          `;
-          const remaining = pendingOverlaps.length - pendingIndex - 1;
+            <div class="arrow"></div>
+            <div class="new-schedule">
+              <div class="label">取代後時段</div>
+              <div class="schedule-details">
+                <div class="color-block" style="--block-color: ${newColor};"></div>
+                <div class="schedule-info">
+                  <p><strong>${newSchedule.jobName}</strong></p>
+                  <p>${formatTime(newSchedule.start)} - ${formatTime(
+            newSchedule.end
+          )}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p>請選擇操作：</p>
+        `;
+
+          const remaining = pendingOverlaps.length - pendingIndex;
           replaceAllButton.textContent = `全部取代(${remaining})`;
           replaceAllCancelButton.textContent = `全部取消(${remaining})`;
         }
@@ -1567,7 +1613,6 @@
             updateSchedule();
             updateTotalHours();
           } else if (action === "cancelAll") {
-            // 移除所有待處理的重疊
             closeOverlapModal();
             showToast("已取消所有取代操作。", "#ff69b4");
           } else {
