@@ -1001,11 +1001,15 @@
                 scheduleItem.style.top = `${topPosition}px`;
                 scheduleItem.style.height = `${height}px`;
                 scheduleItem.style.backgroundColor = color;
-                scheduleItem.innerHTML = `🐰<br>${jobName}<br>${formatTime(
-                  start
-                )}<br><span class="vertical-line"></span><br>${formatTime(
-                  end
-                )}`;
+                scheduleItem.innerHTML = `
+                  <div class="schedule-content">
+                    <span>🐰</span>
+                    <br>${jobName}
+                    <br>${formatTime(start)}
+                    <br><span class="vertical-line"></span>
+                    <br>${formatTime(end)}
+                  </div>
+                `;
 
                 const deleteButton = document.createElement("button");
                 deleteButton.classList.add("delete-btn");
@@ -1291,6 +1295,7 @@
           return overlaps;
         }
 
+        // 創建重疊模態框
         const overlapModal = document.createElement("div");
         overlapModal.id = "overlapModal";
         overlapModal.className = "modal";
@@ -1301,15 +1306,56 @@
             <div id="overlapContent"></div>
             <div class="overlap-actions">
               <button id="replaceButton" class="rounded-button">取代</button>
-              <button id="replaceAllButton" class="rounded-button">全部取代</button>
               <button id="cancelOverlapButton" class="rounded-button">取消</button>
+              <button id="replaceAllButton" class="rounded-button">全部取代</button>
+              <button id="replaceAllCancelButton" class="rounded-button">全部取消</button>
             </div>
           </div>
         `;
         document.body.appendChild(overlapModal);
 
+        // 添加 CSS 樣式
         const style = document.createElement("style");
         style.innerHTML = `
+          /* 新增標籤樣式 */
+          .label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-align: center;
+            width: 100%;
+          }
+    
+          /* 更新 .schedule-details 以符合長條式風格 */
+          .schedule-details {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9; /* 可根據需要調整背景色 */
+            margin-bottom: 10px;
+            position: relative;
+          }
+    
+          /* 更新 .color-block */
+          .schedule-details .color-block {
+            width: 10px;
+            height: 40px; /* 調整高度以適應長條式 */
+            background-color: #ff69b4;
+            margin-right: 10px;
+          }
+    
+          /* 調整 .schedule-info 的排版 */
+          .schedule-info {
+            flex: 1;
+          }
+    
+          /* 更新按鈕樣式 */
+          .overlap-actions {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+          }
+    
           .rounded-button {
             background-color: #ff69b4;
             border: none;
@@ -1322,47 +1368,10 @@
             font-size: 16px;
             border-radius: 25px;
             cursor: pointer;
+            min-width: 100px; /* 確保按鈕有一致的最小寬度 */
           }
-          .overlap-actions {
-            text-align: center;
-          }
-          .overlap-schedule {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-          }
-          .overlap-schedule .schedule-details {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 10px;
-          }
-          .schedule-details .color-block {
-            width: 10px;
-            height: 100%;
-            background-color: #ff69b4;
-            margin-right: 10px;
-          }
-          .schedule-details .schedule-info {
-            flex: 1;
-          }
-          .arrow-with-text {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 0 10px;
-          }
-          .arrow {
-            font-size: 24px;
-            color: #ff69b4;
-          }
-          .replace-text {
-            font-size: 14px;
-            color: #555;
-          }
+    
+          /* 調整按鈕在手機介面的大小 */
           @media (max-width: 600px) {
             .overlap-schedule {
               flex-direction: column;
@@ -1370,6 +1379,7 @@
             .rounded-button {
               font-size: 14px;
               padding: 8px 16px;
+              min-width: 80px;
             }
           }
         `;
@@ -1379,6 +1389,9 @@
           document.getElementById("closeOverlapModal");
         const replaceButton = document.getElementById("replaceButton");
         const replaceAllButton = document.getElementById("replaceAllButton");
+        const replaceAllCancelButton = document.getElementById(
+          "replaceAllCancelButton"
+        );
         const cancelOverlapButton = document.getElementById(
           "cancelOverlapButton"
         );
@@ -1401,32 +1414,37 @@
         function updateOverlapModal() {
           const currentOverlap = pendingOverlaps[pendingIndex];
           const { dateKey, overlap, newSchedule } = currentOverlap;
+          const color = jobColors[newSchedule.jobName] || "#ff69b4";
+
           overlapContent.innerHTML = `
             <p>日期：${formatDate(dateKey)}</p>
             <div class="overlap-schedule">
-              <div class="schedule-details">
-                <div class="color-block" style="background-color: ${
-                  jobColors[overlap.jobName] || "#ff69b4"
-                };"></div>
-                <div class="schedule-info">
-                  <p><strong>${overlap.jobName}</strong></p>
-                  <p>${formatTime(overlap.start)} - ${formatTime(
+              <div class="original-schedule">
+                <div class="label">原時段</div>
+                <div class="schedule-details">
+                  <div class="color-block" style="background-color: ${
+                    jobColors[overlap.jobName] || "#ff69b4"
+                  };"></div>
+                  <div class="schedule-info">
+                    <p><strong>${overlap.jobName}</strong></p>
+                    <p>${formatTime(overlap.start)} - ${formatTime(
             overlap.end
           )}</p>
+                  </div>
                 </div>
               </div>
-              <div class="arrow-with-text">
-                <div class="arrow">↓</div>
-              </div>
-              <div class="schedule-details">
-                <div class="color-block" style="background-color: ${
-                  jobColors[newSchedule.jobName] || "#ff69b4"
-                };"></div>
-                <div class="schedule-info">
-                  <p><strong>${newSchedule.jobName}</strong></p>
-                  <p>${formatTime(newSchedule.start)} - ${formatTime(
+              <div class="new-schedule">
+                <div class="label">取代後時段</div>
+                <div class="schedule-details">
+                  <div class="color-block" style="background-color: ${
+                    jobColors[newSchedule.jobName] || "#ff69b4"
+                  };"></div>
+                  <div class="schedule-info">
+                    <p><strong>${newSchedule.jobName}</strong></p>
+                    <p>${formatTime(newSchedule.start)} - ${formatTime(
             newSchedule.end
           )}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1434,6 +1452,7 @@
           `;
           const remaining = pendingOverlaps.length - pendingIndex - 1;
           replaceAllButton.textContent = `全部取代(${remaining})`;
+          replaceAllCancelButton.textContent = `全部取消(${remaining})`;
         }
 
         function closeOverlapModal() {
@@ -1460,6 +1479,12 @@
           }
         });
 
+        replaceAllCancelButton.addEventListener("click", () => {
+          if (pendingAction) {
+            pendingAction("cancelAll");
+          }
+        });
+
         window.addEventListener("click", (event) => {
           if (event.target == overlapModal) {
             closeOverlapModal();
@@ -1479,6 +1504,7 @@
           if (action === "replace") {
             const { dateKey, overlap, newSchedule } =
               pendingOverlaps[pendingIndex];
+            const color = jobColors[newSchedule.jobName] || "#ff69b4";
             removeOverlap(dateKey, overlap);
             addScheduleToStorage(dateKey, newSchedule, newSchedule.jobName);
             pendingIndex++;
@@ -1504,7 +1530,7 @@
                   )} ${formatTime(newSchedule.start)}-${formatTime(
                     newSchedule.end
                   )})`,
-                  newSchedule.color
+                  color
                 );
               }
               closeOverlapModal();
@@ -1514,6 +1540,7 @@
           } else if (action === "replaceAll") {
             for (let i = pendingIndex; i < pendingOverlaps.length; i++) {
               const { dateKey, overlap, newSchedule } = pendingOverlaps[i];
+              const color = jobColors[newSchedule.jobName] || "#ff69b4";
               removeOverlap(dateKey, overlap);
               addScheduleToStorage(dateKey, newSchedule, newSchedule.jobName);
             }
@@ -1539,6 +1566,10 @@
             closeOverlapModal();
             updateSchedule();
             updateTotalHours();
+          } else if (action === "cancelAll") {
+            // 移除所有待處理的重疊
+            closeOverlapModal();
+            showToast("已取消所有取代操作。", "#ff69b4");
           } else {
             closeOverlapModal();
           }
@@ -1682,8 +1713,7 @@
             pendingIndex = 0;
             pendingAction = handleOverlapAction;
             pendingDatesToAdd = allNewSchedules;
-            updateOverlapModal();
-            overlapModal.style.display = "block";
+            showOverlapModal(pendingOverlaps, handleOverlapAction);
           } else {
             allNewSchedules.forEach(({ dateKey, newSchedule }) => {
               addScheduleToStorage(dateKey, newSchedule, jobName);
