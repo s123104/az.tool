@@ -945,6 +945,7 @@
     <div id="toast" class="toast"></div>
     <script>
       document.addEventListener("DOMContentLoaded", (event) => {
+        // 取得 DOM 元素的引用
         const prevWeekBtn = document.getElementById("prevWeek");
         const nextWeekBtn = document.getElementById("nextWeek");
         const totalHoursElement = document.getElementById("totalHours");
@@ -974,11 +975,14 @@
         const commandJobNameInput = document.getElementById("commandJobName");
         const commandInput = document.getElementById("commandInput");
         const toast = document.getElementById("toast");
+
+        // 從 localStorage 中取得或初始化資料
         let schedules = JSON.parse(localStorage.getItem("schedules")) || {};
         let jobNames = JSON.parse(localStorage.getItem("jobNames")) || [];
         let jobColors = JSON.parse(localStorage.getItem("jobColors")) || {};
         let currentEditKey = null;
 
+        // 定義可用的顏色清單
         const colors = [
           "#ffc0cb",
           "#ffb6c1",
@@ -1003,6 +1007,7 @@
           "#FFBAD1",
         ];
 
+        // 取得日期的鍵值，用於儲存在物件中
         function getLocalDateKey(date) {
           const year = date.getFullYear();
           const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -1010,8 +1015,10 @@
           return `${year}-${month}-${day}`;
         }
 
+        // 設定當前週的起始日期（週一）
         let currentWeekStart = getMonday(new Date());
 
+        // 取得指定日期所在週的週一日期
         function getMonday(d) {
           d = new Date(d);
           const day = d.getDay();
@@ -1019,6 +1026,7 @@
           return new Date(d.setDate(diff));
         }
 
+        // 更新週的顯示（前一週或下一週）
         function updateWeek(direction) {
           currentWeekStart = new Date(
             currentWeekStart.getFullYear(),
@@ -1034,6 +1042,7 @@
           });
         }
 
+        // 生成週視圖的網格
         function generateWeekGrid() {
           const weekGrid = document.querySelector(".week-grid");
           weekGrid.innerHTML = "";
@@ -1053,6 +1062,7 @@
 
             weekGrid.appendChild(dayColumn);
 
+            // 點擊日曆頭部，打開當日的詳細視圖
             dayHeader.addEventListener("click", () => {
               const date = new Date(currentWeekStart);
               date.setDate(date.getDate() + i);
@@ -1062,6 +1072,7 @@
           }
         }
 
+        // 更新週視圖中的日期顯示
         function updateDates() {
           const dayHeaders = document.querySelectorAll(".day-header");
           for (let i = 0; i < 7; i++) {
@@ -1073,12 +1084,13 @@
           }
         }
 
+        // 更新行程顯示
         function updateSchedule() {
           const dayContents = document.querySelectorAll(".day-content");
           dayContents.forEach((content) => (content.innerHTML = ""));
 
           const dayContentHeight = dayContents[0].clientHeight;
-          const totalMinutesInDay = 17 * 60;
+          const totalMinutesInDay = 17 * 60; // 從7點到24點，共17小時
 
           Object.keys(schedules).forEach((dateKey) => {
             const scheduleArray = schedules[dateKey];
@@ -1103,7 +1115,7 @@
                   return;
                 }
 
-                const duration = (endTime - startTime) / 60000;
+                const duration = (endTime - startTime) / 60000; // 轉換為分鐘
                 const topPosition =
                   (((startTime.getHours() - 7) * 60 + startTime.getMinutes()) /
                     totalMinutesInDay) *
@@ -1118,14 +1130,14 @@
                 scheduleItem.style.height = `${height}px`;
                 scheduleItem.style.backgroundColor = color;
                 scheduleItem.innerHTML = `
-            <div class="schedule-content">
-              <span>🐰</span>
-              <br>${jobName}
-              <br>${formatTime(start)}
-              <br><span class="vertical-line"></span>
-              <br>${formatTime(end)}
-            </div>
-          `;
+                  <div class="schedule-content">
+                    <span>🐰</span>
+                    <br>${jobName}
+                    <br>${formatTime(start)}
+                    <br><span class="vertical-line"></span>
+                    <br>${formatTime(end)}
+                  </div>
+                `;
 
                 const deleteButton = document.createElement("button");
                 deleteButton.classList.add("delete-btn");
@@ -1150,6 +1162,7 @@
           });
         }
 
+        // 更新本週總工時
         function updateTotalHours() {
           let totalHours = 0;
           const weekStartDate = new Date(currentWeekStart);
@@ -1171,7 +1184,7 @@
                   console.error(`無法解析時間: ${start} 或 ${end}`);
                   return;
                 }
-                const duration = (endTime - startTime) / 3600000;
+                const duration = (endTime - startTime) / 3600000; // 轉換為小時
                 totalHours += duration;
               });
             }
@@ -1181,6 +1194,7 @@
           )} 小時`;
         }
 
+        // 解析時間字串，支援多種格式
         function parseTime(timeStr) {
           if (timeStr.includes(":")) {
             const [hoursStr, minutesStr] = timeStr.split(":");
@@ -1221,6 +1235,7 @@
           }
         }
 
+        // 格式化時間，用於顯示
         function formatTime(timeStr) {
           const [hours, minutes] = timeStr.split(":").map(Number);
           if (isNaN(hours) || isNaN(minutes)) {
@@ -1234,6 +1249,7 @@
             .padStart(2, "0")}`;
         }
 
+        // 為工作名稱取得顏色，若無則分配一個新的顏色
         function getColorForJob(jobName) {
           if (jobColors[jobName]) {
             return jobColors[jobName];
@@ -1257,15 +1273,18 @@
           }
         }
 
+        // 開啟新增工作模態框
         function openAddModal() {
           modalAdd.style.display = "block";
           resetAddForms();
         }
 
+        // 關閉新增工作模態框
         function closeAddModal() {
           modalAdd.style.display = "none";
         }
 
+        // 開啟編輯工作模態框
         function openEditModal(dateKey, scheduleId) {
           const schedule = schedules[dateKey].find((s) => s.id === scheduleId);
           if (!schedule) return;
@@ -1297,11 +1316,13 @@
           modalEdit.style.display = "block";
         }
 
+        // 關閉編輯工作模態框
         function closeEditModal() {
           modalEdit.style.display = "none";
           currentEditKey = null;
         }
 
+        // 開啟查看當日工作模態框
         function openViewDayModal(dateKey) {
           const date = new Date(dateKey);
           const formattedDate = `${date.getMonth() + 1}/${date.getDate()}`;
@@ -1310,11 +1331,13 @@
           modalViewDay.style.display = "block";
         }
 
+        // 關閉查看當日工作模態框
         function closeViewDayModal() {
           modalViewDay.style.display = "none";
           dayScheduleList.innerHTML = "";
         }
 
+        // 填充當日的工作列表
         function populateDayScheduleList(dateKey) {
           dayScheduleList.innerHTML = "";
           const scheduleArray = schedules[dateKey] || [];
@@ -1372,6 +1395,7 @@
           });
         }
 
+        // 刪除工作
         function deleteSchedule(dateKey, scheduleId, jobName, start, end) {
           if (schedules[dateKey]) {
             schedules[dateKey] = schedules[dateKey].filter(
@@ -1393,6 +1417,7 @@
           }
         }
 
+        // 尋找時間重疊的工作
         function findOverlaps(dateKey, newSchedule, ignoreScheduleId) {
           const overlaps = [];
           const scheduleArray = schedules[dateKey] || [];
@@ -1411,215 +1436,235 @@
           return overlaps;
         }
 
-        // 創建重疊模態框
+        // 創建時間重疊的模態框
         const overlapModal = document.createElement("div");
         overlapModal.id = "overlapModal";
         overlapModal.className = "modal";
-        overlapModal.innerHTML = `
-    <div class="modal-content">
-      <span class="close" id="closeOverlapModal">&times;</span>
-      <h2>時間重疊</h2>
-      <div id="overlapContent"></div>
-      <div class="overlap-actions">
-        <button id="replaceButton" class="action-btn edit-btn">取代</button>
-        <button id="cancelOverlapButton" class="action-btn delete-btn">取消</button>
-        <button id="replaceAllButton" class="action-btn edit-btn">全部取代</button>
-        <button id="replaceAllCancelButton" class="action-btn delete-btn">全部取消</button>
-      </div>
-    </div>
-  `;
         document.body.appendChild(overlapModal);
 
+        // 時間重疊模態框的內容結構
+        overlapModal.innerHTML = `
+          <div class="modal-content">
+            <span class="close" id="closeOverlapModal">&times;</span>
+            <h2>時間重疊</h2>
+            <div id="overlapContent"></div>
+          </div>
+        `;
+
+        // 取得重疊模態框內的元素
         const closeOverlapModalBtn =
           document.getElementById("closeOverlapModal");
-        const replaceButton = document.getElementById("replaceButton");
-        const replaceAllButton = document.getElementById("replaceAllButton");
-        const replaceAllCancelButton = document.getElementById(
-          "replaceAllCancelButton"
-        );
-        const cancelOverlapButton = document.getElementById(
-          "cancelOverlapButton"
-        );
         const overlapContent = document.getElementById("overlapContent");
 
+        // 用於管理待處理的重疊工作
         let pendingOverlaps = [];
         let pendingIndex = 0;
-        let pendingAction = null;
-        let pendingDatesToAdd = [];
         let isBatch = false;
+        let pendingDatesToAdd = [];
 
+        // 顯示時間重疊的模態框
         function showOverlapModal(overlaps, action) {
           pendingOverlaps = overlaps;
           pendingIndex = 0;
-          pendingAction = action;
+          isBatch = action === "batch";
+          pendingDatesToAdd = [];
           updateOverlapModal();
           overlapModal.style.display = "block";
         }
 
+        // 更新時間重疊模態框的內容
         function updateOverlapModal() {
+          if (pendingIndex >= pendingOverlaps.length) {
+            closeOverlapModal();
+            return;
+          }
+
           const currentOverlap = pendingOverlaps[pendingIndex];
           const { dateKey, overlap, newSchedule } = currentOverlap;
-          const color = jobColors[newSchedule.jobName] || "#ff69b4";
-
           const originalColor = jobColors[overlap.jobName] || "#ff69b4";
           const newColor = jobColors[newSchedule.jobName] || "#ff69b4";
 
           overlapContent.innerHTML = `
-          <p>日期：${formatDate(dateKey)}</p>
-          <div class="overlap-schedule">
-            <div class="original-schedule">
-              <div class="label">原時段</div>
-              <div class="schedule-details">
-                <div class="color-block" style="--block-color: ${originalColor};"></div>
-                <div class="schedule-info">
-                  <p><strong>${overlap.jobName}</strong></p>
-                  <p>${formatTime(overlap.start)} - ${formatTime(
+            <p>日期：${formatDate(dateKey)}</p>
+            <div class="overlap-schedule">
+              <div class="original-schedule">
+                <div class="label">原時段</div>
+                <div class="schedule-details">
+                  <div class="color-block" style="--block-color: ${originalColor};"></div>
+                  <div class="schedule-info">
+                    <p><strong>${overlap.jobName}</strong></p>
+                    <p>${formatTime(overlap.start)} - ${formatTime(
             overlap.end
           )}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="arrow"></div>
-            <div class="new-schedule">
-              <div class="label">取代後時段</div>
-              <div class="schedule-details">
-                <div class="color-block" style="--block-color: ${newColor};"></div>
-                <div class="schedule-info">
-                  <p><strong>${newSchedule.jobName}</strong></p>
-                  <p>${formatTime(newSchedule.start)} - ${formatTime(
+              <div class="arrow"></div>
+              <div class="new-schedule">
+                <div class="label">新時段</div>
+                <div class="schedule-details">
+                  <div class="color-block" style="--block-color: ${newColor};"></div>
+                  <div class="schedule-info">
+                    <p><strong>${newSchedule.jobName}</strong></p>
+                    <p>${formatTime(newSchedule.start)} - ${formatTime(
             newSchedule.end
           )}</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <p>請選擇操作：</p>
-        `;
+            <p>請選擇操作：</p>
+            <div class="overlap-actions">
+              <button id="replaceButton" class="action-btn edit-btn">取代</button>
+              <button id="cancelOverlapButton" class="action-btn delete-btn">取消</button>
+              <button id="replaceAllButton" class="action-btn edit-btn">
+                全部取代(${pendingOverlaps.length - pendingIndex})
+              </button>
+              <button id="replaceAllCancelButton" class="action-btn delete-btn">
+                全部取消(${pendingOverlaps.length - pendingIndex})
+              </button>
+            </div>
+          `;
 
-          const remaining = pendingOverlaps.length - pendingIndex;
-          replaceAllButton.textContent = `全部取代(${remaining})`;
-          replaceAllCancelButton.textContent = `全部取消(${remaining})`;
+          // 綁定按鈕事件
+          attachOverlapActionListeners();
         }
 
+        // 綁定時間重疊模態框中的按鈕事件
+        function attachOverlapActionListeners() {
+          const replaceBtn = document.getElementById("replaceButton");
+          const cancelBtn = document.getElementById("cancelOverlapButton");
+          const replaceAllBtn = document.getElementById("replaceAllButton");
+          const replaceAllCancelBtn = document.getElementById(
+            "replaceAllCancelButton"
+          );
+
+          // 移除之前的事件監聽器
+          replaceBtn.replaceWith(replaceBtn.cloneNode(true));
+          cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+          replaceAllBtn.replaceWith(replaceAllBtn.cloneNode(true));
+          replaceAllCancelBtn.replaceWith(replaceAllCancelBtn.cloneNode(true));
+
+          // 重新取得按鈕引用
+          const newReplaceBtn = document.getElementById("replaceButton");
+          const newCancelBtn = document.getElementById("cancelOverlapButton");
+          const newReplaceAllBtn = document.getElementById("replaceAllButton");
+          const newReplaceAllCancelBtn = document.getElementById(
+            "replaceAllCancelButton"
+          );
+
+          // 綁定事件
+          newReplaceBtn.addEventListener("click", () => {
+            handleOverlapAction("replace");
+          });
+
+          newCancelBtn.addEventListener("click", () => {
+            handleOverlapAction("cancel"); // 單次取消
+          });
+
+          newReplaceAllBtn.addEventListener("click", () => {
+            handleOverlapAction("replaceAll");
+          });
+
+          newReplaceAllCancelBtn.addEventListener("click", () => {
+            handleOverlapAction("cancelAll");
+          });
+        }
+
+        // 關閉時間重疊模態框
         function closeOverlapModal() {
           overlapModal.style.display = "none";
           pendingOverlaps = [];
           pendingIndex = 0;
-          pendingAction = null;
           pendingDatesToAdd = [];
           isBatch = false;
         }
 
-        closeOverlapModalBtn.addEventListener("click", closeOverlapModal);
-        cancelOverlapButton.addEventListener("click", closeOverlapModal);
-
-        replaceButton.addEventListener("click", () => {
-          if (pendingAction) {
-            pendingAction("replace");
-          }
-        });
-
-        replaceAllButton.addEventListener("click", () => {
-          if (pendingAction) {
-            pendingAction("replaceAll");
-          }
-        });
-
-        replaceAllCancelButton.addEventListener("click", () => {
-          if (pendingAction) {
-            pendingAction("cancelAll");
-          }
-        });
-
-        window.addEventListener("click", (event) => {
-          if (event.target == overlapModal) {
-            closeOverlapModal();
-          }
-        });
-
-        function removeOverlap(dateKey, overlapSchedule) {
-          schedules[dateKey] = schedules[dateKey].filter(
-            (s) => s.id !== overlapSchedule.id
-          );
-          if (schedules[dateKey].length === 0) {
-            delete schedules[dateKey];
-          }
-        }
-
+        // 處理時間重疊的操作
         function handleOverlapAction(action) {
           if (action === "replace") {
+            // 單次取代
             const { dateKey, overlap, newSchedule } =
               pendingOverlaps[pendingIndex];
             const color = jobColors[newSchedule.jobName] || "#ff69b4";
             removeOverlap(dateKey, overlap);
             addScheduleToStorage(dateKey, newSchedule, newSchedule.jobName);
+            showToast(
+              `已取代工作: ${overlap.jobName} 被 ${
+                newSchedule.jobName
+              } (${formatDate(dateKey)} ${formatTime(
+                newSchedule.start
+              )}-${formatTime(newSchedule.end)})`,
+              color
+            );
             pendingIndex++;
-            if (pendingIndex < pendingOverlaps.length) {
-              updateOverlapModal();
-            } else {
-              if (isBatch) {
-                pendingDatesToAdd.forEach(({ dateKey, newSchedule }) => {
-                  addScheduleToStorage(
-                    dateKey,
-                    newSchedule,
-                    newSchedule.jobName
-                  );
-                });
-                showToast(
-                  `已批量新增工作: ${newSchedule.jobName}`,
-                  newSchedule.color
-                );
-              } else {
-                showToast(
-                  `已新增工作: ${newSchedule.jobName} (${formatDate(
-                    dateKey
-                  )} ${formatTime(newSchedule.start)}-${formatTime(
-                    newSchedule.end
-                  )})`,
-                  color
-                );
-              }
-              closeOverlapModal();
-              updateSchedule();
-              updateTotalHours();
-            }
+            updateOverlapModal();
           } else if (action === "replaceAll") {
-            for (let i = pendingIndex; i < pendingOverlaps.length; i++) {
-              const { dateKey, overlap, newSchedule } = pendingOverlaps[i];
+            // 全部取代
+            for (; pendingIndex < pendingOverlaps.length; pendingIndex++) {
+              const { dateKey, overlap, newSchedule } =
+                pendingOverlaps[pendingIndex];
               const color = jobColors[newSchedule.jobName] || "#ff69b4";
               removeOverlap(dateKey, overlap);
               addScheduleToStorage(dateKey, newSchedule, newSchedule.jobName);
-            }
-            if (isBatch) {
-              pendingDatesToAdd.forEach(({ dateKey, newSchedule }) => {
-                addScheduleToStorage(dateKey, newSchedule, newSchedule.jobName);
-              });
               showToast(
-                `已批量新增工作: ${pendingOverlaps[0].newSchedule.jobName}`,
-                pendingOverlaps[0].newSchedule.color
-              );
-            } else {
-              const { dateKey, newSchedule } = pendingOverlaps[pendingIndex];
-              showToast(
-                `已新增工作: ${newSchedule.jobName} (${formatDate(
-                  dateKey
-                )} ${formatTime(newSchedule.start)}-${formatTime(
-                  newSchedule.end
-                )})`,
-                newSchedule.color
+                `已取代工作: ${overlap.jobName} 被 ${
+                  newSchedule.jobName
+                } (${formatDate(dateKey)} ${formatTime(
+                  newSchedule.start
+                )}-${formatTime(newSchedule.end)})`,
+                color
               );
             }
             closeOverlapModal();
             updateSchedule();
             updateTotalHours();
+          } else if (action === "cancel") {
+            // 單次取消，保留原有的工作，不做任何動作
+            showToast(
+              `已保留原工作: ${
+                pendingOverlaps[pendingIndex].overlap.jobName
+              } (${formatDate(
+                pendingOverlaps[pendingIndex].dateKey
+              )} ${formatTime(
+                pendingOverlaps[pendingIndex].overlap.start
+              )}-${formatTime(pendingOverlaps[pendingIndex].overlap.end)})`,
+              jobColors[pendingOverlaps[pendingIndex].overlap.jobName] ||
+                "#ff69b4"
+            );
+            pendingIndex++;
+            updateOverlapModal();
           } else if (action === "cancelAll") {
+            // 全部取消，保留原有的工作，不做任何動作
+            for (; pendingIndex < pendingOverlaps.length; pendingIndex++) {
+              // 不進行任何操作，保留原有的工作
+            }
             closeOverlapModal();
-            showToast("已取消所有取代操作。", "#ff69b4");
-          } else {
+            showToast("已取消新增的工作，保留原有的工作。", "#ff69b4");
+          }
+
+          // 如果所有重疊已處理，則關閉模態框
+          if (pendingIndex >= pendingOverlaps.length) {
             closeOverlapModal();
           }
         }
 
+        // 移除重疊的工作
+        function removeOverlap(dateKey, overlapSchedule) {
+          if (schedules[dateKey]) {
+            schedules[dateKey] = schedules[dateKey].filter(
+              (s) => s.id !== overlapSchedule.id
+            );
+            if (schedules[dateKey].length === 0) {
+              delete schedules[dateKey];
+            }
+            localStorage.setItem("schedules", JSON.stringify(schedules));
+            updateSchedule();
+            updateTotalHours();
+          }
+        }
+
+        // 添加工作到儲存中
         function addScheduleToStorage(dateKey, newSchedule, jobName) {
           if (!Array.isArray(schedules[dateKey])) {
             schedules[dateKey] = [];
@@ -1632,6 +1677,24 @@
           }
         }
 
+        // 顯示提示訊息
+        function showToast(message, color) {
+          toast.textContent = message;
+          toast.style.backgroundColor = color || "#ff1493";
+          toast.className = "toast show";
+          setTimeout(() => {
+            toast.className = toast.className.replace("show", "");
+            toast.style.backgroundColor = "";
+          }, 3000);
+        }
+
+        // 格式化日期
+        function formatDate(dateStr) {
+          const date = new Date(dateStr);
+          return `${date.getMonth() + 1}/${date.getDate()}`;
+        }
+
+        // 儲存新增的單次工作
         function saveAddSchedule() {
           const jobName = document.getElementById("addJobName").value.trim();
           const jobDate = document.getElementById("addJobDate").value;
@@ -1664,7 +1727,7 @@
               overlap,
               newSchedule,
             }));
-            showOverlapModal(overlapData, handleOverlapAction);
+            showOverlapModal(overlapData, "single");
             return;
           }
 
@@ -1680,6 +1743,7 @@
           );
         }
 
+        // 儲存批量新增的工作
         function saveBatchAddSchedule() {
           const jobName = document
             .getElementById("batchAddJobName")
@@ -1737,6 +1801,7 @@
           closeAddModal();
         }
 
+        // 處理批量新增的行程
         function handleBatchSchedules(datesToAdd, jobName, color) {
           let allOverlaps = [];
           let allNewSchedules = [];
@@ -1756,9 +1821,8 @@
             isBatch = true;
             pendingOverlaps = allOverlaps;
             pendingIndex = 0;
-            pendingAction = handleOverlapAction;
             pendingDatesToAdd = allNewSchedules;
-            showOverlapModal(pendingOverlaps, handleOverlapAction);
+            showOverlapModal(pendingOverlaps, "batch");
           } else {
             allNewSchedules.forEach(({ dateKey, newSchedule }) => {
               addScheduleToStorage(dateKey, newSchedule, jobName);
@@ -1769,6 +1833,7 @@
           }
         }
 
+        // 儲存指令新增的行程
         function saveCommandSchedule() {
           const commandJobName = document
             .getElementById("commandJobName")
@@ -1818,66 +1883,7 @@
           closeAddModal();
         }
 
-        function saveEditSchedule() {
-          if (!currentEditKey) return;
-          const { dateKey, scheduleId } = currentEditKey;
-
-          const jobName = document.getElementById("editJobName").value.trim();
-          const jobDate = document.getElementById("editJobDate").value;
-          const startTime =
-            document.getElementById("editStartHour").value.padStart(2, "0") +
-            ":" +
-            document.getElementById("editStartMinute").value.padStart(2, "0");
-          const endTime =
-            document.getElementById("editEndHour").value.padStart(2, "0") +
-            ":" +
-            document.getElementById("editEndMinute").value.padStart(2, "0");
-          const color = getColorForJob(jobName);
-
-          const newDateKey = getLocalDateKey(new Date(jobDate));
-
-          const newSchedule = {
-            id: scheduleId,
-            jobName,
-            start: startTime,
-            end: endTime,
-            color,
-          };
-
-          const scheduleArray = schedules[dateKey];
-          const scheduleIndex = scheduleArray.findIndex(
-            (s) => s.id === scheduleId
-          );
-          if (scheduleIndex === -1) return;
-          scheduleArray.splice(scheduleIndex, 1);
-          if (scheduleArray.length === 0) {
-            delete schedules[dateKey];
-          }
-
-          const overlaps = findOverlaps(newDateKey, newSchedule, scheduleId);
-          if (overlaps.length > 0) {
-            isBatch = false;
-            const overlapData = overlaps.map((overlap) => ({
-              dateKey: newDateKey,
-              overlap,
-              newSchedule,
-            }));
-            showOverlapModal(overlapData, handleOverlapAction);
-            return;
-          }
-
-          addScheduleToStorage(newDateKey, newSchedule, jobName);
-          closeEditModal();
-          updateSchedule();
-          updateTotalHours();
-          showToast(
-            `已修改工作: ${jobName} (${formatDate(jobDate)} ${formatTime(
-              startTime
-            )}-${formatTime(endTime)})`,
-            color
-          );
-        }
-
+        // 解析指令文字，轉換為行程物件
         function parseCommand(command) {
           const commandRegex =
             /^(\d{1,2})\/(\d{1,2})(?:\s*[-~]\s*(\d{1,2})\/(\d{1,2}))?\s*([\d.:]{1,5})\s*[-~]\s*([\d.:]{1,5})(?:\s*[（(]([^）)]+)[)）])?$/;
@@ -1925,6 +1931,7 @@
           };
         }
 
+        // 將時間字串轉換為標準格式
         function convertTime(timeStr) {
           if (timeStr.includes(":")) {
             const [hoursStr, minutesStr] = timeStr.split(":");
@@ -1967,10 +1974,12 @@
           }
         }
 
+        // 切換星期的選擇狀態
         function toggleWeekdaySelection(event) {
           event.target.classList.toggle("selected");
         }
 
+        // 自動完成功能
         function autocomplete(inp, arr) {
           let currentFocus;
           inp.addEventListener("input", function (e) {
@@ -2045,6 +2054,7 @@
           });
         }
 
+        // 切換新增模式（單次、批量、指令）
         function toggleAddMode(selectedMode) {
           singleAddToggle.classList.remove("active");
           batchAddToggle.classList.remove("active");
@@ -2066,6 +2076,7 @@
           }
         }
 
+        // 綁定事件監聽器
         addButton.addEventListener("click", () => {
           openAddModal();
         });
@@ -2073,6 +2084,7 @@
         closeAddBtn.addEventListener("click", closeAddModal);
         closeEditBtn.addEventListener("click", closeEditModal);
         closeViewDayBtn.addEventListener("click", closeViewDayModal);
+        closeOverlapModalBtn.addEventListener("click", closeOverlapModal);
 
         window.addEventListener("click", (event) => {
           if (event.target == modalAdd) {
@@ -2083,6 +2095,9 @@
           }
           if (event.target == modalViewDay) {
             closeViewDayModal();
+          }
+          if (event.target == overlapModal) {
+            closeOverlapModal();
           }
         });
 
@@ -2121,6 +2136,7 @@
           saveEditSchedule();
         });
 
+        // 更新時間刻度
         function updateTimeScale() {
           const timeScale = document.querySelector(".time-scale");
           timeScale.innerHTML = "";
@@ -2135,6 +2151,7 @@
           }
         }
 
+        // 填充時間選項
         function populateTimeOptions() {
           const hours = [...Array(24).keys()].map((i) =>
             String(i).padStart(2, "0")
@@ -2177,6 +2194,7 @@
           });
         }
 
+        // 重置新增表單
         function resetAddForms() {
           addForm.reset();
           batchAddForm.reset();
@@ -2187,16 +2205,7 @@
           toggleAddMode("single");
         }
 
-        function showToast(message, color) {
-          toast.textContent = message;
-          toast.style.backgroundColor = color || "#ff1493";
-          toast.className = "toast show";
-          setTimeout(() => {
-            toast.className = toast.className.replace("show", "");
-            toast.style.backgroundColor = "";
-          }, 3000);
-        }
-
+        // 初始化應用程式
         generateWeekGrid();
         updateDates();
         updateTimeScale();
@@ -2228,6 +2237,7 @@
         );
       });
 
+      // 格式化日期函數，供其他地方使用
       function formatDate(dateStr) {
         const date = new Date(dateStr);
         return `${date.getMonth() + 1}/${date.getDate()}`;
