@@ -24,6 +24,35 @@
         height: 100%;
       }
 
+      /* 表單樣式中新增對 select 的樣式 */
+      input[type="text"],
+      input[type="date"],
+      textarea,
+      select {
+        width: calc(100% - 10px);
+        padding: 5px;
+        margin: 5px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        appearance: none; /* 移除預設樣式 */
+        -moz-appearance: none;
+        -webkit-appearance: none;
+      }
+
+      /* 時間選擇器中的 select 元素 */
+      .time-input-wrapper select {
+        width: 45%;
+        margin: 5px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        appearance: none; /* 移除預設樣式 */
+        -moz-appearance: none;
+        -webkit-appearance: none;
+      }
+
       /* 容器與佈局 */
       .calendar-container {
         display: flex;
@@ -875,17 +904,13 @@
               maxlength="4"
               required
             />
-            <!-- 種類選擇由 JavaScript 動態添加 -->
-            <!-- 種類選擇 -->
-            <!--
-    <label for="commandCategory">種類</label>
-    <select id="commandCategory" name="commandCategory" required>
-      <option value="工作">工作</option>
-      <option value="課堂">課堂</option>
-      <option value="會議">會議</option>
-      <option value="事項">事項</option>
-    </select>
-    -->
+            <label for="commandCategory">種類</label>
+            <select id="commandCategory" name="commandCategory" required>
+              <option value="工作">工作</option>
+              <option value="課堂">課堂</option>
+              <option value="會議">會議</option>
+              <option value="事項">事項</option>
+            </select>
             <label for="commandInput">輸入指令:</label>
             <textarea
               id="commandInput"
@@ -1212,7 +1237,7 @@
           });
         }
 
-        // 更新本週總工時
+        // 更新本週總工時，只累加類型為 "工作" 的行程
         function updateTotalHours() {
           let totalHours = 0;
           const weekStartDate = new Date(currentWeekStart);
@@ -1227,15 +1252,17 @@
             const scheduleDate = new Date(dateKey);
             if (scheduleDate >= weekStartDate && scheduleDate < weekEndDate) {
               scheduleArray.forEach((schedule) => {
-                const { start, end } = schedule;
-                const startTime = parseTime(start);
-                const endTime = parseTime(end);
-                if (!startTime || !endTime) {
-                  console.error(`無法解析時間: ${start} 或 ${end}`);
-                  return;
+                if (schedule.category === "工作") {
+                  const { start, end } = schedule;
+                  const startTime = parseTime(start);
+                  const endTime = parseTime(end);
+                  if (!startTime || !endTime) {
+                    console.error(`無法解析時間: ${start} 或 ${end}`);
+                    return;
+                  }
+                  const duration = (endTime - startTime) / 3600000; // 轉換為小時
+                  totalHours += duration;
                 }
-                const duration = (endTime - startTime) / 3600000; // 轉換為小時
-                totalHours += duration;
               });
             }
           });
