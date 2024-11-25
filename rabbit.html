@@ -1555,7 +1555,6 @@
           pendingOverlaps = overlaps;
           pendingIndex = 0;
           isBatch = action === "batch";
-          pendingDatesToAdd = [];
           updateOverlapModal();
           overlapModal.style.display = "block";
         }
@@ -1673,6 +1672,21 @@
           isBatch = false;
         }
 
+        // 移除重疊的工作
+        function removeOverlap(dateKey, overlapSchedule) {
+          if (schedules[dateKey]) {
+            schedules[dateKey] = schedules[dateKey].filter(
+              (s) => s.id !== overlapSchedule.id
+            );
+            if (schedules[dateKey].length === 0) {
+              delete schedules[dateKey];
+            }
+            localStorage.setItem("schedules", JSON.stringify(schedules));
+            updateSchedule();
+            updateTotalHours();
+          }
+        }
+
         // 處理時間重疊的操作
         function handleOverlapAction(action) {
           if (action === "replace") {
@@ -1691,7 +1705,14 @@
               color
             );
             pendingIndex++;
-            updateOverlapModal();
+            if (pendingIndex >= pendingOverlaps.length) {
+              // 所有重疊已處理，關閉模態框
+              closeOverlapModal();
+              updateSchedule();
+              updateTotalHours();
+            } else {
+              updateOverlapModal();
+            }
           } else if (action === "replaceAll") {
             // 全部取代
             for (; pendingIndex < pendingOverlaps.length; pendingIndex++) {
@@ -1726,34 +1747,18 @@
                 "#ff69b4"
             );
             pendingIndex++;
-            updateOverlapModal();
+            if (pendingIndex >= pendingOverlaps.length) {
+              // 所有重疊已處理，關閉模態框
+              closeOverlapModal();
+            } else {
+              updateOverlapModal();
+            }
           } else if (action === "cancelAll") {
             // 全部取消，保留原有的工作，不做任何動作
-            for (; pendingIndex < pendingOverlaps.length; pendingIndex++) {
-              // 不進行任何操作，保留原有的工作
-            }
+            pendingIndex = pendingOverlaps.length; // 將 pendingIndex 設為最大值
             closeOverlapModal();
-            showToast("已取消新增的工作，保留原有的工作。", "#ff69b4");
-          }
-
-          // 如果所有重疊已處理，則關閉模態框
-          if (pendingIndex >= pendingOverlaps.length) {
-            closeOverlapModal();
-          }
-        }
-
-        // 移除重疊的工作
-        function removeOverlap(dateKey, overlapSchedule) {
-          if (schedules[dateKey]) {
-            schedules[dateKey] = schedules[dateKey].filter(
-              (s) => s.id !== overlapSchedule.id
-            );
-            if (schedules[dateKey].length === 0) {
-              delete schedules[dateKey];
-            }
-            localStorage.setItem("schedules", JSON.stringify(schedules));
-            updateSchedule();
-            updateTotalHours();
+            showToast("已取消新增的重疊工作，保留原有的工作。", "#ff69b4");
+            // 非重疊的工作已經添加，無需處理
           }
         }
 
@@ -1914,8 +1919,8 @@
         // 處理批量新增的行程
         function handleBatchSchedules(datesToAdd, jobName, color) {
           let allOverlaps = [];
-          let allNewSchedules = [];
 
+          // 先遍歷所有的日期，添加非重疊的工作，收集有重疊的工作
           datesToAdd.forEach(({ dateKey, newSchedule }) => {
             const overlaps = findOverlaps(dateKey, newSchedule);
             if (overlaps.length > 0) {
@@ -1923,22 +1928,22 @@
                 allOverlaps.push({ dateKey, overlap, newSchedule });
               });
             } else {
-              allNewSchedules.push({ dateKey, newSchedule });
+              // 直接添加非重疊的工作
+              addScheduleToStorage(dateKey, newSchedule, jobName);
             }
           });
+
+          // 更新日程和總工時
+          updateSchedule();
+          updateTotalHours();
 
           if (allOverlaps.length > 0) {
             isBatch = true;
             pendingOverlaps = allOverlaps;
             pendingIndex = 0;
-            pendingDatesToAdd = allNewSchedules;
+            // 無需使用 pendingDatesToAdd，因為非重疊的工作已經添加
             showOverlapModal(pendingOverlaps, "batch");
           } else {
-            allNewSchedules.forEach(({ dateKey, newSchedule }) => {
-              addScheduleToStorage(dateKey, newSchedule, jobName);
-            });
-            updateSchedule();
-            updateTotalHours();
             showToast(`已批量新增工作: ${jobName}`, color);
           }
         }
