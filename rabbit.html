@@ -1218,10 +1218,10 @@
                 deleteButton.innerHTML = "X";
                 deleteButton.addEventListener("click", (event) => {
                   event.stopPropagation();
-                  deleteSchedule(dateKey, id, jobName, start, end);
+                  deleteSchedule(dateKey, id);
                   scheduleItem.remove();
                   updateTotalHours();
-                  showToast(`已刪除工作 (${formatDate(dateKey)})`, "#ff1493");
+                  // 不需要在這裡呼叫 showToast，因為已經在 deleteSchedule 函數內處理
                 });
                 scheduleItem.appendChild(deleteButton);
 
@@ -1484,24 +1484,29 @@
         }
 
         // 刪除工作
-        function deleteSchedule(dateKey, scheduleId, jobName, start, end) {
+        function deleteSchedule(dateKey, scheduleId) {
           if (schedules[dateKey]) {
-            schedules[dateKey] = schedules[dateKey].filter(
-              (s) => s.id !== scheduleId
+            const scheduleIndex = schedules[dateKey].findIndex(
+              (s) => s.id === scheduleId
             );
-            if (schedules[dateKey].length === 0) {
-              delete schedules[dateKey];
+            if (scheduleIndex !== -1) {
+              const deletedSchedule = schedules[dateKey][scheduleIndex];
+              const { jobName, start, end } = deletedSchedule; // 取得工作資訊
+              schedules[dateKey].splice(scheduleIndex, 1);
+              if (schedules[dateKey].length === 0) {
+                delete schedules[dateKey];
+              }
+              localStorage.setItem("schedules", JSON.stringify(schedules));
+              updateSchedule();
+              updateTotalHours();
+              const color = jobColors[jobName] || "#ff1493";
+              showToast(
+                `已刪除工作: ${jobName} (${formatDate(dateKey)} ${formatTime(
+                  start
+                )}-${formatTime(end)})`,
+                color
+              );
             }
-            localStorage.setItem("schedules", JSON.stringify(schedules));
-            updateSchedule();
-            updateTotalHours();
-            const color = jobColors[jobName] || "#ff1493";
-            showToast(
-              `已刪除工作: ${jobName} (${formatDate(dateKey)} ${formatTime(
-                start
-              )}-${formatTime(end)})`,
-              color
-            );
           }
         }
 
