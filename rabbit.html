@@ -896,28 +896,27 @@
         <div id="commandContainer" style="display: none">
           <h2>指令快速新增</h2>
           <form id="commandForm" autocomplete="off">
-            <label for="commandJobName">工作名稱</label>
-            <input
-              type="text"
-              id="commandJobName"
-              name="commandJobName"
-              maxlength="4"
-              required
-            />
-            <label for="commandCategory">種類</label>
-            <select id="commandCategory" name="commandCategory" required>
-              <option value="工作">工作</option>
-              <option value="課堂">課堂</option>
-              <option value="會議">會議</option>
-              <option value="事項">事項</option>
-            </select>
-            <label for="commandInput">輸入指令:</label>
-            <textarea
-              id="commandInput"
-              name="commandInput"
-              rows="5"
-              required
-            ></textarea>
+            <div class="form-group">
+              <label for="commandJobName">工作名稱</label>
+              <input
+                type="text"
+                id="commandJobName"
+                name="commandJobName"
+                maxlength="4"
+                required
+              />
+            </div>
+            <!-- 種類選擇將由 JavaScript 動態添加 -->
+            <!-- 在這裡不需要手動添加「種類」標籤和選單 -->
+            <div class="form-group">
+              <label for="commandInput">輸入指令:</label>
+              <textarea
+                id="commandInput"
+                name="commandInput"
+                rows="5"
+                required
+              ></textarea>
+            </div>
             <details>
               <summary>點此查看指令範例</summary>
               <p>格式說明:</p>
@@ -1946,7 +1945,8 @@
 
         // 在指令新增的部分加入種類選擇
         function addCategorySelectToCommandForm() {
-          const commandContainer = document.getElementById("commandContainer");
+          const commandForm = document.getElementById("commandForm");
+
           const label = document.createElement("label");
           label.setAttribute("for", "commandCategory");
           label.textContent = "種類";
@@ -1963,13 +1963,18 @@
             select.appendChild(option);
           });
 
-          // 將種類選擇加入到指令新增的表單中
-          const commandForm = document.getElementById("commandForm");
-          commandForm.insertBefore(
-            select,
-            commandForm.querySelector("textarea")
+          // 建立一個容器來包裝 label 和 select，以保持排版一致
+          const container = document.createElement("div");
+          container.classList.add("form-group");
+
+          container.appendChild(label);
+          container.appendChild(select);
+
+          // 將種類選擇插入到「輸入指令」的上方
+          const commandInputLabel = commandForm.querySelector(
+            'label[for="commandInput"]'
           );
-          commandForm.insertBefore(label, select);
+          commandForm.insertBefore(container, commandInputLabel.parentNode);
         }
 
         addCategorySelectToCommandForm();
