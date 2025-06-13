@@ -6,9 +6,17 @@
     <title>1A2B 數字猜謎遊戲</title>
     <link rel="icon" href="https://s123104.github.io/az.tool/img/impressed.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
 
+
+<!-- Font Awesome CDN for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+
+    * {
+        box-sizing: border-box;
+    }
 
     body {
         font-family: 'Noto Sans TC', sans-serif;
@@ -16,11 +24,15 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 100vh;
         margin: 0;
         padding: 0 10px;
-        padding-top: env(safe-area-inset-top);
-        padding-bottom: env(safe-area-inset-bottom);
+        /* iOS Safe Area Support with fallback */
+        padding-top: env(safe-area-inset-top, 0);
+        padding-left: env(safe-area-inset-left, 0);
+        padding-right: env(safe-area-inset-right, 0);
+        /* Use dynamic viewport height for proper iOS handling */
+        min-height: 100vh;
+        min-height: 100dvh;
         overflow: hidden;
         transition: background-color 0.5s;
         -ms-touch-action: none;
@@ -32,7 +44,9 @@
         border-radius: 20px;
         width: 90%;
         max-width: 400px;
-        height: calc(100vh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        /* Use dynamic viewport height with safe area considerations */
+        height: calc(100vh - 20px);
+        height: calc(100dvh - 20px);
         box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         display: flex;
         flex-direction: column;
@@ -60,15 +74,25 @@
         margin-bottom: 8px;
     }
 
+    .game-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
     .mode-toggle {
         background: rgba(255,255,255,0.2);
         border: none;
         color: white;
-        padding: 5px 10px;
+        padding: 6px 12px;
         border-radius: 15px;
-        font-size: 12px;
+        font-size: 11px;
         cursor: pointer;
         transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: 4px;
     }
 
     .mode-toggle:hover {
@@ -143,19 +167,21 @@
     .wolf-message {
         align-self: flex-start;
         background-color: #f0f0f0;
-        margin-left: 60px;
+        margin-left: 50px;
     }
 
     .wolf-message::before {
         content: '';
         position: absolute;
-        left: -50px;
-        top: 0;
-        width: 40px;
-        height: 40px;
+        left: -45px;
+        top: 5px;
+        width: 35px;
+        height: 35px;
         background-image: url('https://s123104.github.io/az.tool/img/impressed.png');
-        background-size: cover;
-        border-radius: 50%;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        /* 不用圓角，完整顯示PNG去背圖片 */
     }
 
     .user-message {
@@ -219,28 +245,29 @@
     .input-container {
         display: flex;
         flex-direction: column;
-        padding: 15px;
-        padding-bottom: calc(15px + env(safe-area-inset-bottom));
+        padding: 12px;
+        /* iOS Safe Area底部支援 - 最新解決方案 */
+        padding-bottom: calc(12px + env(safe-area-inset-bottom, 0));
         background-color: #f0f0f0;
         box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
     }
 
     input {
         flex-grow: 1;
-        padding: 12px;
-        font-size: 18px;
+        padding: 10px;
+        font-size: 16px;
         border: none;
         border-radius: 20px;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
         box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
         text-align: center;
-        letter-spacing: 8px;
+        letter-spacing: 6px;
         font-weight: bold;
     }
 
     button {
-        padding: 12px 15px;
-        font-size: 16px;
+        padding: 8px 12px;
+        font-size: 14px;
         background-color: #575757;
         color: white;
         border: none;
@@ -265,13 +292,16 @@
         display: flex;
         flex-wrap: wrap;
         justify-content: space-between;
-        gap: 8px;
+        gap: 6px;
+        /* 降低鍵盤高度 */
     }
 
     .number-buttons button {
         width: 30%;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         font-weight: bold;
+        /* 減少按鈕高度 */
+        padding: 10px 8px;
     }
 
     .number-buttons button.clicked {
@@ -401,6 +431,24 @@
         cursor: pointer;
         color: #666;
     }
+
+    /* iOS 15+ Safari地址欄支援 */
+    @supports (height: 100dvh) {
+        body {
+            min-height: 100dvh;
+        }
+        
+        .game-container {
+            height: calc(100dvh - 20px);
+        }
+    }
+
+    /* 確保底部安全區域 */
+    @supports (padding: env(safe-area-inset-bottom)) {
+        .input-container {
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+        }
+    }
 </style>
 
 
@@ -409,10 +457,19 @@
     <div class="game-container">
         <div class="chat-header">
             <div class="header-title">
-                <span>🎮 1A2B 數字猜謎</span>
+                <div class="game-title">
+                    <i class="fas fa-gamepad"></i>
+                    <span>1A2B 數字猜謎</span>
+                </div>
                 <div>
-                    <button class="mode-toggle" id="childrenModeBtn">👶 兒童模式</button>
-                    <button class="mode-toggle" id="achievementBtn">🏆 成就</button>
+                    <button class="mode-toggle" id="childrenModeBtn">
+                        <i class="fas fa-child"></i>
+                        <span>兒童模式</span>
+                    </button>
+                    <button class="mode-toggle" id="achievementBtn">
+                        <i class="fas fa-trophy"></i>
+                        <span>成就</span>
+                    </button>
                 </div>
             </div>
             <div class="stats-container">
@@ -450,8 +507,12 @@
 <!-- 成就彈窗 -->
 <div class="achievement-modal" id="achievementModal">
     <div class="achievement-content">
-        <button class="close-modal" onclick="closeAchievementModal()">×</button>
-        <h3 style="text-align: center; margin-top: 0;">🏆 成就系統</h3>
+        <button class="close-modal" onclick="closeAchievementModal()">
+            <i class="fas fa-times"></i>
+        </button>
+        <h3 style="text-align: center; margin-top: 0;">
+            <i class="fas fa-trophy" style="color: #ff9800;"></i> 成就系統
+        </h3>
         <div id="achievementList"></div>
     </div>
 </div>
@@ -477,16 +538,16 @@
     const guessInput = document.getElementById('guess');
     const numberButtons = document.getElementById('numberButtons');
 
-    // 成就定義
+    // 成就定義 - 使用 Font Awesome 圖標
     const achievements = [
-        { id: 'first_win', name: '初次勝利', desc: '完成第一局遊戲', icon: '🎉', condition: () => playerData.gamesPlayed >= 1 },
-        { id: 'quick_win', name: '神算子', desc: '3次內猜中', icon: '🧠', condition: () => attempts <= 3 },
-        { id: 'persistent', name: '堅持不懈', desc: '完成10局遊戲', icon: '💪', condition: () => playerData.gamesPlayed >= 10 },
-        { id: 'score_1000', name: '千分達人', desc: '總分達1000', icon: '💯', condition: () => playerData.totalScore >= 1000 },
-        { id: 'level_5', name: '進階玩家', desc: '達到等級5', icon: '⭐', condition: () => playerData.level >= 5 },
-        { id: 'win_streak_5', name: '連勝王', desc: '連續勝利5次', icon: '🔥', condition: () => playerData.winStreak >= 5 },
-        { id: 'score_10000', name: '萬分高手', desc: '總分達10000', icon: '👑', condition: () => playerData.totalScore >= 10000 },
-        { id: 'score_100000', name: '十萬巨星', desc: '總分達100000', icon: '🌟', condition: () => playerData.totalScore >= 100000 }
+        { id: 'first_win', name: '初次勝利', desc: '完成第一局遊戲', icon: 'fas fa-star', condition: () => playerData.gamesPlayed >= 1 },
+        { id: 'quick_win', name: '神算子', desc: '3次內猜中', icon: 'fas fa-brain', condition: () => attempts <= 3 },
+        { id: 'persistent', name: '堅持不懈', desc: '完成10局遊戲', icon: 'fas fa-dumbbell', condition: () => playerData.gamesPlayed >= 10 },
+        { id: 'score_1000', name: '千分達人', desc: '總分達1000', icon: 'fas fa-medal', condition: () => playerData.totalScore >= 1000 },
+        { id: 'level_5', name: '進階玩家', desc: '達到等級5', icon: 'fas fa-level-up-alt', condition: () => playerData.level >= 5 },
+        { id: 'win_streak_5', name: '連勝王', desc: '連續勝利5次', icon: 'fas fa-fire', condition: () => playerData.winStreak >= 5 },
+        { id: 'score_10000', name: '萬分高手', desc: '總分達10000', icon: 'fas fa-crown', condition: () => playerData.totalScore >= 10000 },
+        { id: 'score_100000', name: '十萬巨星', desc: '總分達100000', icon: 'fas fa-gem', condition: () => playerData.totalScore >= 100000 }
     ];
 
     // 等級名稱
@@ -502,13 +563,21 @@
 
     // 數據持久化
     function savePlayerData() {
-        localStorage.setItem('1a2b_playerData', JSON.stringify(playerData));
+        try {
+            localStorage.setItem('1a2b_playerData', JSON.stringify(playerData));
+        } catch (e) {
+            console.warn('無法保存數據到本地存儲');
+        }
     }
 
     function loadPlayerData() {
-        const saved = localStorage.getItem('1a2b_playerData');
-        if (saved) {
-            playerData = { ...playerData, ...JSON.parse(saved) };
+        try {
+            const saved = localStorage.getItem('1a2b_playerData');
+            if (saved) {
+                playerData = { ...playerData, ...JSON.parse(saved) };
+            }
+        } catch (e) {
+            console.warn('無法載入本地存儲數據');
         }
     }
 
@@ -546,12 +615,12 @@
         chatBody.scrollTop = chatBody.scrollHeight;
     }
 
-    // 歡迎訊息
+    // 歡迎訊息 - 使用圖標
     function addWelcomeMessage() {
-        setTimeout(() => addMessage('🎮 歡迎來到1A2B數字猜謎遊戲！'), 500);
+        setTimeout(() => addMessage('<i class="fas fa-gamepad" style="color: #3d3d3d;"></i> 歡迎來到1A2B數字猜謎遊戲！'), 500);
         setTimeout(() => addMessage('我已經想好了一個4位不重複的數字，你來猜猜看吧！'), 1000);
         if (playerData.gamesPlayed > 0) {
-            setTimeout(() => addMessage(`歡迎回來！你目前是 ${levelNames[Math.min(playerData.level - 1, levelNames.length - 1)]} 等級，總分 ${playerData.totalScore.toLocaleString()} 分！`), 1500);
+            setTimeout(() => addMessage(`<i class="fas fa-user-check" style="color: #4caf50;"></i> 歡迎回來！你目前是 ${levelNames[Math.min(playerData.level - 1, levelNames.length - 1)]} 等級，總分 ${playerData.totalScore.toLocaleString()} 分！`), 1500);
         }
     }
 
@@ -561,7 +630,7 @@
         
         if (guess.length !== 4 || !/^\d{4}$/.test(guess) || new Set(guess).size !== 4) {
             addMessage(guess, true);
-            addMessage('請輸入4個不重複的數字！再試一次吧。🤔');
+            addMessage('<i class="fas fa-exclamation-triangle" style="color: #f39c12;"></i> 請輸入4個不重複的數字！再試一次吧。');
             guessInput.value = '';
             updateNumberButtons();
             return;
@@ -600,21 +669,21 @@
             message += `<div class="result-explanation">`;
             
             if (a > 0) {
-                message += `<div style="margin-bottom: 10px;">✅ 位置完全正確的數字：</div>`;
+                message += `<div style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: #4caf50;"></i> 位置完全正確的數字：</div>`;
                 correctPositions.forEach(item => {
                     message += `<span class="correct-position">數字 ${item.digit} 在第 ${item.pos} 位</span>`;
                 });
             }
             
             if (b > 0) {
-                message += `<div style="margin: 10px 0;">🔄 數字正確但位置錯誤：</div>`;
+                message += `<div style="margin: 10px 0;"><i class="fas fa-sync-alt" style="color: #ff9800;"></i> 數字正確但位置錯誤：</div>`;
                 wrongPositions.forEach(item => {
                     message += `<span class="wrong-position">數字 ${item.digit} 位置不對</span>`;
                 });
             }
             
             if (a === 0 && b === 0) {
-                message += `<div style="text-align: center; color: #666;">❌ 這4個數字都不在答案中喔！</div>`;
+                message += `<div style="text-align: center; color: #666;"><i class="fas fa-times-circle" style="color: #f44336;"></i> 這4個數字都不在答案中喔！</div>`;
             }
             
             message += `</div>`;
@@ -626,7 +695,7 @@
 
         // 提示訊息
         if (attempts >= 5 && playerData.level === 1) {
-            addMessage('💡 小提示：A表示數字和位置都對，B表示數字對但位置不對', false);
+            addMessage('<i class="fas fa-lightbulb" style="color: #ffc107;"></i> 小提示：A表示數字和位置都對，B表示數字對但位置不對', false);
         }
     }
 
@@ -649,22 +718,22 @@
             showLevelUp();
         }
 
-        addMessage(`🎉 太棒了！你猜對了！答案是 ${secretNumber}`, false);
-        addMessage(`🏆 獲得 ${totalScore} 分！(基礎: ${baseScore}, 等級獎勵: ${levelBonus}, 連勝獎勵: ${streakBonus})`, false);
+        addMessage(`<i class="fas fa-party-horn" style="color: #4caf50;"></i> 太棒了！你猜對了！答案是 ${secretNumber}`, false);
+        addMessage(`<i class="fas fa-trophy" style="color: #ff9800;"></i> 獲得 ${totalScore} 分！(基礎: ${baseScore}, 等級獎勵: ${levelBonus}, 連勝獎勵: ${streakBonus})`, false);
         
         checkAchievements();
         savePlayerData();
         updateDisplay();
 
         setTimeout(() => {
-            addMessage('🎮 新遊戲即將開始...', false);
+            addMessage('<i class="fas fa-redo" style="color: #2196f3;"></i> 新遊戲即將開始...', false);
             setTimeout(restartGame, 2000);
         }, 3000);
     }
 
     // 顯示升級
     function showLevelUp() {
-        addMessage(`🎊 恭喜升級！現在是 Lv.${playerData.level} ${levelNames[Math.min(playerData.level - 1, levelNames.length - 1)]}！`, false);
+        addMessage(`<i class="fas fa-level-up-alt" style="color: #9c27b0;"></i> 恭喜升級！現在是 Lv.${playerData.level} ${levelNames[Math.min(playerData.level - 1, levelNames.length - 1)]}！`, false);
         createSparkleEffect();
     }
 
@@ -672,7 +741,7 @@
     function restartGame() {
         secretNumber = generateSecretNumber();
         attempts = 0;
-        addMessage('🎯 新遊戲開始！我已經想好新的數字了，加油！', false);
+        addMessage('<i class="fas fa-bullseye" style="color: #673ab7;"></i> 新遊戲開始！我已經想好新的數字了，加油！', false);
         guessInput.value = '';
         updateNumberButtons();
     }
@@ -690,12 +759,21 @@
         buttonLayout.forEach(row => {
             row.forEach(item => {
                 const button = document.createElement('button');
-                button.textContent = item;
-                button.onclick = () => handleButtonClick(button, item);
                 
-                if (typeof item === 'number' && guessInput.value.includes(item.toString())) {
-                    button.disabled = true;
-                    button.classList.add('clicked');
+                if (typeof item === 'number') {
+                    button.textContent = item;
+                    button.onclick = () => handleButtonClick(button, item);
+                    
+                    if (guessInput.value.includes(item.toString())) {
+                        button.disabled = true;
+                        button.classList.add('clicked');
+                    }
+                } else if (item === 'C') {
+                    button.innerHTML = '<i class="fas fa-times"></i>';
+                    button.onclick = () => handleButtonClick(button, item);
+                } else if (item === '←') {
+                    button.innerHTML = '<i class="fas fa-backspace"></i>';
+                    button.onclick = () => handleButtonClick(button, item);
                 }
                 
                 numberButtons.appendChild(button);
@@ -755,11 +833,13 @@
     function showAchievementNotification(achievement) {
         const notification = document.createElement('div');
         notification.className = 'achievement-notification';
-        notification.innerHTML = `${achievement.icon} 成就解鎖：${achievement.name}`;
+        notification.innerHTML = `<i class="${achievement.icon}"></i> 成就解鎖：${achievement.name}`;
         document.body.appendChild(notification);
         
         setTimeout(() => {
-            document.body.removeChild(notification);
+            if (document.body.contains(notification)) {
+                document.body.removeChild(notification);
+            }
         }, 3000);
     }
 
@@ -773,7 +853,7 @@
             setTimeout(() => {
                 const sparkle = document.createElement('div');
                 sparkle.className = 'sparkle';
-                sparkle.textContent = '✨';
+                sparkle.innerHTML = '<i class="fas fa-star"></i>';
                 sparkle.style.left = Math.random() * window.innerWidth + 'px';
                 sparkle.style.top = Math.random() * window.innerHeight + 'px';
                 effect.appendChild(sparkle);
@@ -799,13 +879,13 @@
         const btn = document.getElementById('childrenModeBtn');
         
         if (isChildrenMode) {
-            btn.textContent = '👨 普通模式';
+            btn.innerHTML = '<i class="fas fa-user-tie"></i><span>普通模式</span>';
             document.body.classList.add('children-mode');
-            addMessage('🎨 已切換到兒童模式！會有更詳細的說明喔！', false);
+            addMessage('<i class="fas fa-palette" style="color: #e91e63;"></i> 已切換到兒童模式！會有更詳細的說明喔！', false);
         } else {
-            btn.textContent = '👶 兒童模式';
+            btn.innerHTML = '<i class="fas fa-child"></i><span>兒童模式</span>';
             document.body.classList.remove('children-mode');
-            addMessage('💼 已切換到普通模式', false);
+            addMessage('<i class="fas fa-briefcase" style="color: #607d8b;"></i> 已切換到普通模式', false);
         }
     }
 
@@ -818,7 +898,9 @@
             const unlocked = playerData.achievements.includes(achievement.id);
             return `
                 <div class="achievement-item ${unlocked ? 'unlocked' : 'locked'}">
-                    <div class="achievement-icon">${achievement.icon}</div>
+                    <div class="achievement-icon">
+                        <i class="${achievement.icon}" style="color: ${unlocked ? '#4caf50' : '#999'};"></i>
+                    </div>
                     <div class="achievement-info">
                         <h4>${achievement.name}</h4>
                         <p>${achievement.desc}</p>
@@ -858,9 +940,11 @@
         }
     });
 
-    // 防止縮放
+    // 防止縮放和手勢
     document.addEventListener('dblclick', e => e.preventDefault());
     document.addEventListener('gesturestart', e => e.preventDefault());
+    document.addEventListener('gesturechange', e => e.preventDefault());
+    document.addEventListener('gestureend', e => e.preventDefault());
 
     // 初始化遊戲
     window.onload = init;
