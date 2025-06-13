@@ -3,1097 +3,867 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <title>1A2B 數字猜謎遊戲</title>
+    <link rel="icon" href="https://s123104.github.io/az.tool/img/impressed.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>1A2B 進階數字猜謎遊戲</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
 
 
-<!-- PWA Meta Tags -->
-<meta name="theme-color" content="#6366f1">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
-
-<!-- SEO & Open Graph -->
-<meta name="description" content="最精緻的1A2B數字猜謎遊戲，支援點數系統、成就解鎖和兒童模式">
-<meta property="og:title" content="1A2B 進階數字猜謎遊戲">
-<meta property="og:description" content="最精緻的1A2B數字猜謎遊戲，支援點數系統、成就解鎖和兒童模式">
-<meta property="og:type" content="website">
-
-<!-- CDN Resources -->
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<!-- Tailwind Config -->
-<script>
-    tailwind.config = {
-        darkMode: 'class',
-        theme: {
-            extend: {
-                fontFamily: {
-                    'sans': ['Inter', 'Noto Sans TC', 'sans-serif'],
-                },
-                colors: {
-                    primary: {
-                        50: '#eff6ff',
-                        100: '#dbeafe',
-                        200: '#bfdbfe',
-                        300: '#93c5fd',
-                        400: '#60a5fa',
-                        500: '#3b82f6',
-                        600: '#2563eb',
-                        700: '#1d4ed8',
-                        800: '#1e40af',
-                        900: '#1e3a8a',
-                    },
-                    secondary: {
-                        50: '#fdf2f8',
-                        100: '#fce7f3',
-                        200: '#fbcfe8',
-                        300: '#f9a8d4',
-                        400: '#f472b6',
-                        500: '#ec4899',
-                        600: '#db2777',
-                        700: '#be185d',
-                        800: '#9d174d',
-                        900: '#831843',
-                    },
-                    success: '#10b981',
-                    warning: '#f59e0b',
-                    error: '#ef4444',
-                },
-                spacing: {
-                    '18': '4.5rem',
-                    '88': '22rem',
-                    'safe-bottom': 'env(safe-area-inset-bottom)',
-                    'safe-top': 'env(safe-area-inset-top)',
-                },
-                animation: {
-                    'bounce-gentle': 'bounce-gentle 2s infinite',
-                    'pulse-glow': 'pulse-glow 2s infinite',
-                    'slide-in': 'slide-in 0.3s ease-out',
-                    'number-pop': 'number-pop 0.2s ease-out',
-                },
-                keyframes: {
-                    'bounce-gentle': {
-                        '0%, 100%': { transform: 'translateY(0)' },
-                        '50%': { transform: 'translateY(-4px)' },
-                    },
-                    'pulse-glow': {
-                        '0%, 100%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.5)' },
-                        '50%': { boxShadow: '0 0 30px rgba(59, 130, 246, 0.8)' },
-                    },
-                    'slide-in': {
-                        '0%': { opacity: '0', transform: 'translateY(10px)' },
-                        '100%': { opacity: '1', transform: 'translateY(0)' },
-                    },
-                    'number-pop': {
-                        '0%': { transform: 'scale(1)' },
-                        '50%': { transform: 'scale(1.1)' },
-                        '100%': { transform: 'scale(1)' },
-                    },
-                },
-            },
-        },
-    }
-</script>
-
-<!-- Custom Styles -->
-<style>
-    /* iOS Safe Area Support */
     body {
+        font-family: 'Noto Sans TC', sans-serif;
+        background-color: #ffffff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0 10px;
         padding-top: env(safe-area-inset-top);
         padding-bottom: env(safe-area-inset-bottom);
-        padding-left: env(safe-area-inset-left);
-        padding-right: env(safe-area-inset-right);
+        overflow: hidden;
+        transition: background-color 0.5s;
+        -ms-touch-action: none;
+        touch-action: none;
     }
-    
-    /* Touch Optimizations */
-    * {
-        -webkit-tap-highlight-color: transparent;
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
+
+    .game-container {
+        background-color: #ffffff;
+        border-radius: 20px;
+        width: 90%;
+        max-width: 400px;
+        height: calc(100vh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: background-color 0.5s;
     }
-    
-    input {
-        -webkit-user-select: text;
-        -moz-user-select: text;
-        -ms-user-select: text;
-        user-select: text;
+
+    .chat-header {
+        background: linear-gradient(135deg, #3d3d3d 0%, #5a5a5a 100%);
+        color: white;
+        padding: 15px 10px 10px 10px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 16px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        position: relative;
     }
-    
-    /* Scrollbar Styling */
+
+    .header-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .mode-toggle {
+        background: rgba(255,255,255,0.2);
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .mode-toggle:hover {
+        background: rgba(255,255,255,0.3);
+    }
+
+    .stats-container {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        opacity: 0.9;
+    }
+
+    .stat-item {
+        text-align: center;
+        flex: 1;
+    }
+
+    .stat-value {
+        font-weight: bold;
+        font-size: 13px;
+        margin-bottom: 2px;
+    }
+
+    .level-bar {
+        background: rgba(255,255,255,0.2);
+        height: 4px;
+        border-radius: 2px;
+        margin-top: 5px;
+        overflow: hidden;
+    }
+
+    .level-progress {
+        background: linear-gradient(90deg, #ffeb3b, #ff9800);
+        height: 100%;
+        transition: width 0.5s ease;
+        border-radius: 2px;
+    }
+
+    .chat-body {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+
     .chat-body::-webkit-scrollbar {
-        width: 6px;
+        width: 4px;
     }
-    
-    .chat-body::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    
+
     .chat-body::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 3px;
+        background: #ccc;
+        border-radius: 2px;
     }
-    
-    /* Children Mode Styles */
-    .children-mode .number-button {
-        font-size: 1.5rem;
-        padding: 1rem;
+
+    .message {
+        max-width: 70%;
+        margin-bottom: 15px;
+        padding: 10px 15px;
+        border-radius: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        animation: fadeIn 0.3s ease-out;
+        position: relative;
     }
-    
-    .children-mode .result-a {
-        background: linear-gradient(45deg, #10b981, #34d399);
-        color: white;
-        padding: 0.5rem;
-        border-radius: 0.5rem;
-        font-weight: bold;
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
-    
-    .children-mode .result-b {
-        background: linear-gradient(45deg, #f59e0b, #fbbf24);
-        color: white;
-        padding: 0.5rem;
-        border-radius: 0.5rem;
-        font-weight: bold;
+
+    .wolf-message {
+        align-self: flex-start;
+        background-color: #f0f0f0;
+        margin-left: 60px;
     }
-    
-    /* Particle Effects */
-    @keyframes particle-float {
-        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-        100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
-    }
-    
-    .particle {
+
+    .wolf-message::before {
+        content: '';
         position: absolute;
+        left: -50px;
+        top: 0;
+        width: 40px;
+        height: 40px;
+        background-image: url('https://s123104.github.io/az.tool/img/impressed.png');
+        background-size: cover;
+        border-radius: 50%;
+    }
+
+    .user-message {
+        align-self: flex-end;
+        background-color: #414141;
+        color: white;
+    }
+
+    .result {
+        font-weight: bold;
+        margin-top: 5px;
+        font-size: 18px;
+    }
+
+    .result .A { 
+        color: #4c69d0;
+        background: rgba(76, 105, 208, 0.1);
+        padding: 2px 6px;
+        border-radius: 10px;
+        margin: 0 5px;
+    }
+
+    .result .B { 
+        color: #b61f1f;
+        background: rgba(182, 31, 31, 0.1);
+        padding: 2px 6px;
+        border-radius: 10px;
+        margin: 0 5px;
+    }
+
+    /* 兒童模式特殊樣式 */
+    .children-mode .result-explanation {
+        background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+        border: 2px solid #e1bee7;
+        border-radius: 15px;
+        padding: 15px;
+        margin: 10px 0;
+        font-size: 14px;
+    }
+
+    .children-mode .correct-position {
+        background: linear-gradient(135deg, #c8e6c9, #a5d6a7);
+        color: #2e7d32;
+        padding: 8px 12px;
+        border-radius: 20px;
+        margin: 5px;
+        display: inline-block;
+        font-weight: bold;
+    }
+
+    .children-mode .wrong-position {
+        background: linear-gradient(135deg, #ffe0b2, #ffcc02);
+        color: #ef6c00;
+        padding: 8px 12px;
+        border-radius: 20px;
+        margin: 5px;
+        display: inline-block;
+        font-weight: bold;
+    }
+
+    .input-container {
+        display: flex;
+        flex-direction: column;
+        padding: 15px;
+        padding-bottom: calc(15px + env(safe-area-inset-bottom));
+        background-color: #f0f0f0;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    }
+
+    input {
+        flex-grow: 1;
+        padding: 12px;
+        font-size: 18px;
+        border: none;
+        border-radius: 20px;
+        margin-bottom: 15px;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        text-align: center;
+        letter-spacing: 8px;
+        font-weight: bold;
+    }
+
+    button {
+        padding: 12px 15px;
+        font-size: 16px;
+        background-color: #575757;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    button:hover {
+        background-color: #343434;
+        transform: translateY(-1px);
+    }
+
+    button:active {
+        transform: scale(0.98) translateY(0);
+    }
+
+    .number-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .number-buttons button {
+        width: 30%;
+        margin-bottom: 8px;
+        font-weight: bold;
+    }
+
+    .number-buttons button.clicked {
+        background-color: #333;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    .number-buttons button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* 成就通知 */
+    .achievement-notification {
+        position: fixed;
+        top: 50px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #ff9800, #f57c00);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        z-index: 1000;
+        animation: achievementSlide 3s ease-in-out;
+        font-weight: bold;
+    }
+
+    @keyframes achievementSlide {
+        0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        20%, 80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    }
+
+    /* 升級特效 */
+    .level-up-effect {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         pointer-events: none;
-        animation: particle-float 2s ease-out forwards;
+        z-index: 999;
     }
-    
-    /* CRT Filter for Shake Easter Egg */
-    .crt-filter {
-        filter: contrast(1.2) brightness(1.1) hue-rotate(10deg);
-        animation: crt-flicker 0.1s infinite alternate;
+
+    .sparkle {
+        position: absolute;
+        color: #ffd700;
+        font-size: 20px;
+        animation: sparkleFloat 2s ease-out forwards;
     }
-    
-    @keyframes crt-flicker {
-        0% { filter: contrast(1.2) brightness(1.1) hue-rotate(10deg); }
-        100% { filter: contrast(1.3) brightness(1.2) hue-rotate(15deg); }
+
+    @keyframes sparkleFloat {
+        0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+        100% { opacity: 0; transform: translateY(-100px) rotate(360deg); }
+    }
+
+    /* 成就彈窗 */
+    .achievement-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1001;
+    }
+
+    .achievement-content {
+        background: white;
+        padding: 25px;
+        border-radius: 20px;
+        max-width: 350px;
+        width: 90%;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .achievement-item {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        margin: 8px 0;
+        border-radius: 15px;
+        transition: all 0.3s;
+    }
+
+    .achievement-item.unlocked {
+        background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+        border: 2px solid #4caf50;
+    }
+
+    .achievement-item.locked {
+        background: #f5f5f5;
+        border: 2px solid #ddd;
+        opacity: 0.6;
+    }
+
+    .achievement-icon {
+        font-size: 24px;
+        margin-right: 15px;
+        width: 40px;
+        text-align: center;
+    }
+
+    .achievement-info h4 {
+        margin: 0 0 5px 0;
+        font-size: 14px;
+    }
+
+    .achievement-info p {
+        margin: 0;
+        font-size: 12px;
+        color: #666;
+    }
+
+    .close-modal {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #666;
     }
 </style>
 
 
 </head>
-
-<body class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 font-sans overflow-hidden">
-    <!-- Hidden Easter Egg Button -->
-    <button id="easterEggBtn" class="fixed top-4 left-4 opacity-0 w-8 h-8 bg-primary-500 rounded-full z-50"></button>
-
-
-<!-- Game Container -->
-<div class="flex flex-col h-screen max-w-md mx-auto bg-white shadow-2xl relative">
-    <!-- Header -->
-    <header class="bg-gradient-to-r from-primary-600 to-secondary-600 text-white p-4 pt-8 shadow-lg relative">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                    <i class="fas fa-gamepad text-xl"></i>
-                </div>
+<body>
+    <div class="game-container">
+        <div class="chat-header">
+            <div class="header-title">
+                <span>🎮 1A2B 數字猜謎</span>
                 <div>
-                    <h1 class="text-lg font-bold">1A2B 猜數字</h1>
-                    <p class="text-xs opacity-90" id="levelDisplay">等級 1 - 新手</p>
+                    <button class="mode-toggle" id="childrenModeBtn">👶 兒童模式</button>
+                    <button class="mode-toggle" id="achievementBtn">🏆 成就</button>
                 </div>
             </div>
-            
-            <!-- Settings & Mode Toggle -->
-            <div class="flex items-center space-x-2">
-                <button id="childrenModeBtn" class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center transition-all duration-200 hover:bg-white/30">
-                    <i class="fas fa-child text-lg"></i>
-                </button>
-                <button id="achievementBtn" class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center transition-all duration-200 hover:bg-white/30 relative">
-                    <i class="fas fa-trophy text-lg"></i>
-                    <span id="newAchievementBadge" class="absolute -top-1 -right-1 w-3 h-3 bg-warning rounded-full hidden"></span>
-                </button>
+            <div class="stats-container">
+                <div class="stat-item">
+                    <div class="stat-value" id="scoreDisplay">0</div>
+                    <div>總分</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="levelDisplay">Lv.1</div>
+                    <div id="levelName">新手</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="streakDisplay">0</div>
+                    <div>連勝</div>
+                </div>
+            </div>
+            <div class="level-bar">
+                <div class="level-progress" id="levelProgress" style="width: 0%"></div>
             </div>
         </div>
-        
-        <!-- Stats Bar -->
-        <div class="mt-4 grid grid-cols-3 gap-4 text-center">
-            <div class="bg-white/20 rounded-lg p-2">
-                <div class="text-xs opacity-90">總分</div>
-                <div class="font-bold" id="totalScore">0</div>
-            </div>
-            <div class="bg-white/20 rounded-lg p-2">
-                <div class="text-xs opacity-90">經驗值</div>
-                <div class="font-bold" id="currentExp">0</div>
-            </div>
-            <div class="bg-white/20 rounded-lg p-2">
-                <div class="text-xs opacity-90">連勝</div>
-                <div class="font-bold" id="winStreak">0</div>
-            </div>
-        </div>
-        
-        <!-- Experience Bar -->
-        <div class="mt-3">
-            <div class="bg-white/20 rounded-full h-2 overflow-hidden">
-                <div id="expBar" class="bg-warning h-full transition-all duration-500" style="width: 0%"></div>
-            </div>
-        </div>
-    </header>
 
-    <!-- Chat Area -->
-    <div class="flex-1 overflow-y-auto p-4 space-y-3 chat-body" id="chatBody">
-        <!-- Messages will be inserted here -->
+
+    <div class="chat-body" id="chatBody">
+        <!-- 訊息將在此插入 -->
     </div>
 
-    <!-- Input Area with Safe Bottom Padding -->
-    <div class="p-4 bg-gray-50 border-t" style="padding-bottom: calc(1rem + env(safe-area-inset-bottom));">
-        <!-- Guess Display -->
-        <div class="mb-4">
-            <div class="bg-white rounded-xl p-4 border-2 border-gray-200 text-center">
-                <div class="text-sm text-gray-600 mb-2">你的猜測</div>
-                <div id="guessDisplay" class="text-2xl font-bold text-gray-800 tracking-widest min-h-8">----</div>
-            </div>
-        </div>
-        
-        <!-- Number Pad -->
-        <div class="grid grid-cols-3 gap-3 mb-4" id="numberPad">
-            <!-- Number buttons will be generated by JS -->
-        </div>
-        
-        <!-- Action Buttons -->
-        <div class="grid grid-cols-2 gap-3">
-            <button id="clearBtn" class="bg-gray-500 text-white py-3 rounded-xl font-medium transition-all duration-200 hover:bg-gray-600 active:scale-95">
-                <i class="fas fa-backspace mr-2"></i>清除
-            </button>
-            <button id="submitBtn" class="bg-primary-500 text-white py-3 rounded-xl font-medium transition-all duration-200 hover:bg-primary-600 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
-                <i class="fas fa-paper-plane mr-2"></i>提交
-            </button>
+    <div class="input-container">
+        <input type="text" id="guess" maxlength="4" placeholder="輸入4位數字" readonly>
+        <div class="number-buttons" id="numberButtons">
+            <!-- 按鈕將由 JavaScript 動態生成 -->
         </div>
     </div>
 </div>
 
-<!-- Achievement Modal -->
-<div id="achievementModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl p-6 max-w-sm w-full max-h-96 overflow-y-auto">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-xl font-bold text-gray-800">🏆 成就系統</h3>
-            <button id="closeAchievementModal" class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                <i class="fas fa-times text-gray-600"></i>
-            </button>
-        </div>
-        <div id="achievementList" class="space-y-3">
-            <!-- Achievements will be populated here -->
-        </div>
+<!-- 成就彈窗 -->
+<div class="achievement-modal" id="achievementModal">
+    <div class="achievement-content">
+        <button class="close-modal" onclick="closeAchievementModal()">×</button>
+        <h3 style="text-align: center; margin-top: 0;">🏆 成就系統</h3>
+        <div id="achievementList"></div>
     </div>
 </div>
-
-<!-- New Achievement Notification -->
-<div id="achievementNotification" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-warning to-secondary-500 text-white px-6 py-3 rounded-full shadow-lg hidden z-50 animate-slide-in">
-    <div class="flex items-center space-x-2">
-        <i class="fas fa-trophy"></i>
-        <span id="achievementText">新成就解鎖！</span>
-    </div>
-</div>
-
-<!-- Web App Manifest -->
-<script type="application/manifest+json">
-{
-    "name": "1A2B 進階數字猜謎遊戲",
-    "short_name": "1A2B Game",
-    "description": "最精緻的1A2B數字猜謎遊戲",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#6366f1",
-    "icons": [
-        {
-            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>",
-            "sizes": "192x192",
-            "type": "image/svg+xml"
-        }
-    ]
-}
-</script>
 
 <script>
-    // ==================== 遊戲狀態管理 ====================
-    class Game1A2B {
-        constructor() {
-            this.secretNumber = '';
-            this.currentGuess = '';
-            this.attempts = 0;
-            this.gameHistory = [];
-            this.isChildrenMode = false;
-            this.score = this.loadData('totalScore', 0);
-            this.experience = this.loadData('experience', 0);
-            this.level = this.loadData('level', 1);
-            this.winStreak = this.loadData('winStreak', 0);
-            this.achievements = this.loadData('achievements', []);
-            this.gamesPlayed = this.loadData('gamesPlayed', 0);
-            
-            this.initializeGame();
-            this.setupEventListeners();
-            this.setupEasterEggs();
-            this.updateDisplay();
-            this.checkAchievements();
-        }
+    // 遊戲狀態
+    let secretNumber = generateSecretNumber();
+    let attempts = 0;
+    let isChildrenMode = false;
+    
+    // 玩家數據
+    let playerData = {
+        totalScore: 0,
+        level: 1,
+        experience: 0,
+        winStreak: 0,
+        gamesPlayed: 0,
+        achievements: []
+    };
 
-        // ==================== 數據持久化 ====================
-        saveData(key, value) {
-            try {
-                localStorage.setItem(`1a2b_${key}`, JSON.stringify(value));
-            } catch (e) {
-                console.warn('無法保存數據到本地存儲');
-            }
-        }
+    // DOM 元素
+    const chatBody = document.getElementById('chatBody');
+    const guessInput = document.getElementById('guess');
+    const numberButtons = document.getElementById('numberButtons');
 
-        loadData(key, defaultValue) {
-            try {
-                const stored = localStorage.getItem(`1a2b_${key}`);
-                return stored ? JSON.parse(stored) : defaultValue;
-            } catch (e) {
-                return defaultValue;
-            }
-        }
+    // 成就定義
+    const achievements = [
+        { id: 'first_win', name: '初次勝利', desc: '完成第一局遊戲', icon: '🎉', condition: () => playerData.gamesPlayed >= 1 },
+        { id: 'quick_win', name: '神算子', desc: '3次內猜中', icon: '🧠', condition: () => attempts <= 3 },
+        { id: 'persistent', name: '堅持不懈', desc: '完成10局遊戲', icon: '💪', condition: () => playerData.gamesPlayed >= 10 },
+        { id: 'score_1000', name: '千分達人', desc: '總分達1000', icon: '💯', condition: () => playerData.totalScore >= 1000 },
+        { id: 'level_5', name: '進階玩家', desc: '達到等級5', icon: '⭐', condition: () => playerData.level >= 5 },
+        { id: 'win_streak_5', name: '連勝王', desc: '連續勝利5次', icon: '🔥', condition: () => playerData.winStreak >= 5 },
+        { id: 'score_10000', name: '萬分高手', desc: '總分達10000', icon: '👑', condition: () => playerData.totalScore >= 10000 },
+        { id: 'score_100000', name: '十萬巨星', desc: '總分達100000', icon: '🌟', condition: () => playerData.totalScore >= 100000 }
+    ];
 
-        // ==================== 遊戲初始化 ====================
-        initializeGame() {
-            this.generateSecretNumber();
-            this.attempts = 0;
-            this.gameHistory = [];
-            this.currentGuess = '';
-            this.createNumberPad();
-            this.addWelcomeMessage();
-            this.gamesPlayed++;
-            this.saveData('gamesPlayed', this.gamesPlayed);
-        }
+    // 等級名稱
+    const levelNames = ['新手', '學徒', '熟練', '專家', '高手', '大師', '宗師', '傳說', '神話', '至尊'];
 
-        generateSecretNumber() {
-            const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-            this.secretNumber = '';
-            for (let i = 0; i < 4; i++) {
-                const index = Math.floor(Math.random() * digits.length);
-                this.secretNumber += digits[index];
-                digits.splice(index, 1);
-            }
-            console.log('Secret number generated:', this.secretNumber); // For debugging
-        }
+    // 初始化
+    function init() {
+        loadPlayerData();
+        updateDisplay();
+        addWelcomeMessage();
+        updateNumberButtons();
+    }
 
-        createNumberPad() {
-            const numberPad = document.getElementById('numberPad');
-            numberPad.innerHTML = '';
-            
-            // Create number buttons 1-9, 0
-            const layout = [
-                [1, 2, 3],
-                [4, 5, 6], 
-                [7, 8, 9],
-                ['⌫', 0, '✓']
-            ];
+    // 數據持久化
+    function savePlayerData() {
+        localStorage.setItem('1a2b_playerData', JSON.stringify(playerData));
+    }
 
-            layout.forEach(row => {
-                row.forEach(item => {
-                    const button = document.createElement('button');
-                    button.className = `number-button bg-white border-2 border-gray-200 rounded-xl py-4 text-xl font-semibold transition-all duration-200 hover:bg-gray-50 active:scale-95 ${this.isChildrenMode ? 'text-2xl py-5' : ''}`;
-                    
-                    if (typeof item === 'number') {
-                        button.textContent = item;
-                        button.onclick = () => this.addNumber(item);
-                    } else if (item === '⌫') {
-                        button.innerHTML = '<i class="fas fa-backspace"></i>';
-                        button.onclick = () => this.removeLastNumber();
-                        button.className += ' text-gray-600';
-                    } else if (item === '✓') {
-                        button.innerHTML = '<i class="fas fa-check"></i>';
-                        button.onclick = () => this.submitGuess();
-                        button.className += ' bg-primary-500 text-white hover:bg-primary-600';
-                    }
-                    
-                    numberPad.appendChild(button);
-                });
-            });
-
-            this.updateNumberPadState();
-        }
-
-        // ==================== 輸入處理 ====================
-        addNumber(number) {
-            if (this.currentGuess.length < 4 && !this.currentGuess.includes(number.toString())) {
-                this.currentGuess += number;
-                this.updateGuessDisplay();
-                this.updateNumberPadState();
-                
-                // Number pop animation
-                this.animateNumberInput(number);
-                
-                // Auto submit when 4 digits entered
-                if (this.currentGuess.length === 4) {
-                    setTimeout(() => this.submitGuess(), 300);
-                }
-            }
-        }
-
-        removeLastNumber() {
-            if (this.currentGuess.length > 0) {
-                this.currentGuess = this.currentGuess.slice(0, -1);
-                this.updateGuessDisplay();
-                this.updateNumberPadState();
-            }
-        }
-
-        clearGuess() {
-            this.currentGuess = '';
-            this.updateGuessDisplay();
-            this.updateNumberPadState();
-        }
-
-        updateGuessDisplay() {
-            const display = document.getElementById('guessDisplay');
-            const displayText = this.currentGuess.padEnd(4, '-');
-            display.textContent = displayText.split('').join(' ');
-        }
-
-        updateNumberPadState() {
-            const buttons = document.querySelectorAll('.number-button');
-            buttons.forEach(button => {
-                const text = button.textContent.trim();
-                if (!isNaN(text) && text !== '') {
-                    const number = parseInt(text);
-                    if (this.currentGuess.includes(number.toString())) {
-                        button.className = button.className.replace('bg-white border-gray-200', 'bg-gray-300 border-gray-400');
-                        button.disabled = true;
-                    } else {
-                        button.className = button.className.replace('bg-gray-300 border-gray-400', 'bg-white border-gray-200');
-                        button.disabled = false;
-                    }
-                }
-            });
-
-            // Update submit button state
-            const submitBtn = document.getElementById('submitBtn');
-            if (this.currentGuess.length === 4) {
-                submitBtn.disabled = false;
-                submitBtn.className = submitBtn.className.replace('disabled:opacity-50 disabled:cursor-not-allowed', '');
-            } else {
-                submitBtn.disabled = true;
-            }
-        }
-
-        // ==================== 遊戲邏輯 ====================
-        submitGuess() {
-            if (this.currentGuess.length !== 4) {
-                this.addMessage('請輸入完整的4位數字！', false, 'warning');
-                return;
-            }
-
-            // Check for duplicate digits
-            if (new Set(this.currentGuess).size !== 4) {
-                this.addMessage('請輸入4個不重複的數字！', false, 'warning');
-                this.clearGuess();
-                return;
-            }
-
-            this.attempts++;
-            this.addMessage(this.currentGuess, true);
-
-            const result = this.calculateResult(this.currentGuess, this.secretNumber);
-            this.gameHistory.push({
-                guess: this.currentGuess,
-                result: result,
-                attempt: this.attempts
-            });
-
-            if (result.a === 4) {
-                this.handleWin();
-            } else {
-                this.addResultMessage(result);
-                this.clearGuess();
-            }
-        }
-
-        calculateResult(guess, secret) {
-            let a = 0, b = 0;
-            for (let i = 0; i < 4; i++) {
-                if (guess[i] === secret[i]) {
-                    a++;
-                } else if (secret.includes(guess[i])) {
-                    b++;
-                }
-            }
-            return { a, b };
-        }
-
-        handleWin() {
-            const baseScore = Math.max(100 - (this.attempts - 1) * 10, 10);
-            const levelBonus = this.level * 5;
-            const gameScore = baseScore + levelBonus;
-            
-            this.score += gameScore;
-            this.experience += gameScore;
-            this.winStreak++;
-            
-            // Level up check
-            const newLevel = Math.floor(this.experience / 500) + 1;
-            if (newLevel > this.level) {
-                this.level = newLevel;
-                this.showLevelUp();
-            }
-
-            this.addMessage(`🎉 恭喜！你猜對了！答案是 ${this.secretNumber}`, false, 'success');
-            this.addMessage(`🏆 獲得 ${gameScore} 分！(基礎分: ${baseScore}, 等級獎勵: ${levelBonus})`, false, 'success');
-            
-            this.saveAllData();
-            this.updateDisplay();
-            this.checkAchievements();
-            this.createParticleEffect();
-            
-            setTimeout(() => {
-                this.addMessage('🎮 新遊戲即將開始...', false);
-                setTimeout(() => this.initializeGame(), 2000);
-            }, 3000);
-        }
-
-        addResultMessage(result) {
-            if (this.isChildrenMode) {
-                // Children mode with detailed explanation
-                let message = '<div class="space-y-2">';
-                message += `<div class="text-lg">第 ${this.attempts} 次猜測結果：</div>`;
-                
-                if (result.a > 0) {
-                    message += `<div class="result-a">✅ ${result.a}A - 有 ${result.a} 個數字位置完全正確！</div>`;
-                }
-                
-                if (result.b > 0) {
-                    message += `<div class="result-b">🔶 ${result.b}B - 有 ${result.b} 個數字存在但位置不對！</div>`;
-                }
-                
-                if (result.a === 0 && result.b === 0) {
-                    message += '<div class="bg-gray-200 p-3 rounded-lg">❌ 0A0B - 這4個數字都不在答案中喔！</div>';
-                }
-                
-                message += '</div>';
-                this.addMessage(message, false);
-            } else {
-                // Normal mode
-                const resultText = `<span class="font-bold text-2xl">
-                    <span class="text-success">${result.a}A</span>
-                    <span class="text-warning">${result.b}B</span>
-                </span>`;
-                this.addMessage(`第 ${this.attempts} 次：${resultText}`, false);
-            }
-
-            // Hint system for beginners
-            if (this.attempts >= 5 && this.level === 1) {
-                this.addMessage('💡 小提示：A表示數字和位置都對，B表示數字對但位置不對', false, 'info');
-            }
-        }
-
-        // ==================== 消息系統 ====================
-        addMessage(content, isUser = false, type = 'normal') {
-            const chatBody = document.getElementById('chatBody');
-            const messageDiv = document.createElement('div');
-            
-            let bgColor = isUser ? 'bg-primary-500 text-white' : 'bg-white';
-            let alignment = isUser ? 'ml-auto' : 'mr-auto';
-            
-            if (!isUser) {
-                switch (type) {
-                    case 'success': bgColor = 'bg-green-100 border-green-300 text-green-800'; break;
-                    case 'warning': bgColor = 'bg-yellow-100 border-yellow-300 text-yellow-800'; break;
-                    case 'info': bgColor = 'bg-blue-100 border-blue-300 text-blue-800'; break;
-                }
-            }
-
-            messageDiv.className = `max-w-xs p-3 rounded-2xl shadow-md animate-slide-in ${bgColor} ${alignment} ${type !== 'normal' ? 'border-2' : ''}`;
-            messageDiv.innerHTML = content;
-            
-            chatBody.appendChild(messageDiv);
-            chatBody.scrollTop = chatBody.scrollHeight;
-        }
-
-        addWelcomeMessage() {
-            const welcomeMessages = [
-                '🎮 歡迎來到1A2B數字猜謎遊戲！',
-                '🎯 我已經想好一個4位不重複數字',
-                '🧠 A表示數字和位置都正確，B表示數字正確但位置錯誤',
-                '🏆 完成遊戲可獲得經驗值和成就！',
-                '開始猜測吧！'
-            ];
-
-            welcomeMessages.forEach((msg, index) => {
-                setTimeout(() => this.addMessage(msg, false, index === 0 ? 'success' : 'normal'), index * 800);
-            });
-        }
-
-        // ==================== 等級與成就系統 ====================
-        updateDisplay() {
-            document.getElementById('totalScore').textContent = this.score.toLocaleString();
-            document.getElementById('currentExp').textContent = this.experience.toLocaleString();
-            document.getElementById('winStreak').textContent = this.winStreak;
-            document.getElementById('levelDisplay').textContent = `等級 ${this.level} - ${this.getLevelName()}`;
-            
-            // Update experience bar
-            const expBar = document.getElementById('expBar');
-            const expInLevel = this.experience % 500;
-            const expPercentage = (expInLevel / 500) * 100;
-            expBar.style.width = `${expPercentage}%`;
-        }
-
-        getLevelName() {
-            const levelNames = [
-                '新手', '學徒', '熟練', '專家', '大師', '宗師', '傳說', '神話', '至尊', '無敵'
-            ];
-            return levelNames[Math.min(this.level - 1, levelNames.length - 1)] || '超越極限';
-        }
-
-        showLevelUp() {
-            this.addMessage(`🎊 恭喜升級！現在是等級 ${this.level} - ${this.getLevelName()}！`, false, 'success');
-            this.createParticleEffect('🌟');
-        }
-
-        saveAllData() {
-            this.saveData('totalScore', this.score);
-            this.saveData('experience', this.experience);
-            this.saveData('level', this.level);
-            this.saveData('winStreak', this.winStreak);
-            this.saveData('achievements', this.achievements);
-        }
-
-        // ==================== 成就系統 ====================
-        checkAchievements() {
-            const achievementDefinitions = [
-                { id: 'first_win', name: '首次勝利', description: '完成第一局遊戲', icon: '🏁', condition: () => this.gamesPlayed >= 1 },
-                { id: 'quick_solver', name: '神算子', description: '3次內猜中答案', icon: '🧠', condition: () => this.gameHistory.length > 0 && this.attempts <= 3 },
-                { id: 'persistent', name: '堅持不懈', description: '完成10局遊戲', icon: '💪', condition: () => this.gamesPlayed >= 10 },
-                { id: 'level_5', name: '進階玩家', description: '達到等級5', icon: '⭐', condition: () => this.level >= 5 },
-                { id: 'score_1000', name: '千分達人', description: '總分達到1000分', icon: '💯', condition: () => this.score >= 1000 },
-                { id: 'win_streak_5', name: '連勝王', description: '連續勝利5次', icon: '🔥', condition: () => this.winStreak >= 5 },
-                { id: 'score_10000', name: '萬分高手', description: '總分達到10000分', icon: '👑', condition: () => this.score >= 10000 },
-                { id: 'level_10', name: '大師級別', description: '達到等級10', icon: '🏆', condition: () => this.level >= 10 },
-                { id: 'score_100000', name: '十萬巨星', description: '總分達到100000分', icon: '🌟', condition: () => this.score >= 100000 },
-            ];
-
-            achievementDefinitions.forEach(achievement => {
-                if (!this.achievements.includes(achievement.id) && achievement.condition()) {
-                    this.unlockAchievement(achievement);
-                }
-            });
-        }
-
-        unlockAchievement(achievement) {
-            this.achievements.push(achievement.id);
-            this.saveData('achievements', this.achievements);
-            this.showAchievementNotification(achievement);
-            
-            // Show new achievement badge
-            document.getElementById('newAchievementBadge').classList.remove('hidden');
-        }
-
-        showAchievementNotification(achievement) {
-            const notification = document.getElementById('achievementNotification');
-            const text = document.getElementById('achievementText');
-            text.textContent = `${achievement.icon} ${achievement.name}`;
-            
-            notification.classList.remove('hidden');
-            setTimeout(() => {
-                notification.classList.add('hidden');
-            }, 3000);
-        }
-
-        // ==================== 兒童模式 ====================
-        toggleChildrenMode() {
-            this.isChildrenMode = !this.isChildrenMode;
-            const body = document.body;
-            const btn = document.getElementById('childrenModeBtn');
-            
-            if (this.isChildrenMode) {
-                body.classList.add('children-mode');
-                btn.innerHTML = '<i class="fas fa-child text-yellow-300"></i>';
-                this.addMessage('🎨 已切換到兒童模式！更清楚的結果說明', false, 'info');
-            } else {
-                body.classList.remove('children-mode');
-                btn.innerHTML = '<i class="fas fa-child"></i>';
-                this.addMessage('💼 已切換到普通模式', false, 'info');
-            }
-            
-            this.createNumberPad();
-            this.saveData('childrenMode', this.isChildrenMode);
-        }
-
-        // ==================== 動畫效果 ====================
-        animateNumberInput(number) {
-            const buttons = document.querySelectorAll('.number-button');
-            buttons.forEach(button => {
-                if (button.textContent.trim() === number.toString()) {
-                    button.classList.add('animate-number-pop');
-                    setTimeout(() => button.classList.remove('animate-number-pop'), 200);
-                }
-            });
-        }
-
-        createParticleEffect(emoji = '🎉') {
-            const container = document.querySelector('.game-container');
-            for (let i = 0; i < 15; i++) {
-                setTimeout(() => {
-                    const particle = document.createElement('div');
-                    particle.className = 'particle';
-                    particle.style.left = Math.random() * 100 + '%';
-                    particle.style.fontSize = (Math.random() * 20 + 15) + 'px';
-                    particle.textContent = emoji;
-                    container.appendChild(particle);
-                    
-                    setTimeout(() => particle.remove(), 2000);
-                }, i * 100);
-            }
-        }
-
-        // ==================== 事件監聽器 ====================
-        setupEventListeners() {
-            // Clear button
-            document.getElementById('clearBtn').onclick = () => this.clearGuess();
-            
-            // Submit button  
-            document.getElementById('submitBtn').onclick = () => this.submitGuess();
-            
-            // Children mode toggle
-            document.getElementById('childrenModeBtn').onclick = () => this.toggleChildrenMode();
-            
-            // Achievement modal
-            document.getElementById('achievementBtn').onclick = () => this.showAchievementModal();
-            document.getElementById('closeAchievementModal').onclick = () => this.hideAchievementModal();
-            
-            // Keyboard support
-            document.addEventListener('keydown', (e) => {
-                if (e.key >= '0' && e.key <= '9') {
-                    this.addNumber(parseInt(e.key));
-                } else if (e.key === 'Backspace') {
-                    this.removeLastNumber();
-                } else if (e.key === 'Enter') {
-                    this.submitGuess();
-                } else if (e.key === 'Escape') {
-                    this.clearGuess();
-                }
-            });
-            
-            // Load saved children mode
-            const savedChildrenMode = this.loadData('childrenMode', false);
-            if (savedChildrenMode) {
-                this.toggleChildrenMode();
-            }
-        }
-
-        showAchievementModal() {
-            const modal = document.getElementById('achievementModal');
-            const list = document.getElementById('achievementList');
-            
-            // Hide new achievement badge
-            document.getElementById('newAchievementBadge').classList.add('hidden');
-            
-            // Achievement definitions for display
-            const allAchievements = [
-                { id: 'first_win', name: '首次勝利', description: '完成第一局遊戲', icon: '🏁' },
-                { id: 'quick_solver', name: '神算子', description: '3次內猜中答案', icon: '🧠' },
-                { id: 'persistent', name: '堅持不懈', description: '完成10局遊戲', icon: '💪' },
-                { id: 'level_5', name: '進階玩家', description: '達到等級5', icon: '⭐' },
-                { id: 'score_1000', name: '千分達人', description: '總分達到1000分', icon: '💯' },
-                { id: 'win_streak_5', name: '連勝王', description: '連續勝利5次', icon: '🔥' },
-                { id: 'score_10000', name: '萬分高手', description: '總分達到10000分', icon: '👑' },
-                { id: 'level_10', name: '大師級別', description: '達到等級10', icon: '🏆' },
-                { id: 'score_100000', name: '十萬巨星', description: '總分達到100000分', icon: '🌟' },
-            ];
-            
-            list.innerHTML = allAchievements.map(achievement => {
-                const unlocked = this.achievements.includes(achievement.id);
-                return `
-                    <div class="flex items-center space-x-3 p-3 rounded-lg ${unlocked ? 'bg-green-50 border border-green-200' : 'bg-gray-50 border border-gray-200'}">
-                        <div class="text-2xl ${unlocked ? '' : 'grayscale opacity-50'}">${achievement.icon}</div>
-                        <div class="flex-1">
-                            <div class="font-semibold ${unlocked ? 'text-green-800' : 'text-gray-600'}">${achievement.name}</div>
-                            <div class="text-sm ${unlocked ? 'text-green-600' : 'text-gray-500'}">${achievement.description}</div>
-                        </div>
-                        ${unlocked ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-lock text-gray-400"></i>'}
-                    </div>
-                `;
-            }).join('');
-            
-            modal.classList.remove('hidden');
-        }
-
-        hideAchievementModal() {
-            document.getElementById('achievementModal').classList.add('hidden');
-        }
-
-        // ==================== 彩蛋功能 ====================
-        setupEasterEggs() {
-            // Konami Code Easter Egg
-            this.setupKonamiCode();
-            
-            // Long Press Logo Easter Egg
-            this.setupLongPressEasterEgg();
-            
-            // Shake Detection Easter Egg
-            this.setupShakeDetection();
-            
-            // Time-based Easter Eggs
-            this.setupTimeBasedEasterEggs();
-            
-            // Keyboard Combo Easter Egg
-            this.setupKeyboardCombo();
-            
-            // Hidden Button Easter Egg
-            this.setupHiddenButton();
-        }
-
-        setupKonamiCode() {
-            const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
-            let konamiIndex = 0;
-            
-            document.addEventListener('keydown', (e) => {
-                if (e.code === konamiCode[konamiIndex]) {
-                    konamiIndex++;
-                    if (konamiIndex === konamiCode.length) {
-                        this.triggerKonamiEasterEgg();
-                        konamiIndex = 0;
-                    }
-                } else {
-                    konamiIndex = 0;
-                }
-            });
-        }
-
-        triggerKonamiEasterEgg() {
-            this.addMessage('🎮 Konami Code 啟動！獲得8-bit徽章！', false, 'success');
-            this.score += 500;
-            this.updateDisplay();
-            this.createParticleEffect('🕹️');
-            
-            // Play retro sound effect (if supported)
-            try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                oscillator.type = 'square';
-                oscillator.frequency.value = 440;
-                oscillator.connect(audioContext.destination);
-                oscillator.start();
-                oscillator.stop(audioContext.currentTime + 0.2);
-            } catch (e) {
-                console.log('Audio not supported');
-            }
-        }
-
-        setupLongPressEasterEgg() {
-            const logo = document.querySelector('.chat-header h1');
-            let pressTimer;
-            
-            logo.addEventListener('touchstart', (e) => {
-                pressTimer = setTimeout(() => {
-                    this.triggerLongPressEasterEgg();
-                    // Haptic feedback
-                    if (navigator.vibrate) {
-                        navigator.vibrate(100);
-                    }
-                }, 1200);
-            });
-            
-            logo.addEventListener('touchend', () => {
-                clearTimeout(pressTimer);
-            });
-            
-            logo.addEventListener('mousedown', (e) => {
-                pressTimer = setTimeout(() => {
-                    this.triggerLongPressEasterEgg();
-                }, 1200);
-            });
-            
-            logo.addEventListener('mouseup', () => {
-                clearTimeout(pressTimer);
-            });
-        }
-
-        triggerLongPressEasterEgg() {
-            this.addMessage('✨ 長按觸發！粒子爆發效果！', false, 'success');
-            this.createParticleEffect('💫');
-            this.experience += 100;
-            this.updateDisplay();
-        }
-
-        setupShakeDetection() {
-            if (window.DeviceMotionEvent) {
-                let lastX, lastY, lastZ;
-                let shakeThreshold = 13;
-                
-                window.addEventListener('devicemotion', (e) => {
-                    const acceleration = e.accelerationIncludingGravity;
-                    if (!acceleration) return;
-                    
-                    const curX = acceleration.x;
-                    const curY = acceleration.y;
-                    const curZ = acceleration.z;
-                    
-                    if (lastX !== undefined) {
-                        const deltaX = Math.abs(lastX - curX);
-                        const deltaY = Math.abs(lastY - curY);
-                        const deltaZ = Math.abs(lastZ - curZ);
-                        
-                        if (deltaX + deltaY + deltaZ > shakeThreshold) {
-                            this.triggerShakeEasterEgg();
-                        }
-                    }
-                    
-                    lastX = curX;
-                    lastY = curY;
-                    lastZ = curZ;
-                });
-            }
-        }
-
-        triggerShakeEasterEgg() {
-            this.addMessage('📱 偵測到搖動！啟動復古CRT濾鏡！', false, 'info');
-            document.body.classList.add('crt-filter');
-            setTimeout(() => {
-                document.body.classList.remove('crt-filter');
-            }, 3000);
-        }
-
-        setupTimeBasedEasterEggs() {
-            const now = new Date();
-            const hour = now.getHours();
-            const minute = now.getMinutes();
-            const month = now.getMonth() + 1;
-            const date = now.getDate();
-            
-            // 3:14 AM Easter Egg
-            if (hour === 3 && minute === 14) {
-                this.addMessage('🌙 夜貓模式啟動！深夜的神秘時刻...', false, 'info');
-                document.querySelector('.chat-header').style.background = 'linear-gradient(45deg, #1e1b4b, #312e81)';
-            }
-            
-            // April Fool's Day Easter Egg
-            if (month === 4 && date === 1) {
-                this.triggerAprilFoolsEasterEgg();
-            }
-        }
-
-        triggerAprilFoolsEasterEgg() {
-            this.addMessage('🐟 愚人節快樂！按鈕們要調皮一下...', false, 'success');
-            const buttons = document.querySelectorAll('button');
-            buttons.forEach(button => {
-                if (!button.innerHTML.includes('🐟')) {
-                    button.innerHTML += ' 🐟';
-                }
-            });
-            
-            // Remove fish emojis after April 2nd
-            setTimeout(() => {
-                if (new Date().getDate() > 1) {
-                    buttons.forEach(button => {
-                        button.innerHTML = button.innerHTML.replace(' 🐟', '');
-                    });
-                }
-            }, 24 * 60 * 60 * 1000);
-        }
-
-        setupKeyboardCombo() {
-            let ctrlPressed = false;
-            let altPressed = false;
-            
-            document.addEventListener('keydown', (e) => {
-                if (e.ctrlKey) ctrlPressed = true;
-                if (e.altKey) altPressed = true;
-                
-                if (ctrlPressed && altPressed && e.key === 't') {
-                    this.showTailwindCheatSheet();
-                }
-            });
-            
-            document.addEventListener('keyup', (e) => {
-                if (!e.ctrlKey) ctrlPressed = false;
-                if (!e.altKey) altPressed = false;
-            });
-        }
-
-        showTailwindCheatSheet() {
-            this.addMessage('📚 Tailwind CSS 秘笈已解鎖！', false, 'info');
-            const cheatSheet = `
-                <div class="bg-gray-100 p-4 rounded-lg text-xs">
-                    <strong>Tailwind 常用類別：</strong><br>
-                    • 間距：p-4, m-2, space-y-3<br>
-                    • 顏色：bg-blue-500, text-red-600<br>
-                    • 響應式：sm:, md:, lg:, xl:<br>
-                    • Flexbox：flex, justify-center, items-center<br>
-                    • 網格：grid, grid-cols-3, gap-4<br>
-                    按 ESC 關閉
-                </div>
-            `;
-            this.addMessage(cheatSheet, false);
-        }
-
-        setupHiddenButton() {
-            const hiddenBtn = document.getElementById('easterEggBtn');
-            let clickCount = 0;
-            
-            hiddenBtn.onclick = () => {
-                clickCount++;
-                if (clickCount === 1) {
-                    this.addMessage('🔍 你發現了隱藏按鈕！再點擊2次解鎖秘密...', false, 'info');
-                } else if (clickCount === 3) {
-                    this.addMessage('🎉 隱藏彩蛋解鎖！獲得神秘獎勵！', false, 'success');
-                    this.score += 1000;
-                    this.experience += 200;
-                    this.updateDisplay();
-                    this.createParticleEffect('🎁');
-                    clickCount = 0;
-                }
-            };
+    function loadPlayerData() {
+        const saved = localStorage.getItem('1a2b_playerData');
+        if (saved) {
+            playerData = { ...playerData, ...JSON.parse(saved) };
         }
     }
 
-    // ==================== Service Worker 註冊 ====================
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            const swCode = `
-                const CACHE_NAME = '1a2b-game-v1';
-                const urlsToCache = ['/'];
-                
-                self.addEventListener('install', event => {
-                    event.waitUntil(
-                        caches.open(CACHE_NAME)
-                            .then(cache => cache.addAll(urlsToCache))
-                    );
-                });
-                
-                self.addEventListener('fetch', event => {
-                    event.respondWith(
-                        caches.match(event.request)
-                            .then(response => response || fetch(event.request))
-                    );
-                });
-            `;
+    // 生成密碼
+    function generateSecretNumber() {
+        const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        let result = '';
+        for (let i = 0; i < 4; i++) {
+            const index = Math.floor(Math.random() * digits.length);
+            result += digits[index];
+            digits.splice(index, 1);
+        }
+        return result;
+    }
+
+    // 更新顯示
+    function updateDisplay() {
+        document.getElementById('scoreDisplay').textContent = playerData.totalScore.toLocaleString();
+        document.getElementById('levelDisplay').textContent = `Lv.${playerData.level}`;
+        document.getElementById('levelName').textContent = levelNames[Math.min(playerData.level - 1, levelNames.length - 1)];
+        document.getElementById('streakDisplay').textContent = playerData.winStreak;
+        
+        // 更新經驗條
+        const expInLevel = playerData.experience % 500;
+        const progress = (expInLevel / 500) * 100;
+        document.getElementById('levelProgress').style.width = `${progress}%`;
+    }
+
+    // 添加訊息
+    function addMessage(message, isUser = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user-message' : 'wolf-message'}`;
+        messageDiv.innerHTML = message;
+        chatBody.appendChild(messageDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    // 歡迎訊息
+    function addWelcomeMessage() {
+        setTimeout(() => addMessage('🎮 歡迎來到1A2B數字猜謎遊戲！'), 500);
+        setTimeout(() => addMessage('我已經想好了一個4位不重複的數字，你來猜猜看吧！'), 1000);
+        if (playerData.gamesPlayed > 0) {
+            setTimeout(() => addMessage(`歡迎回來！你目前是 ${levelNames[Math.min(playerData.level - 1, levelNames.length - 1)]} 等級，總分 ${playerData.totalScore.toLocaleString()} 分！`), 1500);
+        }
+    }
+
+    // 檢查猜測
+    function checkGuess() {
+        const guess = guessInput.value;
+        
+        if (guess.length !== 4 || !/^\d{4}$/.test(guess) || new Set(guess).size !== 4) {
+            addMessage(guess, true);
+            addMessage('請輸入4個不重複的數字！再試一次吧。🤔');
+            guessInput.value = '';
+            updateNumberButtons();
+            return;
+        }
+
+        attempts++;
+        addMessage(guess, true);
+
+        let a = 0, b = 0;
+        let correctPositions = [];
+        let wrongPositions = [];
+
+        for (let i = 0; i < 4; i++) {
+            if (guess[i] === secretNumber[i]) {
+                a++;
+                correctPositions.push({ digit: guess[i], pos: i + 1 });
+            } else if (secretNumber.includes(guess[i])) {
+                b++;
+                wrongPositions.push({ digit: guess[i], pos: i + 1 });
+            }
+        }
+
+        if (a === 4) {
+            handleWin();
+        } else {
+            addResultMessage(a, b, correctPositions, wrongPositions);
+            guessInput.value = '';
+            updateNumberButtons();
+        }
+    }
+
+    // 添加結果訊息
+    function addResultMessage(a, b, correctPositions, wrongPositions) {
+        if (isChildrenMode) {
+            let message = `<div>第 ${attempts} 次猜測結果：</div>`;
+            message += `<div class="result-explanation">`;
             
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
+            if (a > 0) {
+                message += `<div style="margin-bottom: 10px;">✅ 位置完全正確的數字：</div>`;
+                correctPositions.forEach(item => {
+                    message += `<span class="correct-position">數字 ${item.digit} 在第 ${item.pos} 位</span>`;
+                });
+            }
             
-            navigator.serviceWorker.register(swUrl)
-                .then(registration => console.log('SW registered:', registration))
-                .catch(error => console.log('SW registration failed:', error));
+            if (b > 0) {
+                message += `<div style="margin: 10px 0;">🔄 數字正確但位置錯誤：</div>`;
+                wrongPositions.forEach(item => {
+                    message += `<span class="wrong-position">數字 ${item.digit} 位置不對</span>`;
+                });
+            }
+            
+            if (a === 0 && b === 0) {
+                message += `<div style="text-align: center; color: #666;">❌ 這4個數字都不在答案中喔！</div>`;
+            }
+            
+            message += `</div>`;
+            addMessage(message);
+        } else {
+            const resultMessage = `<div>第 ${attempts} 次：</div><div class="result"><span class="A">${a}A</span><span class="B">${b}B</span></div>`;
+            addMessage(resultMessage);
+        }
+
+        // 提示訊息
+        if (attempts >= 5 && playerData.level === 1) {
+            addMessage('💡 小提示：A表示數字和位置都對，B表示數字對但位置不對', false);
+        }
+    }
+
+    // 處理勝利
+    function handleWin() {
+        const baseScore = Math.max(100 - (attempts - 1) * 10, 10);
+        const levelBonus = playerData.level * 5;
+        const streakBonus = playerData.winStreak * 2;
+        const totalScore = baseScore + levelBonus + streakBonus;
+
+        playerData.totalScore += totalScore;
+        playerData.experience += totalScore;
+        playerData.winStreak++;
+        playerData.gamesPlayed++;
+
+        // 檢查升級
+        const newLevel = Math.floor(playerData.experience / 500) + 1;
+        if (newLevel > playerData.level) {
+            playerData.level = newLevel;
+            showLevelUp();
+        }
+
+        addMessage(`🎉 太棒了！你猜對了！答案是 ${secretNumber}`, false);
+        addMessage(`🏆 獲得 ${totalScore} 分！(基礎: ${baseScore}, 等級獎勵: ${levelBonus}, 連勝獎勵: ${streakBonus})`, false);
+        
+        checkAchievements();
+        savePlayerData();
+        updateDisplay();
+
+        setTimeout(() => {
+            addMessage('🎮 新遊戲即將開始...', false);
+            setTimeout(restartGame, 2000);
+        }, 3000);
+    }
+
+    // 顯示升級
+    function showLevelUp() {
+        addMessage(`🎊 恭喜升級！現在是 Lv.${playerData.level} ${levelNames[Math.min(playerData.level - 1, levelNames.length - 1)]}！`, false);
+        createSparkleEffect();
+    }
+
+    // 重新開始遊戲
+    function restartGame() {
+        secretNumber = generateSecretNumber();
+        attempts = 0;
+        addMessage('🎯 新遊戲開始！我已經想好新的數字了，加油！', false);
+        guessInput.value = '';
+        updateNumberButtons();
+    }
+
+    // 更新數字按鈕
+    function updateNumberButtons() {
+        numberButtons.innerHTML = '';
+        const buttonLayout = [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+            ['C', 0, '←']
+        ];
+        
+        buttonLayout.forEach(row => {
+            row.forEach(item => {
+                const button = document.createElement('button');
+                button.textContent = item;
+                button.onclick = () => handleButtonClick(button, item);
+                
+                if (typeof item === 'number' && guessInput.value.includes(item.toString())) {
+                    button.disabled = true;
+                    button.classList.add('clicked');
+                }
+                
+                numberButtons.appendChild(button);
+            });
         });
     }
 
-    // ==================== 遊戲初始化 ====================
-    window.addEventListener('DOMContentLoaded', () => {
-        window.game = new Game1A2B();
+    // 處理按鈕點擊
+    function handleButtonClick(button, value) {
+        if (typeof value === 'number') {
+            addNumberToGuess(button, value);
+        } else if (value === '←') {
+            deleteLastDigit();
+        } else if (value === 'C') {
+            clearGuess();
+        }
+    }
+
+    // 添加數字到猜測
+    function addNumberToGuess(button, number) {
+        if (guessInput.value.length < 4 && !guessInput.value.includes(number.toString())) {
+            guessInput.value += number;
+            button.classList.add('clicked');
+            button.disabled = true;
+            
+            if (guessInput.value.length === 4) {
+                setTimeout(checkGuess, 300);
+            } else {
+                updateNumberButtons();
+            }
+        }
+    }
+
+    // 刪除最後一位數字
+    function deleteLastDigit() {
+        guessInput.value = guessInput.value.slice(0, -1);
+        updateNumberButtons();
+    }
+
+    // 清除猜測
+    function clearGuess() {
+        guessInput.value = '';
+        updateNumberButtons();
+    }
+
+    // 檢查成就
+    function checkAchievements() {
+        achievements.forEach(achievement => {
+            if (!playerData.achievements.includes(achievement.id) && achievement.condition()) {
+                playerData.achievements.push(achievement.id);
+                showAchievementNotification(achievement);
+            }
+        });
+    }
+
+    // 顯示成就通知
+    function showAchievementNotification(achievement) {
+        const notification = document.createElement('div');
+        notification.className = 'achievement-notification';
+        notification.innerHTML = `${achievement.icon} 成就解鎖：${achievement.name}`;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 3000);
+    }
+
+    // 創建閃爍特效
+    function createSparkleEffect() {
+        const effect = document.createElement('div');
+        effect.className = 'level-up-effect';
+        document.body.appendChild(effect);
+        
+        for (let i = 0; i < 20; i++) {
+            setTimeout(() => {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.textContent = '✨';
+                sparkle.style.left = Math.random() * window.innerWidth + 'px';
+                sparkle.style.top = Math.random() * window.innerHeight + 'px';
+                effect.appendChild(sparkle);
+                
+                setTimeout(() => {
+                    if (effect.contains(sparkle)) {
+                        effect.removeChild(sparkle);
+                    }
+                }, 2000);
+            }, i * 100);
+        }
+        
+        setTimeout(() => {
+            if (document.body.contains(effect)) {
+                document.body.removeChild(effect);
+            }
+        }, 4000);
+    }
+
+    // 兒童模式切換
+    function toggleChildrenMode() {
+        isChildrenMode = !isChildrenMode;
+        const btn = document.getElementById('childrenModeBtn');
+        
+        if (isChildrenMode) {
+            btn.textContent = '👨 普通模式';
+            document.body.classList.add('children-mode');
+            addMessage('🎨 已切換到兒童模式！會有更詳細的說明喔！', false);
+        } else {
+            btn.textContent = '👶 兒童模式';
+            document.body.classList.remove('children-mode');
+            addMessage('💼 已切換到普通模式', false);
+        }
+    }
+
+    // 顯示成就彈窗
+    function showAchievementModal() {
+        const modal = document.getElementById('achievementModal');
+        const list = document.getElementById('achievementList');
+        
+        list.innerHTML = achievements.map(achievement => {
+            const unlocked = playerData.achievements.includes(achievement.id);
+            return `
+                <div class="achievement-item ${unlocked ? 'unlocked' : 'locked'}">
+                    <div class="achievement-icon">${achievement.icon}</div>
+                    <div class="achievement-info">
+                        <h4>${achievement.name}</h4>
+                        <p>${achievement.desc}</p>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        modal.style.display = 'flex';
+    }
+
+    // 關閉成就彈窗
+    function closeAchievementModal() {
+        document.getElementById('achievementModal').style.display = 'none';
+    }
+
+    // 事件監聽
+    document.getElementById('childrenModeBtn').onclick = toggleChildrenMode;
+    document.getElementById('achievementBtn').onclick = showAchievementModal;
+
+    // 鍵盤支援
+    document.addEventListener('keydown', (e) => {
+        if (e.key >= '0' && e.key <= '9') {
+            const number = parseInt(e.key);
+            const buttons = document.querySelectorAll('.number-buttons button');
+            buttons.forEach(btn => {
+                if (btn.textContent == number) {
+                    handleButtonClick(btn, number);
+                }
+            });
+        } else if (e.key === 'Backspace') {
+            deleteLastDigit();
+        } else if (e.key === 'Enter') {
+            if (guessInput.value.length === 4) {
+                checkGuess();
+            }
+        }
     });
 
-    // ==================== 防止縮放 ====================
+    // 防止縮放
+    document.addEventListener('dblclick', e => e.preventDefault());
     document.addEventListener('gesturestart', e => e.preventDefault());
-    document.addEventListener('gesturechange', e => e.preventDefault());
-    document.addEventListener('gestureend', e => e.preventDefault());
+
+    // 初始化遊戲
+    window.onload = init;
 </script>
 
 
